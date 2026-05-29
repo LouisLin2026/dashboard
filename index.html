@@ -18,32 +18,22 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;min-height:100vh}
-
-/* 頂部 */
 .header{background:var(--accent);color:#fff;padding:14px 16px 10px;user-select:none}
 .h-title{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
-.h-sub{font-size:11px;opacity:.7;margin-top:2px}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;flex-shrink:0}
+.h-sub{font-size:11px;opacity:.7;margin-top:2px;display:flex;align-items:center;gap:6px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;transition:background .3s}
 .sync-dot.off{background:#fbbf24}
-
-/* 頁籤 */
+.sync-dot.err{background:#f87171}
 .nav{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
 .nav-btn{flex:1;min-width:80px;padding:11px 8px 9px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px}
 .nav-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
 .nav-btn .icon{font-size:18px;line-height:1}
 .nav-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}
-
-/* 內容區 */
 .content{padding:12px 14px;max-width:640px;margin:0 auto}
-
-/* 統計列 */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.stat-v{font-size:20px;font-weight:700}
-.stat-l{font-size:10px;color:var(--muted);margin-top:1px}
-
-/* 週次切換 */
+.stat-v{font-size:20px;font-weight:700}.stat-l{font-size:10px;color:var(--muted);margin-top:1px}
 .wtabs{display:flex;border:1px solid var(--border);border-radius:var(--radius-s);overflow:hidden;margin-bottom:10px;background:var(--surface)}
 .wt{flex:1;padding:8px 6px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;border-right:1px solid var(--border);transition:background .12s}
 .wt:last-child{border-right:none}
@@ -51,8 +41,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .wt-sub{font-size:10px;opacity:.7}
 .wt-n{font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:var(--red-l);color:var(--red);margin-top:1px;min-width:20px;text-align:center}
 .wt.on .wt-n{background:rgba(255,255,255,.25);color:#fff}
-
-/* 工具列 */
 .toolbar{display:flex;align-items:center;gap:6px;margin-bottom:9px;flex-wrap:wrap}
 .vtog{display:flex;border:1px solid var(--border);border-radius:var(--radius-s);overflow:hidden;background:var(--surface)}
 .vb{font-size:12px;padding:4px 10px;border:none;background:none;font-family:inherit;cursor:pointer;color:var(--muted)}
@@ -61,8 +49,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .tb:hover{background:var(--bg)}
 .sp{flex:1}
 .clr-btn{font-size:11px;padding:3px 9px;border:1px solid var(--red);border-radius:var(--radius-s);background:none;cursor:pointer;color:var(--red);font-family:inherit}
-
-/* section */
 .sec{margin-bottom:6px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .sh{display:flex;align-items:center;gap:7px;padding:9px 12px;background:var(--bg);cursor:pointer;user-select:none;border-bottom:1px solid var(--border)}
 .sh:hover{background:#F0EDE8}
@@ -72,8 +58,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .sec-cnt{font-size:11px;color:var(--muted);background:var(--border);border-radius:20px;padding:1px 7px}
 .sec-body{display:none;padding:5px 6px 6px}
 .sec-body.op{display:block}
-
-/* 卡片 */
 .card{border:1px solid var(--border);border-radius:var(--radius-s);margin-bottom:4px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .card.editing{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-l)}
 .card.manual-card{border-left:3px solid var(--blue)}
@@ -95,7 +79,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .c-saved{font-size:10px;color:var(--green);display:none;flex-shrink:0}
 .card-btns{display:flex;gap:4px;flex-shrink:0}
 .edit-btn{font-size:11px;padding:3px 8px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--muted);font-family:inherit}
-.edit-btn:hover{background:var(--bg)}
 .del-btn{font-size:11px;padding:3px 7px;border:1px solid var(--red);border-radius:var(--radius-s);background:none;cursor:pointer;color:var(--red);font-family:inherit}
 .card-body{display:none;padding:0 10px 10px;border-top:1px solid var(--border)}
 .card-body.op{display:block}
@@ -104,10 +87,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .fi-label{color:var(--hint);white-space:nowrap;width:44px;flex-shrink:0}
 .fi-val{color:var(--muted)}
 .upd-box{background:var(--bg);border-radius:var(--radius-s);padding:5px 8px;font-size:11.5px;color:var(--muted);line-height:1.6;margin:3px 0;border:1px solid var(--border)}
-.done-card{opacity:.4}
-.done-card .c-title{text-decoration:line-through}
-
-/* 編輯區 */
+.done-card{opacity:.4}.done-card .c-title{text-decoration:line-through}
 .edit-area{background:var(--accent-l);border-radius:var(--radius-s);padding:9px 10px;margin-top:7px;border:1px solid #C8D8F0;display:none}
 .edit-row{display:flex;align-items:center;gap:7px;margin-bottom:6px}
 .edit-label{font-size:11px;color:var(--muted);white-space:nowrap;width:46px;flex-shrink:0}
@@ -115,8 +95,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .edit-area textarea{resize:vertical;min-height:50px}
 .save-btn{font-size:12px;padding:5px 14px;border:none;border-radius:var(--radius-s);background:var(--accent);color:#fff;cursor:pointer;font-weight:700;font-family:inherit}
 .cancel-btn{font-size:12px;padding:5px 11px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--muted);font-family:inherit}
-
-/* 新增面板 */
 .add-panel{border:1px solid var(--blue);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
 .add-hdr{display:flex;align-items:center;gap:7px;padding:9px 12px;background:var(--blue-l);cursor:pointer;user-select:none}
 .add-hdr-t{font-size:13px;font-weight:700;color:var(--blue);flex:1}
@@ -127,36 +105,31 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .add-grid.full{grid-template-columns:1fr}
 .field label{font-size:11px;color:var(--muted);display:block;margin-bottom:3px;font-weight:500}
 .field input,.field select,.field textarea{width:100%;font-size:12px;padding:5px 8px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;background:var(--bg);color:var(--text)}
-.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);background:#fff}
 .field textarea{resize:vertical;min-height:44px}
 .add-footer{display:flex;align-items:center;gap:8px;margin-top:8px}
 .add-btn{font-size:13px;padding:6px 18px;border:none;border-radius:var(--radius-s);background:var(--accent);color:#fff;cursor:pointer;font-weight:700;font-family:inherit}
 .add-reset{font-size:12px;padding:5px 12px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--muted);font-family:inherit}
 .add-msg{font-size:12px;color:var(--green);display:none;font-weight:500}
-
-/* 週報 */
 .mail-meta{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;margin-bottom:10px;font-size:12px}
-.m-row{display:flex;gap:8px;margin-bottom:3px}
-.m-row:last-child{margin-bottom:0}
+.m-row{display:flex;gap:8px;margin-bottom:3px}.m-row:last-child{margin-bottom:0}
 .m-label{color:var(--hint);white-space:nowrap;font-weight:500}
 .m-val{color:var(--text);font-weight:600}
 .mail-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px}
-.mail-header{background:var(--bg);padding:8px 12px;font-size:12px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)}
+.mail-header-bar{background:var(--bg);padding:8px 12px;font-size:12px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)}
 .mail-body{padding:14px 16px;font-size:12.5px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:500px;overflow-y:auto;background:#fff;font-family:'Noto Sans TC',sans-serif}
-
-/* 產出 */
 .exp-info{background:var(--amber-l);border:1px solid #E8C380;border-radius:var(--radius-s);padding:10px 12px;font-size:12.5px;color:#7A4500;margin-bottom:10px;line-height:1.65}
 .exp-data{font-size:11px;font-family:monospace;white-space:pre-wrap;max-height:240px;overflow-y:auto;background:#1E1E1E;padding:10px;border-radius:var(--radius-s);color:#9CDCFE;line-height:1.6;margin-top:8px;display:none}
-
-/* 按鈕 */
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}
 .btn-p{display:inline-flex;align-items:center;gap:5px;padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-s);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .btn-p:active{opacity:.85}
 .btn-s{display:inline-flex;align-items:center;gap:5px;padding:9px 14px;background:#fff;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;color:var(--text)}
-.btn-s:active{background:var(--bg)}
 .note{font-size:11px;color:var(--hint);margin-top:6px;line-height:1.55}
 .prog{font-size:11.5px;color:var(--muted);margin-top:6px}
 .empty{text-align:center;padding:32px 16px;color:var(--hint);font-size:13px}
+.loading-box{text-align:center;padding:40px 16px;color:var(--hint)}
+.loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.update-badge{background:var(--accent);color:#fff;font-size:10px;padding:2px 7px;border-radius:20px;margin-left:5px}
 </style>
 </head>
 <body>
@@ -166,7 +139,10 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <span class="sync-dot" id="syn-dot"></span>
     🏭 宜蘭廠區專案管理
   </div>
-  <div class="h-sub">Louis Lin · 雙週 5/26–6/6 · <span id="syn-txt">同步中...</span></div>
+  <div class="h-sub">
+    <span id="syn-txt">載入中...</span>
+    <span id="last-update"></span>
+  </div>
 </div>
 
 <div class="nav">
@@ -194,14 +170,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <div class="stat"><div class="stat-v" id="s-done" style="color:var(--green)">—</div><div class="stat-l">已完成</div></div>
     <div class="stat"><div class="stat-v" id="s-upd">—</div><div class="stat-l">已更新</div></div>
   </div>
-
   <div class="wtabs">
-    <button class="wt on" id="wt-1" onclick="swWeek(1)">第一週<span class="wt-sub">5/26–5/30</span><span class="wt-n" id="wn-1">—</span></button>
-    <button class="wt" id="wt-2" onclick="swWeek(2)">第二週<span class="wt-sub">6/1–6/6</span><span class="wt-n" id="wn-2">—</span></button>
+    <button class="wt on" id="wt-1" onclick="swWeek(1)">第一週<span class="wt-sub" id="wt-sub-1">—</span><span class="wt-n" id="wn-1">—</span></button>
+    <button class="wt" id="wt-2" onclick="swWeek(2)">第二週<span class="wt-sub" id="wt-sub-2">—</span><span class="wt-n" id="wn-2">—</span></button>
     <button class="wt" id="wt-0" onclick="swWeek(0)">持續推進<span class="wt-sub">6/7以後</span><span class="wt-n" id="wn-0">—</span></button>
   </div>
-
-  <!-- 新增面板 -->
   <div class="add-panel">
     <div class="add-hdr" onclick="togAdd()">
       <span style="font-size:16px">➕</span>
@@ -213,9 +186,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
         <div class="field"><label>部門 *</label><select id="af-dept"><option value="">選擇</option><option>創新中心</option><option>設備課</option><option>生產部</option><option>研發部</option><option>廠務課</option><option>管理部</option><option>董事長室</option></select></div>
         <div class="field"><label>分類</label><input type="text" id="af-cat" placeholder="例：TNA裝機"></div>
       </div>
-      <div class="add-grid full">
-        <div class="field"><label>任務描述 *</label><input type="text" id="af-desc" placeholder="簡要描述任務內容"></div>
-      </div>
+      <div class="add-grid full"><div class="field"><label>任務描述 *</label><input type="text" id="af-desc" placeholder="簡要描述任務內容"></div></div>
       <div class="add-grid">
         <div class="field"><label>負責人</label><input type="text" id="af-owner" placeholder="例：Louis"></div>
         <div class="field"><label>到期日</label><input type="text" id="af-due" placeholder="M/D，例如 6/6"></div>
@@ -224,9 +195,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
         <div class="field"><label>狀態</label><select id="af-status"><option>尚未開始</option><option>進行中</option><option>已完成</option><option>已暫緩</option></select></div>
         <div class="field"><label>顯示週次</label><select id="af-wk"><option value="1">第一週</option><option value="2">第二週</option><option value="0">持續推進</option></select></div>
       </div>
-      <div class="add-grid full">
-        <div class="field"><label>初始說明（選填）</label><textarea id="af-upd" placeholder="填入初始進度說明..."></textarea></div>
-      </div>
+      <div class="add-grid full"><div class="field"><label>初始說明（選填）</label><textarea id="af-upd" placeholder="填入初始進度說明..."></textarea></div></div>
       <div class="add-footer">
         <button class="add-btn" onclick="addItem()">新增</button>
         <button class="add-reset" onclick="resetForm()">清空</button>
@@ -234,7 +203,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
       </div>
     </div>
   </div>
-
   <div class="toolbar">
     <div class="vtog">
       <button class="vb on" id="vb-c" onclick="setView('c')">精簡</button>
@@ -245,9 +213,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <div class="sp"></div>
     <button class="clr-btn" onclick="clearUpdates()">清除更新</button>
   </div>
-
-  <div id="board-content"></div>
-
+  <div id="board-content">
+    <div class="loading-box"><div class="loading-spinner"></div><div>從 Firebase 載入任務中...</div></div>
+  </div>
   <div style="margin-top:10px">
     <button class="btn-p" onclick="doExport()">📤 產出更新控管表</button>
   </div>
@@ -257,13 +225,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 <!-- 週報 -->
 <div id="tab-mail" class="content" style="display:none">
   <div class="mail-meta">
-    <div class="m-row"><span class="m-label">收件人</span><span class="m-val">danny@bfycorp.com；yumingda@bfycorp.com</span></div>
-    <div class="m-row"><span class="m-label">主旨</span><span class="m-val">【週報】宜蘭廠區工作進度彙報 2026/5/26 — Louis Lin</span></div>
-    <div class="m-row"><span class="m-label">週期</span><span class="m-val">2026/5/19（一）至 5/26（五）</span></div>
+    <div class="m-row"><span class="m-label">收件人</span><span class="m-val" id="mail-to">—</span></div>
+    <div class="m-row"><span class="m-label">主旨</span><span class="m-val" id="mail-subj">—</span></div>
+    <div class="m-row"><span class="m-label">週期</span><span class="m-val" id="mail-period">—</span></div>
   </div>
   <div class="mail-wrap">
-    <div class="mail-header">📄 郵件內文</div>
-    <div class="mail-body" id="mail-body"></div>
+    <div class="mail-header-bar">📄 郵件內文</div>
+    <div class="mail-body" id="mail-body">載入中...</div>
   </div>
   <div class="btn-row">
     <button class="btn-p" onclick="openMail()">✉️ 開啟郵件寄送</button>
@@ -276,7 +244,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 <div id="tab-export" class="content" style="display:none">
   <div class="exp-info">
     📌 將看板上填寫的進度更新整理成可直接貼給 Claude 的格式。<br>
-    Claude 收到後會自動更新 Excel 控管表並提供下載連結。
+    Claude 收到後會自動更新 Excel 控管表並同步寫回 Firebase，網頁下次開啟即自動更新。
   </div>
   <div class="btn-row">
     <button class="btn-p" onclick="doExport2()">📋 產出並複製給 Claude</button>
@@ -289,106 +257,72 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 <script>
 // ── Firebase REST ──────────────────────────────────────
 const FB = 'https://evaluation-survey-form-default-rtdb.firebaseio.com';
-const DB_PATH = 'dashboard/louis'; // 獨立路徑，不影響品評資料
+const TASKS_PATH  = 'dashboard/louis/tasks';   // Claude 寫入任務清單
+const CHANGES_PATH = 'dashboard/louis/changes'; // 進度更新
+const MANUALS_PATH = 'dashboard/louis/manuals'; // 手動新增
+const META_PATH   = 'dashboard/louis/meta';    // 週報設定、週次標題等
 
 async function fbGet(p){
-  try{const r=await fetch(`${FB}/${p}.json`);if(!r.ok)return null;return r.json();}catch(e){return null;}
+  try{ const r=await fetch(`${FB}/${p}.json`); if(!r.ok) return null; return r.json(); }
+  catch(e){ return null; }
 }
 async function fbSet(p,v){
-  try{await fetch(`${FB}/${p}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});return true;}catch(e){return false;}
+  try{ await fetch(`${FB}/${p}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)}); return true; }
+  catch(e){ return false; }
 }
 
 // ── 設定 ──────────────────────────────────────────────
-const TODAY = '5/27';
-const SOPT = ['進行中','尚未開始','已完成','已暫緩'];
-const SBG = {進行中:'var(--amber-l)',尚未開始:'var(--blue-l)',已完成:'var(--green-l)',已暫緩:'var(--red-l)'};
-const SCO = {進行中:'var(--amber)',尚未開始:'var(--blue)',已完成:'var(--green)',已暫緩:'var(--red)'};
-const TNA = ['TNA 賠償','TNA 採購','TNA 裝機','TNA裝機','Tna UK 訪廠','TNA設備'];
-const AUTO = ['自動化規劃','PLC自動化'];
-const BPA = ['BPA自動裝箱規劃','外包裝規劃'];
+const SOPT=['進行中','尚未開始','已完成','已暫緩'];
+const SBG={進行中:'var(--amber-l)',尚未開始:'var(--blue-l)',已完成:'var(--green-l)',已暫緩:'var(--red-l)'};
+const SCO={進行中:'var(--amber)',尚未開始:'var(--blue)',已完成:'var(--green)',已暫緩:'var(--red)'};
+const TNA=['TNA 賠償','TNA 採購','TNA 裝機','TNA裝機','Tna UK 訪廠','TNA設備'];
+const AUTO=['自動化規劃','PLC自動化'];
+const BPA=['BPA自動裝箱規劃','外包裝規劃'];
 
-const W1SECS = [
-  {id:'w1ov',lb:'🔴 逾期未完成',f:i=>i.p==='over'&&ST(i)!=='已完成'},
-  {id:'w1tn',lb:'🔧 TNA & 平台',f:i=>i.p==='week1'&&[...TNA,'Tna UK 訪廠'].includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'w1au',lb:'⚙️ 自動化 & PLC',f:i=>i.p==='week1'&&AUTO.includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'w1bp',lb:'📦 BPA 包裝自動化',f:i=>i.p==='week1'&&BPA.includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'w1eq',lb:'🏭 設備 & 生產 & 合約',f:i=>i.p==='week1'&&![...TNA,'Tna UK 訪廠',...AUTO,...BPA].includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'w1mn',lb:'🔖 手動新增',f:i=>i.manual&&i.week===1&&ST(i)!=='已完成'},
-  {id:'w1dn',lb:'✅ 已完成',f:i=>i.week===1&&ST(i)==='已完成'},
-];
-const W2SECS = [
-  {id:'w2tn',lb:'🔧 TNA & 平台',f:i=>i.p==='week2'&&[...TNA,'Tna UK 訪廠','TNA 裝機'].includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'w2au',lb:'⚙️ 自動化 & PLC',f:i=>i.p==='week2'&&AUTO.includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'w2pr',lb:'🏭 生產 & 設備 & 研發',f:i=>i.p==='week2'&&![...TNA,'Tna UK 訪廠','TNA 裝機',...AUTO,...BPA].includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'w2bp',lb:'📦 包裝自動化',f:i=>i.p==='week2'&&BPA.includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'w2mn',lb:'🔖 手動新增',f:i=>i.manual&&i.week===2&&ST(i)!=='已完成'},
-  {id:'w2dn',lb:'✅ 已完成',f:i=>i.week===2&&ST(i)==='已完成'},
-];
-const ONSECS = [
-  {id:'on-au',lb:'⚙️ 自動化 & TNA',f:i=>i.p==='on'&&[...AUTO,...TNA,'Tna UK 訪廠'].includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'on-pr',lb:'🏭 產能 & 設備',f:i=>i.p==='on'&&['產能提升','設備管理','製程優化','新設備開發'].includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'on-bp',lb:'📦 包裝自動化',f:i=>i.p==='on'&&BPA.includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'on-rd',lb:'🧪 研發 & 新品',f:i=>i.p==='on'&&['新品開發'].includes(i.cat)&&ST(i)!=='已完成'},
-  {id:'on-ot',lb:'📂 其他',f:i=>i.p==='on'&&!([...AUTO,...TNA,'Tna UK 訪廠',...BPA,'產能提升','設備管理','製程優化','新設備開發','新品開發'].includes(i.cat))&&ST(i)!=='已完成'},
-  {id:'on-mn',lb:'🔖 手動新增',f:i=>i.manual&&i.week==0&&ST(i)!=='已完成'},
-];
-
-// ── 資料 ──────────────────────────────────────────────
-const BASE = [
-  {row:10,num:'設備課-01',dept:'設備課',cat:'設備管理',desc:'50D 與 58D 零件盤點',owner:'阿昌/張金城',due:'5/28',status:'進行中',week:1,p:'week1',update:'針對50D與58D設備進行所有零件、核心螺旋及模具全面盤點，嚴禁遺失'},
-  {row:11,num:'設備課-02',dept:'設備課',cat:'三冊四表',desc:'整理現場所使用表單（三冊四表）',owner:'Louis',due:'5/29',status:'進行中',week:1,p:'week1',update:'5/15確認：製一課磨粉參數未記錄，製二課米片成形未依機台別，製三課包裝機操作參數未記錄'},
-  {row:12,num:'設備課-03',dept:'設備課',cat:'設備管理',desc:'50D 機台保養與軸承檢測',owner:'阿昌',due:'5/30',status:'進行中',week:1,p:'week1',update:'進行50D機台預防性保養，確認結構可用性'},
-  {row:28,num:'設備課-19',dept:'設備課',cat:'自動化規劃',desc:'PLC保護貼採購（FX5U防塵備品）',owner:'阿昌',due:'5/30',status:'尚未開始',week:1,p:'week1',update:'5/25確認：發包合約需註明PLC附帶保護貼並多備幾片'},
-  {row:36,num:'創新中心-08',dept:'創新中心',cat:'BPA自動裝箱規劃',desc:'整理產品與紙箱規格資料',owner:'Una Kuo',due:'5/29',status:'進行中',week:1,p:'week1',update:'5/26同步提供松川調查表給產品課填寫'},
-  {row:37,num:'創新中心-09',dept:'創新中心',cat:'BPA自動裝箱規劃',desc:'拍攝現有裝箱模式影片/照片',owner:'Una Kuo',due:'5/29',status:'進行中',week:1,p:'week1',update:'拍攝人工裝箱照片與影片，提供BPA團隊作自動化設計參考'},
-  {row:38,num:'創新中心-10',dept:'創新中心',cat:'BPA自動裝箱規劃',desc:'確認紙箱型式與通路需求',owner:'Louis/Cathy',due:'5/29',status:'尚未開始',week:1,p:'week1',update:''},
-  {row:42,num:'創新中心-14',dept:'創新中心',cat:'產能提升',desc:'米花產線產能測試（目標200kg/hr）',owner:'余明達/Louis',due:'5/29',status:'進行中',week:1,p:'week1',update:'5/22安排瑞祥進行最低產能口味測試'},
-  {row:52,num:'創新中心-24',dept:'創新中心',cat:'Tna UK 訪廠',desc:'待TNA提供平台腳架與地板連接規範',owner:'Louis',due:'5/29',status:'進行中',week:1,p:'week1',update:''},
-  {row:82,num:'創新中心-54',dept:'創新中心',cat:'自動化規劃',desc:'電磁閥與氣壓缸品牌決議（SMC已決議）',owner:'林祿偉',due:'5/30',status:'進行中',week:1,p:'week1',update:'5/26決議全廠採用SMC氣動元件，待更新電控規範書'},
-  {row:83,num:'創新中心-55',dept:'創新中心',cat:'自動化規劃',desc:'設備品牌規範表格建立（採購發包合約附件）',owner:'游荃傑',due:'5/30',status:'進行中',week:1,p:'week1',update:'5/25初版已發布，與瑞派克會議後有更新，待正式發布'},
-  {row:88,num:'創新中心-60',dept:'創新中心',cat:'TNA裝機',desc:'包裝機平台修改圖面說明文件',owner:'林祿偉',due:'5/30',status:'進行中',week:1,p:'week1',update:'5/26已發信給瑞派克說明三項修改細節，同步請TNA更新圖面'},
-  {row:89,num:'創新中心-61',dept:'創新中心',cat:'TNA裝機',desc:'米花線設備工藝流程圖與輸送帶圖紙',owner:'林祿偉',due:'5/30',status:'進行中',week:1,p:'week1',update:'5/26已提供瑞派克相關規劃圖面，待對方確認'},
-  {row:90,num:'創新中心-62',dept:'創新中心',cat:'TNA裝機',desc:'平台安裝時程表（供瑞派克回填）',owner:'林祿偉',due:'5/30',status:'進行中',week:1,p:'week1',update:'5/26已提供安裝時程規劃給瑞派克，待回填工時人力'},
-  {row:92,num:'創新中心-64',dept:'創新中心',cat:'TNA裝機',desc:'NP & 薯片機HMI報價+原始碼（小賴）',owner:'林祿偉',due:'5/30',status:'進行中',week:1,p:'week1',update:'5/25指派小賴進行報價；同步要求廠商提供原始程式碼'},
-  {row:108,num:'董事長室-01',dept:'董事長室',cat:'NDA及合約',desc:'K-Tron NDT 合約',owner:'陳淑薇',due:'5/29',status:'進行中',week:1,p:'week1',update:'5/25律師已回復，待秘書確認後提供'},
-  {row:109,num:'董事長室-02',dept:'董事長室',cat:'NDA及合約',desc:'X光機合同（付款條件變更，待重新用印）',owner:'陳淑薇',due:'5/29',status:'進行中',week:1,p:'week1',update:'5/26因付款條件變更，請同和提供變更後合同後重新用印'},
-  {row:110,num:'董事長室-03',dept:'董事長室',cat:'NDA及合約',desc:'給袋機合同（已掃描5/26掛號寄出）',owner:'陳淑薇',due:'5/29',status:'進行中',week:1,p:'week1',update:'5/26合同已掃描，郵局掛號寄出'},
-  // 第二週
-  {row:8,num:'研發部-02',dept:'研發部',cat:'新品開發',desc:'高蛋白原料採購方針評估會議',owner:'蔡媛芳',due:'6/1',status:'尚未開始',week:2,p:'week2',update:''},
-  {row:13,num:'設備課-04',dept:'設備課',cat:'新品開發',desc:'50D全輸送螺旋配件確認與整合',owner:'阿昌',due:'6/1',status:'進行中',week:2,p:'week2',update:'TVP螺旋不動，50D產線新增全輸送螺旋；確認相關配件與模具是否齊全'},
-  {row:14,num:'設備課-05',dept:'設備課',cat:'產能提升',desc:'成型機抽風驗證（兩週內完成）',owner:'Louis',due:'6/4',status:'進行中',week:2,p:'week2',update:'確認抽風後是否能配合冷卻措施徹底解決產品黏連問題'},
-  {row:43,num:'創新中心-15',dept:'創新中心',cat:'TNA 裝機',desc:'大陸技師入關文件提早辦理',owner:'Louis',due:'6/1',status:'尚未開始',week:2,p:'week2',update:''},
-  {row:44,num:'創新中心-16',dept:'創新中心',cat:'外包裝規劃',desc:'自動化包裝線規劃（BPA→董事長報告）',owner:'Danny/Louis',due:'6/5',status:'進行中',week:2,p:'week2',update:'5/22修改包裝順序流程圖，重新向TNA報價，確認三台開箱機配置'},
-  {row:54,num:'創新中心-26',dept:'創新中心',cat:'Tna UK 訪廠',desc:'教育訓練手冊翻譯（含X光機/給袋機）',owner:'Louis/陳敬穆',due:'6/5',status:'進行中',week:2,p:'week2',update:'TNA已提供英文版手冊，5/21轉發給副總及阿穆翻譯'},
-  {row:62,num:'創新中心-34',dept:'創新中心',cat:'Tna UK 訪廠',desc:'灑粉替換套組報價確認',owner:'Louis',due:'6/5',status:'進行中',week:2,p:'week2',update:'5/9已提供相關報價及賠償方案'},
-  {row:72,num:'創新中心-44',dept:'創新中心',cat:'TNA設備',desc:'瑞派克設備後續討論',owner:'Louis',due:'6/1',status:'進行中',week:2,p:'week2',update:'5/22已準備問題集（含包裝機順序、噴油噴糖、製一製二連線等）'},
-  {row:78,num:'創新中心-50',dept:'創新中心',cat:'PLC自動化',desc:'PLC & Sensor規格選型持續推進',owner:'林祿偉',due:'6/6',status:'進行中',week:2,p:'week2',update:'5/26關於HMI等相關電控元件持續找廠商進行設備選型建議'},
-  {row:94,num:'創新中心-66',dept:'創新中心',cat:'PLC自動化',desc:'jack提供崑崙HMI 15吋型號及丹佛斯/西門子變頻器型號',owner:'jack',due:'6/6',status:'進行中',week:2,p:'week2',update:'5/25指派jack整理崑崙HMI 15吋相容性型號及丹佛斯/西門子具體電控型號資料'},
-  // 持續推進
-  {row:7,num:'研發部-01',dept:'研發部',cat:'新品開發',desc:'高蛋白原料與配方評估',owner:'Louis',due:'8/30',status:'進行中',week:0,p:'on',update:'5/19完成AI輔助開發新配方，待原料資料搜尋及樣品索取'},
-  {row:33,num:'創新中心-05',dept:'創新中心',cat:'TNA 採購',desc:'Spray Gun Kit規格確認及O-Ring備件',owner:'Louis',due:'6/15',status:'進行中',week:0,p:'on',update:'5/26已發信請Tim確認噴頭規格，待確認後進行請購'},
-  {row:45,num:'創新中心-17',dept:'創新中心',cat:'產能提升',desc:'乾燥機採購（400kg+，目標500kg）',owner:'Louis',due:'6/15',status:'進行中',week:0,p:'on',update:'採購400kg以上乾燥機；米花線調查英國廠商，寬度1.5米'},
-  {row:84,num:'創新中心-56',dept:'創新中心',cat:'自動化規劃',desc:'爆米花線電控設計發包（電眼+PLC聯動）',owner:'林祿偉',due:'7/31',status:'進行中',week:0,p:'on',update:'5/25確認：電眼偵測物料高度與速度，PLC聯動噴油噴糖比例，實現一鍵啟停'},
-  {row:85,num:'創新中心-57',dept:'創新中心',cat:'自動化規劃',desc:'薯片線電控原理說明書（jack提供）',owner:'林祿偉',due:'6/15',status:'進行中',week:0,p:'on',update:'5/25確認：jack撰寫薯片線電控工藝說明書，台灣團隊負責後續維護'},
-  {row:86,num:'創新中心-58',dept:'創新中心',cat:'自動化規劃',desc:'震動台料位高度自動控制方案（FX5U聯動）',owner:'林祿偉',due:'6/15',status:'進行中',week:0,p:'on',update:'5/25確認：智能Sensor偵測物料高度→FX5U聯動控制震動台流量'},
-  {row:91,num:'創新中心-63',dept:'創新中心',cat:'TNA裝機',desc:'大陸技師來台入台申請文件辦理',owner:'林祿偉/jack',due:'6/30',status:'進行中',week:0,p:'on',update:'5/25確認：確認大陸技師人員名單、文件辦理進度'},
-  {row:93,num:'創新中心-65',dept:'創新中心',cat:'新設備開發',desc:'確認義大利Re Pietro薯片機功能',owner:'Louis',due:'6/30',status:'進行中',week:0,p:'on',update:'5/26發信確認Lecithin需求及收件人資訊'},
-  {row:96,num:'創新中心-68',dept:'創新中心',cat:'PLC自動化',desc:'工業4.0/5.0 — 全廠MES製造執行系統連線方案',owner:'林祿偉',due:'8/31',status:'尚未開始',week:0,p:'on',update:'5/25確認需連線至全廠MES，待PLC選型確認後進行架構規劃'},
-];
-
-let CH = {}, MN = [], curTab = 'board', curWeek = 1, viewMode = 'c', addOpen = false;
+// ── 狀態 ──────────────────────────────────────────────
+let BASE=[], CH={}, MN=[], META={}, curTab='board', curWeek=1, viewMode='c', addOpen=false;
+let TODAY_STR='', EMAIL_BODY='', W1_LABEL='', W2_LABEL='';
 
 function IT(){ return [...BASE, ...MN]; }
 function ST(i){ return CH[i.row]?.status || i.status; }
 function DU(i){ return CH[i.row]?.due || i.due; }
 function UP(i){
-  const c = CH[i.row] || {};
-  const b = i.update ? i.update.split('\n').filter(Boolean) : [];
-  return [...b, ...(c.updateLines || [])].join('<br>');
+  const c=CH[i.row]||{};
+  const b=i.update?i.update.split('\n').filter(Boolean):[];
+  return [...b,...(c.updateLines||[])].join('<br>');
+}
+
+// ── Section 定義（動態，根據 META 設定）──────────────
+function getSecs(week){
+  if(week===1) return [
+    {id:'w1ov',lb:'🔴 逾期未完成',f:i=>i.p==='over'&&ST(i)!=='已完成'},
+    {id:'w1tn',lb:'🔧 TNA & 平台',f:i=>i.p==='week1'&&[...TNA,'Tna UK 訪廠'].includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'w1au',lb:'⚙️ 自動化 & PLC',f:i=>i.p==='week1'&&AUTO.includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'w1bp',lb:'📦 BPA 包裝自動化',f:i=>i.p==='week1'&&BPA.includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'w1eq',lb:'🏭 設備 & 生產 & 合約',f:i=>i.p==='week1'&&![...TNA,'Tna UK 訪廠',...AUTO,...BPA].includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'w1mn',lb:'🔖 手動新增',f:i=>i.manual&&i.week===1&&ST(i)!=='已完成'},
+    {id:'w1dn',lb:'✅ 已完成',f:i=>i.week===1&&ST(i)==='已完成'},
+  ];
+  if(week===2) return [
+    {id:'w2tn',lb:'🔧 TNA & 平台',f:i=>i.p==='week2'&&[...TNA,'Tna UK 訪廠','TNA 裝機'].includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'w2au',lb:'⚙️ 自動化 & PLC',f:i=>i.p==='week2'&&AUTO.includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'w2pr',lb:'🏭 生產 & 設備 & 研發',f:i=>i.p==='week2'&&![...TNA,'Tna UK 訪廠','TNA 裝機',...AUTO,...BPA].includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'w2bp',lb:'📦 包裝自動化',f:i=>i.p==='week2'&&BPA.includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'w2mn',lb:'🔖 手動新增',f:i=>i.manual&&i.week===2&&ST(i)!=='已完成'},
+    {id:'w2dn',lb:'✅ 已完成',f:i=>i.week===2&&ST(i)==='已完成'},
+  ];
+  return [
+    {id:'on-au',lb:'⚙️ 自動化 & TNA',f:i=>i.p==='on'&&[...AUTO,...TNA,'Tna UK 訪廠'].includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'on-pr',lb:'🏭 產能 & 設備',f:i=>i.p==='on'&&['產能提升','設備管理','製程優化','新設備開發'].includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'on-bp',lb:'📦 包裝自動化',f:i=>i.p==='on'&&BPA.includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'on-rd',lb:'🧪 研發 & 新品',f:i=>i.p==='on'&&['新品開發'].includes(i.cat)&&ST(i)!=='已完成'},
+    {id:'on-ot',lb:'📂 其他',f:i=>i.p==='on'&&!([...AUTO,...TNA,'Tna UK 訪廠',...BPA,'產能提升','設備管理','製程優化','新設備開發','新品開發'].includes(i.cat))&&ST(i)!=='已完成'},
+    {id:'on-mn',lb:'🔖 手動新增',f:i=>i.manual&&i.week==0&&ST(i)!=='已完成'},
+  ];
 }
 
 function badge(i){
-  const s = ST(i), d = DU(i);
+  const s=ST(i),d=DU(i);
   if(s==='已完成') return `<span class="nbadge nb-done">✓ 完成</span>`;
   if(i.manual) return `<span class="nbadge nb-new">新 ${d}</span>`;
   if(i.p==='over') return `<span class="nbadge nb-over">逾期 ${d}</span>`;
@@ -398,9 +332,9 @@ function badge(i){
 }
 
 function cardHTML(i){
-  const s = ST(i), d = DU(i), done = s==='已完成', u = UP(i);
+  const s=ST(i),d=DU(i),done=s==='已完成',u=UP(i);
   return `<div class="card${done?' done-card':''}${i.manual?' manual-card':''}" id="c-${i.row}">
-    <div class="card-hdr" onclick="togCard(${i.row})">
+    <div class="card-hdr" onclick="togCard(${JSON.stringify(i.row)})">
       <span class="c-arr op" id="ca-${i.row}">▶</span>
       ${badge(i)}
       <div class="card-info">
@@ -412,8 +346,8 @@ function cardHTML(i){
         </div>
       </div>
       <div class="card-btns">
-        <button class="edit-btn" onclick="event.stopPropagation();openEdit(${i.row})">編輯</button>
-        ${i.manual?`<button class="del-btn" onclick="event.stopPropagation();delManual(${i.row})">✕</button>`:''}
+        <button class="edit-btn" onclick="event.stopPropagation();openEdit(${JSON.stringify(i.row)})">編輯</button>
+        ${i.manual?`<button class="del-btn" onclick="event.stopPropagation();delManual(${JSON.stringify(i.row)})">✕</button>`:''}
       </div>
     </div>
     <div class="card-body op" id="cb-${i.row}">
@@ -427,8 +361,8 @@ function cardHTML(i){
         <div class="edit-row"><span class="edit-label">到期日</span><input type="text" id="ed-${i.row}" value="${d}" placeholder="M/D"></div>
         <div class="edit-row" style="align-items:flex-start"><span class="edit-label" style="margin-top:5px">更新說明</span><textarea id="eu-${i.row}" placeholder="填入本次進度說明（自動加日期）..."></textarea></div>
         <div style="display:flex;gap:6px;margin-top:5px">
-          <button class="save-btn" onclick="saveItem(${i.row})">儲存</button>
-          <button class="cancel-btn" onclick="closeEdit(${i.row})">取消</button>
+          <button class="save-btn" onclick="saveItem(${JSON.stringify(i.row)})">儲存</button>
+          <button class="cancel-btn" onclick="closeEdit(${JSON.stringify(i.row)})">取消</button>
         </div>
       </div>
     </div>
@@ -436,211 +370,177 @@ function cardHTML(i){
 }
 
 function renderBoard(){
-  const secs = curWeek===1?W1SECS:curWeek===2?W2SECS:ONSECS;
-  let h = '';
+  const secs=getSecs(curWeek);
+  let h='';
   for(const s of secs){
-    const items = IT().filter(s.f);
+    const items=IT().filter(s.f);
     if(!items.length) continue;
-    h += `<div class="sec"><div class="sh" onclick="togSec('${s.id}')"><span class="sec-arr op" id="sa-${s.id}">▶</span><span class="sec-t">${s.lb}</span><span class="sec-cnt">${items.length} 項</span></div><div class="sec-body op" id="sb-${s.id}">${items.map(cardHTML).join('')}</div></div>`;
+    h+=`<div class="sec"><div class="sh" onclick="togSec('${s.id}')"><span class="sec-arr op" id="sa-${s.id}">▶</span><span class="sec-t">${s.lb}</span><span class="sec-cnt">${items.length} 項</span></div><div class="sec-body op" id="sb-${s.id}">${items.map(cardHTML).join('')}</div></div>`;
   }
   document.getElementById('board-content').innerHTML = h || '<div class="empty">此週無待辦項目</div>';
   applyView();
   upStats();
-  Object.keys(CH).forEach(r => {
-    const el = document.getElementById('sv-'+r);
-    if(el) el.style.display = 'inline';
+  Object.keys(CH).forEach(r=>{
+    const el=document.getElementById('sv-'+r); if(el) el.style.display='inline';
   });
 }
 
-function togSec(id){
-  const b=document.getElementById('sb-'+id), a=document.getElementById('sa-'+id);
-  if(!b) return;
-  const op = b.classList.toggle('op');
-  a.classList.toggle('op', op);
-}
-function togCard(r){
-  const b=document.getElementById('cb-'+r), a=document.getElementById('ca-'+r);
-  if(!b) return;
-  const op = b.classList.toggle('op');
-  a.classList.toggle('op', op);
-}
-function openEdit(r){
-  document.getElementById('cb-'+r)?.classList.add('op');
-  document.getElementById('ca-'+r)?.classList.add('op');
-  document.getElementById('ea-'+r).style.display = 'block';
-  document.getElementById('c-'+r)?.classList.add('editing');
-  document.getElementById('eu-'+r)?.focus();
-}
-function closeEdit(r){
-  document.getElementById('ea-'+r).style.display = 'none';
-  document.getElementById('c-'+r)?.classList.remove('editing');
-}
+function togSec(id){ const b=document.getElementById('sb-'+id),a=document.getElementById('sa-'+id); if(!b)return; const op=b.classList.toggle('op'); a.classList.toggle('op',op); }
+function togCard(r){ const b=document.getElementById('cb-'+r),a=document.getElementById('ca-'+r); if(!b)return; const op=b.classList.toggle('op'); a.classList.toggle('op',op); }
+function openEdit(r){ document.getElementById('cb-'+r)?.classList.add('op'); document.getElementById('ca-'+r)?.classList.add('op'); document.getElementById('ea-'+r).style.display='block'; document.getElementById('c-'+r)?.classList.add('editing'); document.getElementById('eu-'+r)?.focus(); }
+function closeEdit(r){ document.getElementById('ea-'+r).style.display='none'; document.getElementById('c-'+r)?.classList.remove('editing'); }
 
 async function saveItem(r){
-  const i = IT().find(x => x.row == r); if(!i) return;
-  const ns = document.getElementById('es-'+r).value;
-  const nd = document.getElementById('ed-'+r).value.trim();
-  const nu = document.getElementById('eu-'+r).value.trim();
-  if(!nu && ns===ST(i) && nd===DU(i)){ closeEdit(r); return; }
-  const c = CH[r] || { updateLines:[] };
-  if(ns !== i.status) c.status = ns;
-  if(nd !== i.due) c.due = nd;
+  const i=IT().find(x=>x.row==r); if(!i) return;
+  const ns=document.getElementById('es-'+r).value;
+  const nd=document.getElementById('ed-'+r).value.trim();
+  const nu=document.getElementById('eu-'+r).value.trim();
+  if(!nu&&ns===ST(i)&&nd===DU(i)){ closeEdit(r); return; }
+  const c=CH[r]||{updateLines:[]};
+  if(ns!==i.status) c.status=ns;
+  if(nd!==i.due) c.due=nd;
   if(nu){
-    const n = (i.update?i.update.split('\n').filter(Boolean):[]).length + (c.updateLines||[]).length + 1;
-    c.updateLines = [...(c.updateLines||[]), `${n}.${TODAY} ${nu}`];
+    const n=(i.update?i.update.split('\n').filter(Boolean):[]).length+(c.updateLines||[]).length+1;
+    c.updateLines=[...(c.updateLines||[]),`${n}.${TODAY_STR} ${nu}`];
   }
-  c.num = i.num; c.desc = i.desc; c.origStatus = i.status; c.origDue = i.due;
-  CH[r] = c;
-  await persist();
-  // 更新 UI
-  const cs = document.getElementById('cs-'+r);
-  if(cs){ cs.style.background=SBG[ns]; cs.style.color=SCO[ns]; cs.textContent=ns; }
-  const fd = document.getElementById('fd-'+r); if(fd) fd.textContent=nd;
-  const fu = document.getElementById('fu-'+r); if(fu){ fu.innerHTML=UP(i); fu.style.display='block'; }
-  const sv = document.getElementById('sv-'+r); if(sv) sv.style.display='inline';
-  document.getElementById('c-'+r)?.classList.toggle('done-card', ns==='已完成');
-  document.getElementById('eu-'+r).value = '';
+  c.num=i.num; c.desc=i.desc; c.origStatus=i.status; c.origDue=i.due;
+  CH[r]=c;
+  setSyn('sv');
+  await fbSet(CHANGES_PATH, CH);
+  setSyn('ok');
+  const cs=document.getElementById('cs-'+r); if(cs){cs.style.background=SBG[ns];cs.style.color=SCO[ns];cs.textContent=ns;}
+  const fd=document.getElementById('fd-'+r); if(fd) fd.textContent=nd;
+  const fu=document.getElementById('fu-'+r); if(fu){fu.innerHTML=UP(i);fu.style.display='block';}
+  const sv=document.getElementById('sv-'+r); if(sv) sv.style.display='inline';
+  document.getElementById('c-'+r)?.classList.toggle('done-card',ns==='已完成');
+  document.getElementById('eu-'+r).value='';
   closeEdit(r);
   upStats();
 }
 
-function setView(m){
-  viewMode = m;
-  document.getElementById('vb-c')?.classList.toggle('on', m==='c');
-  document.getElementById('vb-f')?.classList.toggle('on', m==='f');
-  applyView();
-}
+function setView(m){ viewMode=m; document.getElementById('vb-c')?.classList.toggle('on',m==='c'); document.getElementById('vb-f')?.classList.toggle('on',m==='f'); applyView(); }
 function applyView(){
-  IT().forEach(i => {
-    const b=document.getElementById('cb-'+i.row), a=document.getElementById('ca-'+i.row);
-    if(!b||!a) return;
-    const eo = document.getElementById('ea-'+i.row)?.style.display === 'block';
-    if(viewMode==='c' && !eo){ b.classList.remove('op'); a.classList.remove('op'); }
-    else{ b.classList.add('op'); a.classList.add('op'); }
+  IT().forEach(i=>{
+    const b=document.getElementById('cb-'+i.row),a=document.getElementById('ca-'+i.row); if(!b||!a) return;
+    const eo=document.getElementById('ea-'+i.row)?.style.display==='block';
+    if(viewMode==='c'&&!eo){b.classList.remove('op');a.classList.remove('op');}
+    else{b.classList.add('op');a.classList.add('op');}
   });
 }
 function colAll(){ document.querySelectorAll('.card-body').forEach(e=>e.classList.remove('op')); document.querySelectorAll('.c-arr').forEach(e=>e.classList.remove('op')); }
 function expAll(){ document.querySelectorAll('.card-body').forEach(e=>e.classList.add('op')); document.querySelectorAll('.c-arr').forEach(e=>e.classList.add('op')); }
 
 function swWeek(w){
-  curWeek = w;
-  [0,1,2].forEach(n => document.getElementById('wt-'+n)?.classList.toggle('on', n===w));
+  curWeek=w;
+  [0,1,2].forEach(n=>document.getElementById('wt-'+n)?.classList.toggle('on',n===w));
   renderBoard();
 }
 
-let addOpen2 = false;
-function togAdd(){
-  addOpen2 = !addOpen2;
-  document.getElementById('add-body')?.classList.toggle('op', addOpen2);
-  const a = document.getElementById('add-arr'); if(a) a.style.transform = addOpen2?'rotate(90deg)':'';
-}
-function resetForm(){
-  ['af-dept','af-cat','af-desc','af-owner','af-due','af-upd'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
-  const s=document.getElementById('af-status'); if(s) s.value='尚未開始';
-  const w=document.getElementById('af-wk'); if(w) w.value='1';
-}
+function togAdd(){ addOpen=!addOpen; document.getElementById('add-body')?.classList.toggle('op',addOpen); const a=document.getElementById('add-arr'); if(a)a.style.transform=addOpen?'rotate(90deg)':''; }
+function resetForm(){ ['af-dept','af-cat','af-desc','af-owner','af-due','af-upd'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';}); document.getElementById('af-status').value='尚未開始'; document.getElementById('af-wk').value='1'; }
+
 async function addItem(){
-  const dept = document.getElementById('af-dept')?.value;
-  const desc = document.getElementById('af-desc')?.value.trim();
-  if(!dept || !desc){ alert('請填寫部門與任務描述'); return; }
-  const wk = parseInt(document.getElementById('af-wk')?.value || '1');
-  const pm = {1:'week1', 2:'week2', 0:'on'};
-  const it = {
-    row: 'M'+Date.now(), num: dept+'-新',
-    cat: document.getElementById('af-cat')?.value.trim() || '其他',
-    desc, owner: document.getElementById('af-owner')?.value.trim() || '—',
-    due: document.getElementById('af-due')?.value.trim() || '—',
-    status: document.getElementById('af-status')?.value || '尚未開始',
-    week: wk, p: pm[wk],
-    update: document.getElementById('af-upd')?.value.trim() || '',
-    manual: true
-  };
+  const dept=document.getElementById('af-dept')?.value;
+  const desc=document.getElementById('af-desc')?.value.trim();
+  if(!dept||!desc){alert('請填寫部門與任務描述');return;}
+  const wk=parseInt(document.getElementById('af-wk')?.value||'1');
+  const pm={1:'week1',2:'week2',0:'on'};
+  const it={row:'M'+Date.now(),num:dept+'-新',cat:document.getElementById('af-cat')?.value.trim()||'其他',desc,owner:document.getElementById('af-owner')?.value.trim()||'—',due:document.getElementById('af-due')?.value.trim()||'—',status:document.getElementById('af-status')?.value||'尚未開始',week:wk,p:pm[wk],update:document.getElementById('af-upd')?.value.trim()||'',manual:true};
   MN.push(it);
-  await persist();
+  setSyn('sv');
+  await fbSet(MANUALS_PATH, MN);
+  setSyn('ok');
   renderBoard();
-  const m = document.getElementById('af-msg'); if(m){ m.style.display='inline'; setTimeout(()=>m.style.display='none', 2500); }
+  const m=document.getElementById('af-msg'); if(m){m.style.display='inline';setTimeout(()=>m.style.display='none',2500);}
   resetForm();
 }
+
 async function delManual(r){
-  if(!confirm('確定刪除？')) return;
-  MN = MN.filter(i => i.row !== r);
-  delete CH[r];
-  await persist();
+  if(!confirm('確定刪除？'))return;
+  MN=MN.filter(i=>i.row!==r); delete CH[r];
+  setSyn('sv');
+  await Promise.all([fbSet(MANUALS_PATH,MN), fbSet(CHANGES_PATH,CH)]);
+  setSyn('ok');
   renderBoard();
 }
 
 function upStats(){
-  const all = IT(), nc = Object.keys(CH).length;
-  const over = all.filter(i=>i.p==='over'&&ST(i)!=='已完成').length;
-  const w1 = all.filter(i=>i.p==='week1'&&ST(i)!=='已完成').length;
-  const w2 = all.filter(i=>i.p==='week2'&&ST(i)!=='已完成').length;
-  const on = all.filter(i=>i.p==='on'&&ST(i)!=='已完成').length;
-  const done = all.filter(i=>ST(i)==='已完成').length;
-  document.getElementById('s-over').textContent = over;
-  document.getElementById('s-week').textContent = curWeek===1?w1:curWeek===2?w2:on;
-  document.getElementById('s-week-l').textContent = curWeek===0?'推進中':'本週';
-  document.getElementById('s-done').textContent = done;
-  document.getElementById('s-upd').textContent = nc;
-  document.getElementById('badge-board').textContent = (over+w1);
-  const b3 = document.getElementById('badge-export');
-  if(b3){ b3.textContent=nc; b3.style.display=nc>0?'inline-block':'none'; }
-  document.getElementById('wn-1').textContent = over+w1;
-  document.getElementById('wn-2').textContent = w2;
-  document.getElementById('wn-0').textContent = on;
+  const all=IT(), nc=Object.keys(CH).length;
+  const over=all.filter(i=>i.p==='over'&&ST(i)!=='已完成').length;
+  const w1=all.filter(i=>i.p==='week1'&&ST(i)!=='已完成').length;
+  const w2=all.filter(i=>i.p==='week2'&&ST(i)!=='已完成').length;
+  const on=all.filter(i=>i.p==='on'&&ST(i)!=='已完成').length;
+  const done=all.filter(i=>ST(i)==='已完成').length;
+  document.getElementById('s-over').textContent=over;
+  document.getElementById('s-week').textContent=curWeek===1?w1:curWeek===2?w2:on;
+  document.getElementById('s-week-l').textContent=curWeek===0?'推進中':'本週';
+  document.getElementById('s-done').textContent=done;
+  document.getElementById('s-upd').textContent=nc;
+  document.getElementById('badge-board').textContent=(over+w1);
+  const b3=document.getElementById('badge-export'); if(b3){b3.textContent=nc;b3.style.display=nc>0?'inline-block':'none';}
+  document.getElementById('wn-1').textContent=over+w1;
+  document.getElementById('wn-2').textContent=w2;
+  document.getElementById('wn-0').textContent=on;
 }
 
 function swTab(t){
-  curTab = t;
+  curTab=t;
   ['board','mail','export'].forEach(n=>{
-    document.getElementById('tab-'+n).style.display = n===t?'block':'none';
-    document.getElementById('nav-'+n)?.classList.toggle('active', n===t);
+    document.getElementById('tab-'+n).style.display=n===t?'block':'none';
+    document.getElementById('nav-'+n)?.classList.toggle('active',n===t);
   });
   if(t==='board') renderBoard();
-  if(t==='mail') document.getElementById('mail-body').textContent = EMAIL;
+  if(t==='mail') loadMail();
 }
 
 async function clearUpdates(){
-  if(!confirm('確定清除所有進度更新？手動新增項目不受影響。')) return;
-  CH = {};
-  await persist();
+  if(!confirm('確定清除所有進度更新？手動新增項目不受影響。'))return;
+  CH={};
+  setSyn('sv');
+  await fbSet(CHANGES_PATH,{});
+  setSyn('ok');
   renderBoard();
 }
 
-// ── Firebase 同步 ──────────────────────────────────────
-function setSyn(ok){
-  document.getElementById('syn-dot').className = 'sync-dot' + (ok?'':' off');
-  document.getElementById('syn-txt').textContent = ok?'已同步':'同步中...';
-}
-
-async function persist(){
-  setSyn(false);
-  const data = { changes: CH, manuals: MN, ts: Date.now() };
-  const ok = await fbSet(DB_PATH, data);
-  setSyn(ok);
-}
-
-async function loadData(){
-  setSyn(false);
-  const data = await fbGet(DB_PATH);
-  if(data){
-    CH = data.changes || {};
-    MN = data.manuals || [];
+// ── 週報（從 Firebase META 讀取）────────────────────────
+function loadMail(){
+  if(META.email){
+    document.getElementById('mail-to').textContent = META.email.to || '—';
+    document.getElementById('mail-subj').textContent = META.email.subject || '—';
+    document.getElementById('mail-period').textContent = META.email.period || '—';
+    document.getElementById('mail-body').textContent = META.email.body || '（尚未產出週報，請在 Claude 對話中產出後同步）';
+    EMAIL_BODY = META.email.body || '';
+  } else {
+    document.getElementById('mail-body').textContent = '（尚未產出週報，請在 Claude 對話中產出後同步到 Firebase）';
   }
-  setSyn(true);
+}
+
+function openMail(){
+  if(!EMAIL_BODY){alert('尚未載入週報內容');return;}
+  const s=META.email?.subject||'【週報】宜蘭廠區工作進度彙報 — Louis Lin';
+  const to=META.email?.toEmail||'danny@bfycorp.com';
+  const cc=META.email?.ccEmail||'yumingda@bfycorp.com';
+  window.open(`mailto:${to}?cc=${encodeURIComponent(cc)}&subject=${encodeURIComponent(s)}&body=${encodeURIComponent(EMAIL_BODY)}`);
+}
+function cpMail(){
+  if(!EMAIL_BODY){alert('尚未載入週報內容');return;}
+  navigator.clipboard.writeText(EMAIL_BODY).then(()=>{
+    const b=document.getElementById('cp-btn'); b.textContent='✓ 已複製'; setTimeout(()=>b.textContent='📋 複製內容',2000);
+  });
 }
 
 // ── 匯出 ──────────────────────────────────────────────
 function buildExpText(){
-  const nc = Object.keys(CH).length, nm = MN.length;
-  if(!nc && !nm) return null;
-  let L = ['請根據以下內容，更新控管表：\n'];
+  const nc=Object.keys(CH).length, nm=MN.length;
+  if(!nc&&!nm) return null;
+  let L=['請根據以下內容，更新控管表：\n'];
   if(nc){
     L.push('=== 進度更新 ===');
     for(const [r,c] of Object.entries(CH)){
-      const i = IT().find(x=>x.row==r); if(!i) continue;
+      const i=IT().find(x=>x.row==r); if(!i) continue;
       L.push(`【${i.num}】${i.desc}`);
-      if(c.status && c.status!==i.status) L.push(`  狀態：${i.status} → ${c.status}`);
-      if(c.due && c.due!==i.due) L.push(`  到期日：${i.due} → ${c.due}`);
+      if(c.status&&c.status!==i.status) L.push(`  狀態：${i.status} → ${c.status}`);
+      if(c.due&&c.due!==i.due) L.push(`  到期日：${i.due} → ${c.due}`);
       (c.updateLines||[]).forEach(l=>L.push(`  ${l}`));
       L.push('');
     }
@@ -658,119 +558,73 @@ function buildExpText(){
 }
 
 function doExport(){
-  const txt = buildExpText();
-  if(!txt){ alert('尚未填寫任何更新'); return; }
-  const el = document.getElementById('board-exp');
-  el.textContent = txt; el.style.display = 'block';
+  const txt=buildExpText(); if(!txt){alert('尚未填寫任何更新');return;}
+  const el=document.getElementById('board-exp'); el.textContent=txt; el.style.display='block';
   navigator.clipboard.writeText(txt).then(()=>alert('✓ 已複製！請貼回 Claude 對話視窗'));
 }
 function doExport2(){
-  const txt = buildExpText();
-  if(!txt){ alert('尚未填寫任何更新，請先到看板填寫進度'); return; }
-  const el = document.getElementById('exp-out');
-  el.textContent = txt; el.style.display = 'block';
+  const txt=buildExpText(); if(!txt){alert('尚未填寫任何更新，請先到看板填寫進度');return;}
+  const el=document.getElementById('exp-out'); el.textContent=txt; el.style.display='block';
   navigator.clipboard.writeText(txt).then(()=>{
-    document.getElementById('exp-prog').textContent = '✓ 已複製！請貼回 Claude 對話視窗，Claude 會自動更新 Excel';
+    document.getElementById('exp-prog').textContent='✓ 已複製！請貼回 Claude 對話視窗，Claude 會自動更新 Excel 並同步回 Firebase';
   });
 }
 
-// ── 週報 ──────────────────────────────────────────────
-const EMAIL = `Danny 總經理、余副總 您好，
-
-以下為本週（2026/5/19–5/26）宜蘭廠區工作進度彙報。本週共完成 14 項工作，重要里程碑包含：全廠 PLC/HMI/變頻器選型確認完畢（HMI改採崑崙/台達/研華）、義大利顧問及印度 FEN 線上會議完成、TNA 賠償方案正式確認，自動化推進進入落實階段。
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【一、本週完成事項】（共 14 項）
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-・[創新中心-51] 全廠PLC品牌標準化（三菱FX5U）
-・[創新中心-52] HMI選型（改採崑崙/台達/研華）
-・[創新中心-53] 變頻器選型確認（西門子/丹佛斯I7）
-・[創新中心-18] 義大利顧問 & 印度FEN線上會議
-・[創新中心-04] TNA賠償正式回覆（1.982萬USD+培訓）
-・[創新中心-07] 英國出差照片整理與各廠訪廠紀錄寄送
-・[創新中心-13] TNA機台位置變更協調
-・[創新中心-27] TNA空運費用折扣追蹤
-・[創新中心-29] OMS後VM白鐵底座製作完成
-・[創新中心-30] 噴嘴管路蓋子（TNA自行製作完成）
-・[創新中心-39] 確認最終噴頭規格（米花/米片用油量）
-・[生產部-01] 包裝機產能計算表格（Excel）
-・[創新中心-02] BPA自動化會議準備
-・[創新中心-03] TNA零件採購確認
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【二、本週主要進度更新】
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-▌ TNA設備採購與裝機
-・[創新中心-05] Spray Gun Kit規格確認 — 5/26已發信請Tim確認噴頭規格（截止6/15）
-・[創新中心-60] 包裝機平台修改圖面說明 — 5/26已發信給瑞派克說明三項修改細節
-・[創新中心-61] 米花線設備工藝流程圖 — 5/26已提供瑞派克相關規劃圖面，待對方確認
-・[創新中心-62] 平台安裝時程表 — 5/26已提供安裝時程規劃給瑞派克，待回填工時人力
-
-▌ 自動化規劃
-・[創新中心-50] PLC & Sensor規格選型 — 5/25已於三菱台灣代理商召開討論會
-・[創新中心-54] 電磁閥品牌決議（SMC）— 5/26決議全廠採用SMC氣動元件
-・[創新中心-55] 設備品牌規範表格 — 5/25初版已發布，與瑞派克會議後有更新，待正式發布
-・[創新中心-56] 爆米花線電控設計發包 — 確認電眼偵測流量+PLC聯動噴油噴糖比例
-
-▌ BPA包裝自動化
-・[創新中心-08] 整理產品與紙箱規格資料 — 5/26同步提供松川調查表給產品課填寫
-・[創新中心-16] BPA自動化包裝線規劃 — 5/22修改包裝順序流程圖，重新向TNA報價
-
-▌ 合約與行政
-・[董事長室-02] X光機合同 — 5/26因付款條件變更，請同和提供變更後合同後重新用印
-・[董事長室-03] 給袋機合同 — 5/26合同已掃描，郵局掛號寄出
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【三、下週工作重點（6/1–6/6）】
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-⚠️ [研發部-02] 高蛋白原料採購方針評估會議（蔡媛芳，截止：6/1）
-⚠️ [設備課-04] 50D全輸送螺旋配件確認與整合（阿昌，截止：6/1）
-⚠️ [創新中心-15] 大陸技師入關文件提早辦理（Louis，截止：6/1）
-⚠️ [創新中心-44] 瑞派克設備後續討論（Louis，截止：6/1）
-⚠️ [設備課-05] 成型機抽風驗證（Louis，截止：6/4）
-・[創新中心-16] BPA自動化包裝線規劃→提交董事長報告（Danny/Louis，截止：6/5）
-・[創新中心-26] 教育訓練手冊翻譯含X光機/給袋機（Louis/陳敬穆，截止：6/5）
-・[創新中心-50] PLC & Sensor選型持續推進HMI等元件（Louis，截止：6/6）
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【四、持續推進事項】
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-・乾燥機採購（400 kg+，目標 500 kg）
-・自動化包裝流程圖修改與重新報價
-・震動台料位高度自動控制方案（FX5U聯動）
-・爆米花線電控設計發包（電眼+PLC聯動）
-・大陸技師來台申請文件辦理
-・高蛋白胚專用模具採購（預算8,000英鎊）
-・人員招募（研發課長+機械工程師）
-・薯片線電控原理說明書（jack提供，台灣團隊維護）
-・工業4.0/5.0 全廠MES製造執行系統連線方案規劃
-
-以上為本週工作彙報，請惠予確認，如有任何指示請隨時告知。謝謝！
-
-Louis Lin
-2026年5月27日`;
-
-function openMail(){
-  const s = '【週報】宜蘭廠區工作進度彙報 2026/5/26 — Louis Lin';
-  window.open(`mailto:danny@bfycorp.com?cc=${encodeURIComponent('yumingda@bfycorp.com')}&subject=${encodeURIComponent(s)}&body=${encodeURIComponent(EMAIL)}`);
-}
-function cpMail(){
-  navigator.clipboard.writeText(EMAIL).then(()=>{
-    const b = document.getElementById('cp-btn');
-    b.textContent = '✓ 已複製';
-    setTimeout(()=>b.textContent='📋 複製內容', 2000);
-  });
+// ── 同步狀態 ──────────────────────────────────────────
+function setSyn(state){
+  const dot=document.getElementById('syn-dot');
+  const txt=document.getElementById('syn-txt');
+  if(state==='ok'){dot.className='sync-dot';txt.textContent='已同步';}
+  else if(state==='sv'){dot.className='sync-dot off';txt.textContent='同步中...';}
+  else{dot.className='sync-dot err';txt.textContent='同步失敗，請重新整理';}
 }
 
-// ── 初始化 ────────────────────────────────────────────
+// ── 初始化：從 Firebase 載入所有資料 ──────────────────
 async function init(){
-  await loadData();
+  setSyn('sv');
+  try{
+    const [tasks, changes, manuals, meta] = await Promise.all([
+      fbGet(TASKS_PATH),
+      fbGet(CHANGES_PATH),
+      fbGet(MANUALS_PATH),
+      fbGet(META_PATH),
+    ]);
+
+    // 任務清單（BASE）
+    if(tasks && Array.isArray(tasks)){
+      BASE = tasks;
+    } else if(tasks && typeof tasks==='object'){
+      BASE = Object.values(tasks);
+    }
+
+    // 進度更新
+    CH = changes && typeof changes==='object' && !Array.isArray(changes) ? changes : {};
+
+    // 手動新增
+    MN = manuals && Array.isArray(manuals) ? manuals : (manuals?Object.values(manuals):[]);
+
+    // META（週報、日期設定）
+    META = meta || {};
+    TODAY_STR = META.today || new Date().toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'}).replace(/\//,'/');
+
+    // 更新週次標題
+    if(META.w1Label) document.getElementById('wt-sub-1').textContent = META.w1Label;
+    if(META.w2Label) document.getElementById('wt-sub-2').textContent = META.w2Label;
+
+    // 最後更新時間
+    if(META.lastUpdate){
+      document.getElementById('last-update').textContent = '· 控管表 ' + META.lastUpdate;
+    }
+
+    setSyn('ok');
+  } catch(e){
+    setSyn('err');
+    console.error(e);
+  }
+
   renderBoard();
 }
+
 init();
 </script>
 </body>
