@@ -372,16 +372,28 @@ function toast(msg,color='var(--green)'){const el=document.getElementById('tg');
 
 // ══ 登入 ══
 async function initLogin(){
-  const rawD=await fbGet(P_DEPTS);
-  if(rawD&&Array.isArray(rawD))S.depts=rawD;
+  // 先用預設值立即渲染按鈕，不等 Firebase
+  renderLoginBtns();
 
+  // 再從 Firebase 更新單位清單（背景載入）
+  const rawD=await fbGet(P_DEPTS);
+  if(rawD&&Array.isArray(rawD)){
+    S.depts=rawD;
+    renderLoginBtns(); // 更新後重新渲染
+  } else {
+    // Firebase 無資料時寫入預設值
+    await fbSet(P_DEPTS, S.depts);
+  }
+}
+
+function renderLoginBtns(){
   // 管理者按鈕
   const mgrGrid=document.getElementById('mgr-grid');
-  mgrGrid.innerHTML=MANAGERS.map(m=>`<button class="rbtn manager-role" onclick="loginAs('${escH(m)}',true)">👑 ${escH(m)}</button>`).join('');
+  if(mgrGrid) mgrGrid.innerHTML=MANAGERS.map(m=>`<button class="rbtn manager-role" onclick="loginAs('${escH(m)}',true)">👑 ${escH(m)}</button>`).join('');
 
   // 單位按鈕
   const deptGrid=document.getElementById('dept-grid');
-  deptGrid.innerHTML=S.depts.map(d=>`<button class="rbtn" onclick="loginAs('${escH(d.contact)}',false,'${escH(d.id)}')" style="border-color:${d.color}22;color:${d.color}">${escH(d.name)}</button>`).join('');
+  if(deptGrid) deptGrid.innerHTML=S.depts.map(d=>`<button class="rbtn" onclick="loginAs('${escH(d.contact)}',false,'${escH(d.id)}')" style="border-color:${d.color}22;color:${d.color}">${escH(d.name)}</button>`).join('');
 }
 
 function loginInput(){
