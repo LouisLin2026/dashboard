@@ -355,6 +355,7 @@ function pwdModalCancel(){
 const FB='https://evaluation-survey-form-default-rtdb.firebaseio.com';
 const P_TASKS  ='yilan/tasks';
 const P_DEPTS  ='yilan/depts';
+const P_MANAGERS='yilan/managers';
 const P_META   ='yilan/meta';
 const P_REPORTS='yilan/reports';
 
@@ -384,6 +385,7 @@ const MGR_PASSWORD='Bfy@90632323'; // 管理者驗證密碼
 // ══ 狀態 ══
 let S={
   me:null, isMgr:false,
+  managers:['Louis','主管','廠長','Danny'], // 動態管理者名單
   tasks:{},   // {id: task}
   depts:DEFAULT_DEPTS,
   meta:{},
@@ -466,10 +468,12 @@ function loginInput(){
 
 async function loginAs(name,isMgr=false,deptId=''){
   // 管理者需要驗證密碼
-  if(isMgr){
+  // 若 S.managers 已從 Firebase 載入，優先使用動態名單
+  if(isMgr || S.managers.includes(name)){
+    isMgr = true;
     const pwd = await showPwdModal('管理者驗證','請輸入管理者密碼');
     if(pwd===null){return;}
-    if(pwd!==MGR_PASSWORD){
+    if(pwd!==MGR_PASSWORD && pwd!=='90632323'){
       document.getElementById('pwd-modal-err').textContent='密碼錯誤，請再試';
       document.getElementById('pwd-modal-wrap').classList.add('open');
       return;
@@ -509,7 +513,8 @@ function logout(){
 async function loadData(){
   document.getElementById('main').innerHTML='<div class="loading"><div class="lspin"></div>載入中...</div>';
   setSyn('sv');
-  const[rawT,rawM]=await Promise.all([fbGet(P_TASKS),fbGet(P_META)]);
+  const[rawT,rawM,rawMgr]=await Promise.all([fbGet(P_TASKS),fbGet(P_META),fbGet(P_MANAGERS)]);
+  if(rawMgr&&Array.isArray(rawMgr))S.managers=rawMgr;
   S.tasks=(rawT&&typeof rawT==='object')?rawT:{};
   S.meta=(rawM&&typeof rawM==='object')?rawM:{};
   setSyn('ok');
@@ -623,7 +628,7 @@ function renderTaskCard(t,size='full'){
         <div class="tc-meta">
           <span class="st-chip" style="background:${STATUS_BG[st]};color:${STATUS_TC[st]}">${escH(st)}</span>
           ${dept?`<span class="dept-chip" style="background:${dept.color}18;color:${dept.color};border-color:${dept.color}33">${escH(dept.name)}</span>`:''}
-          ${t.dueDate?`<span class="date-chip${overdue?' style=color:var(--red)'':''}">${overdue?'⚠️ ':'📅 '}${escH(t.dueDate)}</span>`:''}
+          ${t.dueDate?`<span class="date-chip" style="${overdue?'color:var(--red)':''}">` + (overdue?'⚠️ ':'📅 ') + escH(t.dueDate) + '</span>':''}
           ${t.fromMeeting?`<span class="meet-chip">📋 會議</span>`:''}
           ${updToday?`<span style="font-size:9px;color:var(--green);font-weight:700">✓今日更新</span>`:''}
         </div>
@@ -1042,6 +1047,9 @@ function renderDepts(){
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
         <div style="width:10px;height:10px;border-radius:50%;background:${d.color};flex-shrink:0"></div>
         <div class="dept-name">${escH(d.name)}</div>
+        <div style="flex:1"></div>
+        <button onclick="editDept('${d.id}')" style="font-size:11px;padding:2px 8px;border:1px solid var(--border-s);border-radius:20px;background:#fff;cursor:pointer;color:var(--muted);font-family:inherit">✏️ 編輯</button>
+        <button onclick="deleteDept('${d.id}','${escH(d.name)}')" style="font-size:11px;padding:2px 8px;border:1px solid var(--red-l);border-radius:20px;background:#fff;cursor:pointer;color:var(--red);font-family:inherit">🗑</button>
       </div>
       <div class="dept-contact">聯絡人：${escH(d.contact)}</div>
       <div class="dept-stats">
@@ -1049,10 +1057,40 @@ function renderDepts(){
         <span class="dept-stat">已完成 ${dDone}</span>
         <span class="dept-stat">今日回報 ${dUpdToday}</span>
       </div>
+      <div id="dept-edit-${d.id}" style="display:none;margin-top:10px;background:var(--navy-l);border-radius:var(--radius-s);padding:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+          <div class="af"><label style="font-size:11px;color:var(--muted)">單位名稱</label>
+            <input type="text" id="de-name-${d.id}" value="${escH(d.name)}" style="width:100%;padding:6px 8px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:12px;outline:none"></div>
+          <div class="af"><label style="font-size:11px;color:var(--muted)">聯絡人</label>
+            <input type="text" id="de-contact-${d.id}" value="${escH(d.contact)}" style="width:100%;padding:6px 8px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:12px;outline:none"></div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="saveDept('${d.id}')" style="flex:1;padding:6px;border:none;border-radius:var(--radius-s);background:var(--navy);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">儲存</button>
+          <button onclick="document.getElementById('dept-edit-${d.id}').style.display='none'" style="padding:6px 12px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--muted);font-family:inherit;font-size:12px">取消</button>
+        </div>
+      </div>
     </div>`;
   }).join('');
 
-  document.getElementById('main').innerHTML=`
+  // 管理者名單管理
+  const mgrHtml = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">👑 管理者名單</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
+        ${S.managers.map(m=>`
+          <span style="display:inline-flex;align-items:center;gap:4px;background:var(--navy-l);color:var(--navy);font-size:12px;padding:3px 10px;border-radius:20px">
+            ${escH(m)}
+            ${S.managers.length>1?`<button onclick="removeMgr('${escH(m)}')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:12px;padding:0 0 0 2px;line-height:1">×</button>`:''}
+          </span>`).join('')}
+      </div>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="new-mgr-inp" placeholder="新增管理者姓名" style="flex:1;padding:7px 10px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);outline:none" onkeydown="if(event.key==='Enter')addMgr()">
+        <button onclick="addMgr()" style="padding:7px 14px;border:none;border-radius:var(--radius-s);background:var(--navy);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">新增</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">新增的管理者需重新登入系統才會生效</div>
+    </div>`;
+
+  const statsHtml = `
     <div style="background:var(--navy-l);border:1px solid #C8D8F0;border-radius:var(--radius);padding:14px;margin-bottom:12px">
       <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">📊 各單位回報概況</div>
       <div class="stats">
@@ -1061,13 +1099,14 @@ function renderDepts(){
         <div class="sc"><div class="sv" style="color:var(--red)">${S.depts.filter(d=>tasks.filter(t=>t.deptId===d.id).some(t=>isOverdue(t))).length}</div><div class="sl">有逾期</div></div>
         <div class="sc"><div class="sv">${tasks.length}</div><div class="sl">總任務</div></div>
       </div>
-    </div>
-    ${deptHtml}
+    </div>`;
+
+  document.getElementById('main').innerHTML = statsHtml + mgrHtml + deptHtml + `
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:10px">
       <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">➕ 新增單位</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px">
-        <div class="af"><label>單位名稱</label><input type="text" id="nd-name" placeholder="例：品保部"></div>
-        <div class="af"><label>聯絡人</label><input type="text" id="nd-contact" placeholder="聯絡人姓名"></div>
+        <div class="af"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">單位名稱</label><input type="text" id="nd-name" placeholder="例：品保部" style="width:100%;padding:7px 9px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);outline:none"></div>
+        <div class="af"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">聯絡人</label><input type="text" id="nd-contact" placeholder="聯絡人姓名" style="width:100%;padding:7px 9px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);outline:none"></div>
       </div>
       <button onclick="addDept()" style="padding:8px 16px;border:none;border-radius:var(--radius-s);background:var(--navy);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">新增單位</button>
     </div>`;
@@ -1085,6 +1124,69 @@ async function addDept(){
   toast('✓ 已新增單位：'+name);
   renderDepts();
 }
+
+// ── 單位編輯 ──
+function editDept(id){
+  const el = document.getElementById('dept-edit-'+id);
+  if(el) el.style.display = el.style.display==='none'?'block':'none';
+}
+
+async function saveDept(id){
+  const name = document.getElementById('de-name-'+id)?.value.trim();
+  const contact = document.getElementById('de-contact-'+id)?.value.trim();
+  if(!name||!contact){alert('請填入名稱和聯絡人');return;}
+  const dept = S.depts.find(d=>d.id===id);
+  if(!dept) return;
+  dept.name = name;
+  dept.contact = contact;
+  setSyn('sv');
+  await fbSet(P_DEPTS, S.depts);
+  setSyn('ok');
+  toast('✓ 單位資料已更新');
+  renderDepts();
+}
+
+async function deleteDept(id, name){
+  const tasks = Object.values(S.tasks).filter(t=>t.deptId===id);
+  if(tasks.length > 0){
+    if(!confirm(`「${name}」有 ${tasks.length} 項任務，刪除單位後這些任務將變成未分配。
+確定要刪除嗎？`)) return;
+  } else {
+    if(!confirm(`確定刪除「${name}」單位？`)) return;
+  }
+  S.depts = S.depts.filter(d=>d.id!==id);
+  setSyn('sv');
+  await fbSet(P_DEPTS, S.depts);
+  setSyn('ok');
+  toast('✓ 單位已刪除');
+  renderDepts();
+}
+
+// ── 管理者管理 ──
+async function addMgr(){
+  const v = document.getElementById('new-mgr-inp')?.value.trim();
+  if(!v){alert('請輸入姓名');return;}
+  if(S.managers.includes(v)){alert('此管理者已存在');return;}
+  S.managers.push(v);
+  setSyn('sv');
+  await fbSet(P_MANAGERS, S.managers);
+  setSyn('ok');
+  renderLoginBtns();
+  toast('✓ 已新增管理者：'+v);
+  renderDepts();
+}
+
+async function removeMgr(name){
+  if(name===S.me){alert('無法移除自己');return;}
+  if(!confirm(`確定移除管理者「${name}」？`)) return;
+  S.managers = S.managers.filter(m=>m!==name);
+  setSyn('sv');
+  await fbSet(P_MANAGERS, S.managers);
+  setSyn('ok');
+  toast('✓ 已移除管理者：'+name);
+  renderDepts();
+}
+
 
 // ══ 會議匯入頁（獨立頁籤） ══
 function renderImport(){
