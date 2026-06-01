@@ -225,6 +225,34 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .toast-g{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:var(--radius-s);font-size:13px;font-weight:700;z-index:999;box-shadow:var(--shadow-m);opacity:0;transition:opacity .3s;pointer-events:none;font-family:inherit;white-space:nowrap}
 .toast-g.op{opacity:1}
 .section-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--hint);margin-bottom:6px;padding:0 2px}
+
+.eye-btn{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:16px;
+  color:rgba(255,255,255,.5);padding:4px;line-height:1;
+  transition:color .15s;
+}
+.eye-btn:hover{color:rgba(255,255,255,.9);}
+.eye-btn-dark{color:var(--muted);}
+.eye-btn-dark:hover{color:var(--navy);}
+.pwd-wrap{position:relative;display:flex;align-items:center;}
+.pwd-wrap input{flex:1;padding-right:36px !important;}
+
+/* ── 密碼 Modal ── */
+.pwd-modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;}
+.pwd-modal-wrap.open{display:flex;}
+.pwd-modal{background:#fff;border-radius:12px;padding:28px 24px;width:100%;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center;}
+.pwd-modal-title{font-size:16px;font-weight:700;color:#1F3864;margin-bottom:6px;}
+.pwd-modal-sub{font-size:12px;color:#6A6860;margin-bottom:18px;}
+.pwd-modal-inp-wrap{position:relative;margin-bottom:10px;}
+.pwd-modal-inp{width:100%;padding:11px 40px 11px 14px;border:1.5px solid #CBC9C2;border-radius:8px;font-family:inherit;font-size:16px;letter-spacing:.15em;text-align:center;outline:none;}
+.pwd-modal-inp:focus{border-color:#1F3864;}
+.pwd-modal-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#A8A69E;padding:4px;}
+.pwd-modal-eye:hover{color:#1F3864;}
+.pwd-modal-err{font-size:12px;color:#C0392B;min-height:16px;margin-bottom:8px;}
+.pwd-modal-btns{display:flex;gap:8px;}
+.pwd-modal-ok{flex:1;padding:10px;border:none;border-radius:8px;background:#1F3864;color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.pwd-modal-cancel{padding:10px 16px;border:1px solid #CBC9C2;border-radius:8px;background:#fff;cursor:pointer;color:#6A6860;font-family:inherit;font-size:13px;}
 </style>
 </head>
 <body>
@@ -289,6 +317,40 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 <div class="toast-g" id="tg"></div>
 
 <script>
+// ── 顯示/隱藏密碼 ──
+function togglePwd(inputId, btn){
+  const el=document.getElementById(inputId);
+  if(!el)return;
+  if(el.type==='password'){el.type='text';btn.textContent='🙈';}
+  else{el.type='password';btn.textContent='👁';}
+}
+
+// ── 密碼 Modal ──
+let _pwdModalResolve = null;
+function showPwdModal(title='請輸入密碼', sub=''){
+  return new Promise(resolve=>{
+    _pwdModalResolve = resolve;
+    document.getElementById('pwd-modal-title').textContent = '🔐 ' + title;
+    document.getElementById('pwd-modal-sub').textContent = sub;
+    document.getElementById('pwd-modal-inp').value = '';
+    document.getElementById('pwd-modal-err').textContent = '';
+    document.getElementById('pwd-modal-inp').type = 'password';
+    document.querySelector('.pwd-modal-eye').textContent = '👁';
+    document.getElementById('pwd-modal-wrap').classList.add('open');
+    setTimeout(()=>document.getElementById('pwd-modal-inp').focus(), 100);
+  });
+}
+function pwdModalConfirm(){
+  const v = document.getElementById('pwd-modal-inp').value;
+  if(!v){ document.getElementById('pwd-modal-err').textContent='請輸入密碼'; return; }
+  document.getElementById('pwd-modal-wrap').classList.remove('open');
+  if(_pwdModalResolve){ _pwdModalResolve(v); _pwdModalResolve=null; }
+}
+function pwdModalCancel(){
+  document.getElementById('pwd-modal-wrap').classList.remove('open');
+  if(_pwdModalResolve){ _pwdModalResolve(null); _pwdModalResolve=null; }
+}
+
 // ══ Firebase ══
 const FB='https://evaluation-survey-form-default-rtdb.firebaseio.com';
 const P_TASKS  ='yilan/tasks';
@@ -405,8 +467,13 @@ function loginInput(){
 async function loginAs(name,isMgr=false,deptId=''){
   // 管理者需要驗證密碼
   if(isMgr){
-    const pwd=prompt('請輸入管理者密碼：');
-    if(pwd!==MGR_PASSWORD){alert('密碼錯誤！');return;}
+    const pwd = await showPwdModal('管理者驗證','請輸入管理者密碼');
+    if(pwd===null){return;}
+    if(pwd!==MGR_PASSWORD){
+      document.getElementById('pwd-modal-err').textContent='密碼錯誤，請再試';
+      document.getElementById('pwd-modal-wrap').classList.add('open');
+      return;
+    }
   }
   S.me=name; S.isMgr=isMgr; S.deptId=deptId;
   document.getElementById('login-wrap').style.display='none';
@@ -732,7 +799,7 @@ async function parseMeetingTasks(){
 只回傳 JSON 陣列，不要其他文字。`;
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system,messages:[{role:'user',content:`從以下會議記錄提取行動項目：\n\n${ta}`}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','x-api-key':localStorage.getItem('bfy_api_key')||'','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system,messages:[{role:'user',content:`從以下會議記錄提取行動項目：\n\n${ta}`}]})});
     const data=await res.json();
     const raw=(data.content||[]).map(c=>c.text||'').join('');
     const clean=raw.replace(/```json|```/g,'').trim();
@@ -889,7 +956,7 @@ ${overdueT.map(t=>`- ${t.title}，期限：${t.dueDate}`).join('\n')||'無'}
 ${nextW.map(t=>`- ${t.title}（${t.dueDate}）`).join('\n')||'無'}`;
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system,messages:[{role:'user',content:user}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','x-api-key':localStorage.getItem('bfy_api_key')||'','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system,messages:[{role:'user',content:user}]})});
     const data=await res.json();
     S.generatedReport=(data.content||[]).map(c=>c.text||'').join('');
     // 存回 Firebase
@@ -1148,5 +1215,25 @@ async function manualLineNotify(){
 // ══ 初始化 ══
 initLogin();
 </script>
+
+<!-- 密碼 Modal -->
+<div class="pwd-modal-wrap" id="pwd-modal-wrap">
+  <div class="pwd-modal">
+    <div class="pwd-modal-title" id="pwd-modal-title">🔐 請輸入密碼</div>
+    <div class="pwd-modal-sub" id="pwd-modal-sub">輸入管理者密碼繼續</div>
+    <div class="pwd-modal-inp-wrap">
+      <input class="pwd-modal-inp" type="password" id="pwd-modal-inp"
+        placeholder="••••••••••••"
+        onkeydown="if(event.key==='Enter')pwdModalConfirm()">
+      <button class="pwd-modal-eye" onclick="togglePwd('pwd-modal-inp',this)" title="顯示密碼">👁</button>
+    </div>
+    <div class="pwd-modal-err" id="pwd-modal-err"></div>
+    <div class="pwd-modal-btns">
+      <button class="pwd-modal-cancel" onclick="pwdModalCancel()">取消</button>
+      <button class="pwd-modal-ok" onclick="pwdModalConfirm()">確認</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
