@@ -629,7 +629,6 @@ function renderBoard(){
       </button>
     </div>`:'';
 
-  /
 
 // ── 週切換 ──
 function swWeek(w){S.curWeek=w;S.statFilter='';renderBoard();}
@@ -648,7 +647,7 @@ function expAll(){
   document.querySelectorAll('.tc-body').forEach(e=>e.classList.add('op'));
   document.querySelectorAll('.tc-arr').forEach(e=>e.classList.add('op'));
 }
-/ ── 收合展開控制 ──
+  // ── 收合展開控制 ──
   const viewCtrl=`
     <div class="view-ctrl">
       <button class="tb" onclick="colAll()">全部收合</button>
