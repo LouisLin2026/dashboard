@@ -272,6 +272,30 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .tb:hover{border-color:var(--navy);color:var(--navy)}
 .tb.on{background:var(--navy);color:#fff;border-color:var(--navy)}
 
+
+/* ── 搜尋欄 ── */
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-s);padding:8px 12px;margin-bottom:10px;transition:border-color .15s}
+.search-bar:focus-within{border-color:var(--navy)}
+.search-bar input{flex:1;border:none;outline:none;font-family:inherit;font-size:13px;background:none;color:var(--text)}
+.search-bar input::placeholder{color:var(--hint)}
+.search-clear{font-size:14px;cursor:pointer;color:var(--hint);background:none;border:none;padding:0;line-height:1}
+.search-clear:hover{color:var(--red)}
+
+/* ── 任務編輯 Panel ── */
+.task-edit-panel{background:var(--navy-l);border:1.5px solid #C8D8F0;border-radius:var(--radius-s);padding:12px;margin-top:8px;display:none}
+.task-edit-panel.op{display:block}
+.tep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.tep-field{display:flex;flex-direction:column;gap:3px}
+.tep-field label{font-size:11px;color:var(--muted);font-weight:500}
+.tep-field input,.tep-field select,.tep-field textarea{padding:7px 9px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:12px;background:#fff;color:var(--text);outline:none}
+.tep-field input:focus,.tep-field select:focus,.tep-field textarea:focus{border-color:var(--navy)}
+.tep-field textarea{resize:vertical;min-height:52px}
+.tep-full{grid-column:1/-1}
+.tep-btns{display:flex;gap:6px;margin-top:8px}
+.tep-save{flex:1;padding:8px;border:none;border-radius:var(--radius-s);background:var(--navy);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.tep-cancel{padding:8px 14px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--muted);font-family:inherit;font-size:12px}
+.tep-del{padding:8px 14px;border:1px solid var(--red-l);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--red);font-family:inherit;font-size:12px}
+
 </style>
 </head>
 <body>
@@ -410,6 +434,7 @@ let S={
   meta:{},
   tab:'board',
   curWeek:1,     // 1=本週 2=下週 0=持續
+  searchKw:'',   // 搜尋關鍵字
   statFilter:'', // ''=全部 'over'=逾期 'week'=本週 'done'=已完成
   viewMode:'c',  // c=收合 e=展開
   addOpen:false, meetOpen:false,
@@ -597,6 +622,18 @@ function renderBoard(){
     else displayTasks=tasks.filter(t=>isCont(t)&&!DONE_ST.has(t.status||''));
   }
 
+  // ── 搜尋過濾 ──
+  if(S.searchKw){
+    const kw=S.searchKw.toLowerCase();
+    displayTasks=tasks.filter(t=>{
+      const dept=S.depts.find(d=>d.id===t.deptId)?.name||'';
+      return (t.title||'').toLowerCase().includes(kw)||
+             (t.desc||'').toLowerCase().includes(kw)||
+             dept.toLowerCase().includes(kw)||
+             (t.progress||'').toLowerCase().includes(kw);
+    });
+  }
+
   // ── 統計數字 ──
   const statsHtml=`
     <div class="stats" style="margin-bottom:10px">
@@ -612,6 +649,16 @@ function renderBoard(){
       <div class="sc${S.statFilter==='done'?' active':''}" onclick="setStatFilter('done')" title="只看已完成">
         <div class="sv" style="color:var(--green)">${done.length}</div><div class="sl">已完成</div>
       </div>
+    </div>`;
+
+  // ── 搜尋欄 ──
+  const searchHtml=`
+    <div class="search-bar">
+      <span style="font-size:15px;color:var(--hint)">🔍</span>
+      <input type="text" id="search-inp" placeholder="搜尋專案名稱、說明、單位..."
+        value="${escH(S.searchKw)}"
+        oninput="doSearch(this.value)">
+      ${S.searchKw?`<button class="search-clear" onclick="doSearch('')" title="清除搜尋">✕</button>`:''}
     </div>`;
 
   // ── 週切換按鈕（只在無篩選時顯示） ──
@@ -658,13 +705,26 @@ function renderBoard(){
 
   // ── 組合輸出 ──
   document.getElementById('main').innerHTML=
-    statsHtml+weekTabsHtml+viewCtrl+aiBarHtml+mgrTools+taskListHtml;
+    statsHtml+searchHtml+weekTabsHtml+viewCtrl+aiBarHtml+mgrTools+taskListHtml;
 
   if(S.addOpen)document.getElementById('add-body')?.classList.add('op');
   if(S.meetOpen)document.getElementById('meet-body')?.classList.add('op');
   if(S.parsedTasks.length>0)document.getElementById('parsed-tasks')?.classList.add('op');
 }
 
+
+
+// ── 搜尋 ──
+function doSearch(kw){
+  S.searchKw=kw;
+  S.statFilter='';
+  renderBoard();
+  // 重新聚焦搜尋框
+  setTimeout(()=>{
+    const inp=document.getElementById('search-inp');
+    if(inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
+  },50);
+}
 
 // ── 週切換 ──
 function swWeek(w){S.curWeek=w;S.statFilter='';renderBoard();}
@@ -705,12 +765,16 @@ function renderTaskCard(t,size='full'){
           ${updToday?`<span style="font-size:9px;color:var(--green);font-weight:700">✓今日更新</span>`:''}
         </div>
       </div>
-      ${canEdit?`<button class="tc-edit-btn" onclick="event.stopPropagation();openEdit('${t.id}')">填進度</button>`:''}
+      <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+        ${canEdit?`<button class="tc-edit-btn" onclick="event.stopPropagation();openEdit('${t.id}')">填進度</button>`:''}
+        ${S.isMgr?`<button class="tc-edit-btn" style="color:var(--purple);border-color:var(--purple)" onclick="event.stopPropagation();openEditPanel('${t.id}')">✏️ 編輯</button>`:''}
+      </div>
     </div>
     <div class="tc-body" id="tb-${t.id}">
       ${t.desc?`<div class="tc-detail">${escH(t.desc)}</div>`:''}
       ${progLines.length?`<div class="tc-prog-box">${progLines.map((l,i)=>{const m=l.match(/^(\d+\.\S+)\s(.*)$/);const latest=i===progLines.length-1;if(m)return`<div class="prog-line${latest?' latest':''}"><span class="prog-seq">${escH(m[1])}</span>${escH(m[2])}</div>`;return`<div class="prog-line${latest?' latest':''}">${escH(l)}</div>`;}).join('')}</div>`:''}
       ${renderQEdit(t)}
+      ${S.isMgr?renderEditPanel(t):''}
     </div>
   </div>`;
 }
@@ -773,8 +837,10 @@ function renderMeetingPanel(){
 
 function renderQEdit(t){
   const nextSeq=(t.progress||'').split('\n').filter(Boolean).length+1;
+  const dueVal=t.dueDate?(t.dueDate.replace(/\//g,'-')):'';
   return `<div class="qedit" id="qe-${t.id}">
     <div class="qe-row"><span class="qe-lbl">狀態</span><select class="qe-sel" id="qs-${t.id}">${STATUS_OPTS.map(s=>`<option${s===(t.status||'進行中')?' selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="qe-row"><span class="qe-lbl">完成日期</span><input type="date" class="qe-inp" id="qd-${t.id}" value="${dueVal}" title="修改截止日期"></div>
     <div class="qe-row"><span class="qe-lbl">今日進度</span></div>
     <textarea class="qe-ta" id="qu-${t.id}" placeholder="一句話進度（自動加 ${nextSeq}.${todayShort()} ...）"></textarea>
     <div class="qe-btns">
@@ -785,6 +851,100 @@ function renderQEdit(t){
 }
 
 // ══ 互動 ══
+// ── 任務完整編輯 Panel（管理者）──
+function renderEditPanel(t){
+  const dueVal = t.dueDate?(t.dueDate.replace(/\//g,'-')):'';
+  return `<div class="task-edit-panel" id="tep-${t.id}">
+    <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">✏️ 編輯專案內容</div>
+    <div class="tep-grid">
+      <div class="tep-field tep-full">
+        <label>專案名稱</label>
+        <input type="text" id="te-title-${t.id}" value="${escH(t.title)}" placeholder="專案名稱">
+      </div>
+      <div class="tep-field">
+        <label>分配單位</label>
+        <select id="te-dept-${t.id}">
+          <option value="">未分配</option>
+          ${S.depts.map(d=>`<option value="${d.id}"${t.deptId===d.id?' selected':''}>${escH(d.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="tep-field">
+        <label>截止日期</label>
+        <input type="date" id="te-due-${t.id}" value="${dueVal}">
+      </div>
+      <div class="tep-field">
+        <label>狀態</label>
+        <select id="te-status-${t.id}">
+          ${STATUS_OPTS.map(s=>`<option${s===(t.status||'進行中')?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="tep-field">
+        <label>來源標記</label>
+        <select id="te-src-${t.id}">
+          <option value="false"${!t.fromMeeting?' selected':''}>手動新增</option>
+          <option value="true"${t.fromMeeting?' selected':''}>來自會議</option>
+        </select>
+      </div>
+      <div class="tep-field tep-full">
+        <label>說明備註</label>
+        <textarea id="te-desc-${t.id}" placeholder="任務說明或背景...">${escH(t.desc||'')}</textarea>
+      </div>
+    </div>
+    <div class="tep-btns">
+      <button class="tep-save" onclick="saveEditPanel('${t.id}')">💾 儲存變更</button>
+      <button class="tep-cancel" onclick="closeEditPanel('${t.id}')">取消</button>
+      <button class="tep-del" onclick="deleteTask('${t.id}','${escH(t.title)}')">🗑 刪除</button>
+    </div>
+  </div>`;
+}
+
+function openEditPanel(id){
+  const el=document.getElementById('tep-'+id);
+  if(el){el.classList.add('op');el.querySelector('input')?.focus();}
+  // 同時確保卡片展開
+  document.getElementById('tb-'+id)?.classList.add('op');
+  document.getElementById('ta-'+id)?.classList.add('op');
+}
+function closeEditPanel(id){
+  document.getElementById('tep-'+id)?.classList.remove('op');
+}
+
+async function saveEditPanel(id){
+  const t=S.tasks[id]; if(!t) return;
+  const title=document.getElementById('te-title-'+id)?.value.trim();
+  const deptId=document.getElementById('te-dept-'+id)?.value||'';
+  const dueRaw=document.getElementById('te-due-'+id)?.value||'';
+  const status=document.getElementById('te-status-'+id)?.value||'';
+  const src=document.getElementById('te-src-'+id)?.value==='true';
+  const desc=document.getElementById('te-desc-'+id)?.value.trim()||'';
+
+  if(!title){alert('請填入專案名稱');return;}
+  t.title=title;
+  t.deptId=deptId;
+  t.dueDate=dueRaw?dueRaw.replace(/-/g,'/'):t.dueDate;
+  t.status=status;
+  t.fromMeeting=src;
+  t.desc=desc;
+  t.lastUpdated=S.todayStr;
+  t.lastUpdatedBy=S.me;
+
+  setSyn('sv');
+  await fbSet(P_TASKS+'/'+id,t);
+  setSyn('ok');
+  toast('✅ 專案內容已更新');
+  renderBoard();
+}
+
+async function deleteTask(id, title){
+  if(!confirm(`確定刪除「${title}」？\n此操作無法復原。`)) return;
+  delete S.tasks[id];
+  setSyn('sv');
+  await fbDel(P_TASKS+'/'+id);
+  setSyn('ok');
+  toast('✓ 任務已刪除','var(--red)');
+  renderBoard();
+}
+
 function togTask(id){
   const b=document.getElementById('tb-'+id),a=document.getElementById('ta-'+id);
   if(!b)return;const op=b.classList.toggle('op');if(a)a.classList.toggle('op',op);
@@ -846,13 +1006,15 @@ async function addTask(){
 async function saveTask(id){
   const ns=document.getElementById('qs-'+id)?.value||'';
   const txt=document.getElementById('qu-'+id)?.value.trim()||'';
-  if(!txt&&!ns){closeEdit(id);return;}
+  const newDue=document.getElementById('qd-'+id)?.value||'';
+  if(!txt&&!ns&&!newDue){closeEdit(id);return;}
   setSyn('sv');
   const t=S.tasks[id];if(!t)return;
   const prevLines=(t.progress||'').split('\n').filter(Boolean);
   const seq=prevLines.length+1;
   if(txt)t.progress=[...prevLines,`${seq}.${todayShort()} ${txt}`].join('\n');
   if(ns)t.status=ns;
+  if(newDue)t.dueDate=newDue.replace(/-/g,'/');
   t.lastUpdated=S.todayStr;
   t.lastUpdatedBy=S.me;
   await fbPatch(P_TASKS+'/'+id,t);
