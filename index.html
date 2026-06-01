@@ -630,23 +630,9 @@ function renderBoard(){
     </div>`:'';
 
 
-// ── 週切換 ──
-function swWeek(w){S.curWeek=w;S.statFilter='';renderBoard();}
 
-// ── 統計篩選 ──
-function setStatFilter(f){S.statFilter=f;renderBoard();}
 
-// ── 全部收合 ──
-function colAll(){
-  document.querySelectorAll('.tc-body').forEach(e=>e.classList.remove('op'));
-  document.querySelectorAll('.tc-arr').forEach(e=>e.classList.remove('op'));
-}
 
-// ── 全部展開 ──
-function expAll(){
-  document.querySelectorAll('.tc-body').forEach(e=>e.classList.add('op'));
-  document.querySelectorAll('.tc-arr').forEach(e=>e.classList.add('op'));
-}
   // ── 收合展開控制 ──
   const viewCtrl=`
     <div class="view-ctrl">
@@ -677,6 +663,24 @@ function expAll(){
   if(S.addOpen)document.getElementById('add-body')?.classList.add('op');
   if(S.meetOpen)document.getElementById('meet-body')?.classList.add('op');
   if(S.parsedTasks.length>0)document.getElementById('parsed-tasks')?.classList.add('op');
+}
+
+
+// ── 週切換 ──
+function swWeek(w){S.curWeek=w;S.statFilter='';renderBoard();}
+// ── 統計篩選 ──
+function setStatFilter(f){S.statFilter=f;renderBoard();}
+
+// ── 全部收合 ──
+function colAll(){
+  document.querySelectorAll('.tc-body').forEach(e=>e.classList.remove('op'));
+  document.querySelectorAll('.tc-arr').forEach(e=>e.classList.remove('op'));
+}
+
+// ── 全部展開 ──
+function expAll(){
+  document.querySelectorAll('.tc-body').forEach(e=>e.classList.add('op'));
+  document.querySelectorAll('.tc-arr').forEach(e=>e.classList.add('op'));
 }
 
 function renderTaskCard(t,size='full'){
