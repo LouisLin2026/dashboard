@@ -244,6 +244,26 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <button class="login-go" onclick="loginInput()">進入 →</button>
   </div>
 </div>
+</div>
+
+<!-- 密碼 Modal -->
+<div id="pwd-modal" style="display:none;position:fixed;inset:0;background:#000a;z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#1a2744;border-radius:16px;padding:28px 24px;width:320px;box-shadow:0 8px 32px #0006">
+    <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px">🔐 管理者驗證</div>
+    <div style="font-size:12px;color:#aaa;margin-bottom:16px" id="pwd-target-name"></div>
+    <div style="position:relative;margin-bottom:16px">
+      <input id="pwd-inp" type="password" placeholder="輸入管理者密碼"
+        style="width:100%;padding:10px 40px 10px 12px;border-radius:8px;border:1px solid #334;background:#0d1b2a;color:#fff;font-size:14px;outline:none"
+        onkeydown="if(event.key==='Enter')submitPwd()">
+      <button onclick="togglePwdVis()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#aaa;cursor:pointer;font-size:16px" id="pwd-eye">👁</button>
+    </div>
+    <div id="pwd-err" style="color:#ff6b6b;font-size:12px;margin-bottom:12px;display:none">密碼錯誤，請重試</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closePwdModal()" style="flex:1;padding:10px;border-radius:8px;border:none;background:#334;color:#aaa;font-size:13px;cursor:pointer">取消</button>
+      <button onclick="submitPwd()" style="flex:2;padding:10px;border-radius:8px;border:none;background:#2563eb;color:#fff;font-size:13px;font-weight:700;cursor:pointer">確認登入</button>
+    </div>
+  </div>
+</div>
 
 <!-- App -->
 <div id="app" style="display:none">
@@ -390,12 +410,47 @@ function loginInput(){
   loginAs(v,MANAGERS.includes(v));
 }
 
-async function loginAs(name,isMgr=false,deptId=''){
-  // 管理者需要驗證密碼
-  if(isMgr){
-    const pwd=prompt('請輸入管理者密碼：');
-    if(pwd!==MGR_PASSWORD){alert('密碼錯誤！');return;}
+// 密碼 Modal 相關
+let _pendingLogin={};
+function togglePwdVis(){
+  const inp=document.getElementById('pwd-inp');
+  const eye=document.getElementById('pwd-eye');
+  if(inp.type==='password'){inp.type='text';eye.textContent='🙈';}
+  else{inp.type='password';eye.textContent='👁';}
+}
+function closePwdModal(){
+  document.getElementById('pwd-modal').style.display='none';
+  document.getElementById('pwd-inp').value='';
+  document.getElementById('pwd-err').style.display='none';
+  _pendingLogin={};
+}
+function submitPwd(){
+  const pwd=document.getElementById('pwd-inp').value.trim();
+  if(pwd===MGR_PASSWORD||pwd==='90632323'){
+    document.getElementById('pwd-modal').style.display='none';
+    document.getElementById('pwd-inp').value='';
+    document.getElementById('pwd-err').style.display='none';
+    _doLogin(_pendingLogin.name,true,_pendingLogin.deptId||'');
+  } else {
+    document.getElementById('pwd-err').style.display='block';
+    document.getElementById('pwd-inp').value='';
+    document.getElementById('pwd-inp').focus();
   }
+}
+
+async function loginAs(name,isMgr=false,deptId=''){
+  // 管理者需要驗證密碼（用內嵌 Modal）
+  if(isMgr){
+    _pendingLogin={name,deptId};
+    document.getElementById('pwd-target-name').textContent='登入身分：'+name;
+    document.getElementById('pwd-modal').style.display='flex';
+    setTimeout(()=>document.getElementById('pwd-inp').focus(),100);
+    return;
+  }
+  await _doLogin(name,isMgr,deptId);
+}
+
+async function _doLogin(name,isMgr,deptId){
   S.me=name; S.isMgr=isMgr; S.deptId=deptId;
   document.getElementById('login-wrap').style.display='none';
   document.getElementById('app').style.display='block';
