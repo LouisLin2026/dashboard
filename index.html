@@ -68,9 +68,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 /* ── Content ── */
 .content{padding:12px 14px;max-width:560px;margin:0 auto}
 
-/* ── 統計 ── */
+/* ── 統計 (可點擊按鈕版) ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
-.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 6px;text-align:center;box-shadow:var(--shadow)}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 6px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .15s,transform .1s;user-select:none}
+.sc:hover{box-shadow:var(--shadow-m);transform:translateY(-1px)}
+.sc:active{transform:translateY(0)}
 .sv{font-size:20px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace}
 .sl{font-size:10px;color:var(--muted);margin-top:1px}
 
@@ -84,6 +86,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .week-date{font-size:10px;color:rgba(255,255,255,.6)}
 .week-cnt{font-size:10px;background:rgba(255,255,255,.2);color:#fff;padding:1px 7px;border-radius:20px;font-weight:700}
 .week-body{padding:8px}
+
+/* ── 搜尋列 ── */
+.search-bar{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border-s);border-radius:var(--radius-s);padding:7px 10px;margin-bottom:10px}
+.search-bar input{flex:1;border:none;outline:none;font-family:inherit;font-size:13px;background:transparent;color:var(--text)}
+.search-bar input::placeholder{color:var(--hint)}
+.search-clr{background:none;border:none;cursor:pointer;font-size:14px;color:var(--hint);padding:0;line-height:1;display:none}
+.search-clr.vis{display:block}
 
 /* ── 任務卡 ── */
 .task-card{border:1px solid var(--border);border-radius:var(--radius-s);margin-bottom:5px;background:var(--surface);overflow:hidden;transition:border-color .15s}
@@ -121,7 +130,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .qedit{background:var(--navy-l);border:1px solid #C8D8F0;border-radius:var(--radius-s);padding:10px;margin-top:6px;display:none}
 .qedit.op{display:block}
 .qe-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.qe-lbl{font-size:11px;color:var(--muted);width:44px;flex-shrink:0}
+.qe-lbl{font-size:11px;color:var(--muted);width:54px;flex-shrink:0}
 .qe-sel,.qe-inp{flex:1;padding:5px 8px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:12px;background:#fff;color:var(--text);outline:none}
 .qe-sel:focus,.qe-inp:focus{border-color:var(--navy)}
 .qe-ta{width:100%;padding:6px 8px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:12px;background:#fff;color:var(--text);outline:none;resize:vertical;min-height:44px}
@@ -218,6 +227,22 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .toggle-slider:before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
 .toggle input:checked+.toggle-slider:before{transform:translateX(16px)}
 
+/* ── Modal 通用 ── */
+.modal-overlay{position:fixed;inset:0;background:#000a;z-index:9998;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.op{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--radius);padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-m)}
+.modal-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);padding:2px}
+.modal-footer{display:flex;gap:8px;margin-top:14px}
+.modal-btn-save{flex:1;padding:9px;border:none;border-radius:var(--radius-s);background:var(--navy);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.modal-btn-del{padding:9px 14px;border:1px solid var(--red);border-radius:var(--radius-s);background:#fff;color:var(--red);font-family:inherit;font-size:13px;cursor:pointer}
+.modal-btn-cancel{padding:9px 14px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer}
+
+/* ── 篩選 Modal ── */
+.filter-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.fchip{padding:5px 12px;border:1px solid var(--border-s);border-radius:20px;font-family:inherit;font-size:12px;cursor:pointer;background:var(--surface);color:var(--muted)}
+.fchip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
 /* ── 通用 ── */
 .empty{text-align:center;padding:24px;color:var(--hint);font-size:12px}
 .loading{text-align:center;padding:32px;color:var(--hint)}
@@ -244,7 +269,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <button class="login-go" onclick="loginInput()">進入 →</button>
   </div>
 </div>
-</div>
 
 <!-- 密碼 Modal -->
 <div id="pwd-modal" style="display:none;position:fixed;inset:0;background:#000a;z-index:9999;align-items:center;justify-content:center">
@@ -262,6 +286,28 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
       <button onclick="closePwdModal()" style="flex:1;padding:10px;border-radius:8px;border:none;background:#334;color:#aaa;font-size:13px;cursor:pointer">取消</button>
       <button onclick="submitPwd()" style="flex:2;padding:10px;border-radius:8px;border:none;background:#2563eb;color:#fff;font-size:13px;font-weight:700;cursor:pointer">確認登入</button>
     </div>
+  </div>
+</div>
+
+<!-- 編輯任務 Modal -->
+<div id="edit-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span>✏️ 編輯專案</span>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div id="edit-modal-body"></div>
+  </div>
+</div>
+
+<!-- 篩選 Modal -->
+<div id="filter-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span>🔍 篩選任務</span>
+      <button class="modal-close" onclick="document.getElementById('filter-modal').classList.remove('op')">✕</button>
+    </div>
+    <div id="filter-modal-body"></div>
   </div>
 </div>
 
@@ -319,13 +365,15 @@ const P_REPORTS='yilan/reports';
 async function fbGet(p){try{const r=await fetch(`${FB}/${p}.json`);if(!r.ok)return null;return r.json();}catch(e){return null;}}
 async function fbSet(p,v){try{await fetch(`${FB}/${p}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});return true;}catch(e){return false;}}
 async function fbPatch(p,v){try{await fetch(`${FB}/${p}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});return true;}catch(e){return false;}}
-async function fbPost(p,v){try{const r=await fetch(`${FB}/${p}.json`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});return r.ok;}catch(e){return false;}}
+async function fbDel(p){try{await fetch(`${FB}/${p}.json`,{method:'DELETE'});return true;}catch(e){return false;}}
 
 // ══ 常數 ══
 const STATUS_OPTS=['進行中','尚未開始','已完成','已暫緩','待確認'];
 const STATUS_BG={進行中:'var(--amber-l)',尚未開始:'var(--blue-l)',已完成:'var(--green-l)',已暫緩:'var(--red-l)',待確認:'var(--amber-l)'};
 const STATUS_TC={進行中:'var(--amber)',尚未開始:'var(--blue)',已完成:'var(--green)',已暫緩:'var(--red)',待確認:'var(--amber)'};
 const DONE_ST=new Set(['已完成']);
+
+const CAT_OPTS=['','設備','生產','品保','研發','廠務','行政','其他'];
 
 // 預設單位
 const DEFAULT_DEPTS=[
@@ -337,22 +385,26 @@ const DEFAULT_DEPTS=[
   {id:'d6',name:'管理部',contact:'管理主任',color:'#C0392B'},
 ];
 const MANAGERS=['Louis','主管','廠長','Danny'];
-const MGR_PASSWORD='Bfy@90632323'; // 管理者驗證密碼
+const MGR_PASSWORD='Bfy@90632323';
 
 // ══ 狀態 ══
 let S={
   me:null, isMgr:false,
-  tasks:{},   // {id: task}
+  tasks:{},
   depts:DEFAULT_DEPTS,
   meta:{},
   tab:'board',
   addOpen:false, meetOpen:false,
   lineToken:'',
   lineNotify:{newTask:true,importTask:true,weekReport:true,overdue:false},
-  parsedTasks:[],  // 從會議記錄解析出的任務
+  parsedTasks:[],
   generatedReport:'',
   todayStr:'',
-  weekLabel:['',''],  // [本週, 下週] 日期標示
+  weekLabel:['',''],
+  searchQ:'',          // 搜尋關鍵字
+  filterStatus:'',     // 篩選狀態
+  filterDept:'',       // 篩選單位
+  boardView:'biweek',  // 'biweek' | 'all' | 'overdue' | 'thisweek' | 'done'
 };
 
 function todayStr(){const n=new Date();return `${n.getFullYear()}/${(n.getMonth()+1).toString().padStart(2,'0')}/${n.getDate().toString().padStart(2,'0')}`;}
@@ -390,16 +442,82 @@ function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function setSyn(st){const d=document.getElementById('sdot');d.className='sync-dot'+(st==='sv'?' sv':st==='err'?' err':'');}
 function toast(msg,color='var(--green)'){const el=document.getElementById('tg');el.textContent=msg;el.style.background=color;el.style.color='#fff';el.classList.add('op');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('op'),3000);}
 
+// ══ 搜尋/篩選 ══
+function applyFilters(tasks){
+  let arr=[...tasks];
+  // 搜尋
+  if(S.searchQ){
+    const q=S.searchQ.toLowerCase();
+    arr=arr.filter(t=>{
+      const dept=S.depts.find(d=>d.id===t.deptId)?.name||'';
+      return (t.title||'').toLowerCase().includes(q)||(t.desc||'').toLowerCase().includes(q)||(t.progress||'').toLowerCase().includes(q)||dept.toLowerCase().includes(q)||(t.category||'').toLowerCase().includes(q);
+    });
+  }
+  // 狀態篩選
+  if(S.filterStatus) arr=arr.filter(t=>(t.status||'進行中')===S.filterStatus);
+  // 單位篩選
+  if(S.filterDept) arr=arr.filter(t=>t.deptId===S.filterDept);
+  return arr;
+}
+
+function renderSearchBar(){
+  return `<div class="search-bar">
+    <span style="font-size:14px;color:var(--hint)">🔍</span>
+    <input type="text" id="search-inp" placeholder="搜尋專案標題、單位、關鍵字..." value="${escH(S.searchQ)}" oninput="onSearchInput(this.value)">
+    <button class="search-clr${S.searchQ?' vis':''}" id="search-clr" onclick="clearSearch()">✕</button>
+    <button onclick="openFilterModal()" style="border:none;background:none;cursor:pointer;font-size:15px;padding:0" title="篩選">${(S.filterStatus||S.filterDept)?'🔵':'⚙️'}</button>
+  </div>`;
+}
+
+function onSearchInput(v){
+  S.searchQ=v;
+  document.getElementById('search-clr')?.classList.toggle('vis',!!v);
+  renderBoardContent();
+}
+function clearSearch(){
+  S.searchQ='';
+  renderBoardContent();
+}
+
+function openFilterModal(){
+  const body=document.getElementById('filter-modal-body');
+  body.innerHTML=`
+    <div style="margin-bottom:10px">
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px">狀態</div>
+      <div class="filter-chips">
+        <button class="fchip${!S.filterStatus?' active':''}" onclick="setFilter('status','')">全部</button>
+        ${STATUS_OPTS.map(s=>`<button class="fchip${S.filterStatus===s?' active':''}" onclick="setFilter('status','${s}')">${s}</button>`).join('')}
+      </div>
+    </div>
+    <div style="margin-bottom:10px">
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px">單位</div>
+      <div class="filter-chips">
+        <button class="fchip${!S.filterDept?' active':''}" onclick="setFilter('dept','')">全部</button>
+        ${S.depts.map(d=>`<button class="fchip${S.filterDept===d.id?' active':''}" onclick="setFilter('dept','${d.id}')">${escH(d.name)}</button>`).join('')}
+      </div>
+    </div>
+    <button onclick="clearFilters()" style="width:100%;padding:8px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer">清除所有篩選</button>
+  `;
+  document.getElementById('filter-modal').classList.add('op');
+}
+function setFilter(type,val){
+  if(type==='status')S.filterStatus=val;
+  if(type==='dept')S.filterDept=val;
+  document.getElementById('filter-modal').classList.remove('op');
+  renderBoardContent();
+}
+function clearFilters(){
+  S.filterStatus='';S.filterDept='';
+  document.getElementById('filter-modal').classList.remove('op');
+  renderBoardContent();
+}
+
 // ══ 登入 ══
 async function initLogin(){
   const rawD=await fbGet(P_DEPTS);
   if(rawD&&Array.isArray(rawD))S.depts=rawD;
-
-  // 管理者按鈕
   const mgrGrid=document.getElementById('mgr-grid');
   mgrGrid.innerHTML=MANAGERS.map(m=>`<button class="rbtn manager-role" onclick="loginAs('${escH(m)}',true)">👑 ${escH(m)}</button>`).join('');
-
-  // 單位按鈕
   const deptGrid=document.getElementById('dept-grid');
   deptGrid.innerHTML=S.depts.map(d=>`<button class="rbtn" onclick="loginAs('${escH(d.contact)}',false,'${escH(d.id)}')" style="border-color:${d.color}22;color:${d.color}">${escH(d.name)}</button>`).join('');
 }
@@ -410,7 +528,6 @@ function loginInput(){
   loginAs(v,MANAGERS.includes(v));
 }
 
-// 密碼 Modal 相關
 let _pendingLogin={};
 function togglePwdVis(){
   const inp=document.getElementById('pwd-inp');
@@ -439,7 +556,6 @@ function submitPwd(){
 }
 
 async function loginAs(name,isMgr=false,deptId=''){
-  // 管理者需要驗證密碼（用內嵌 Modal）
   if(isMgr){
     _pendingLogin={name,deptId};
     document.getElementById('pwd-target-name').textContent='登入身分：'+name;
@@ -459,23 +575,19 @@ async function _doLogin(name,isMgr,deptId){
   S.todayStr=todayStr();
   S.weekLabel=[getWeekLabel(0),getWeekLabel(1)];
   document.getElementById('hdr-sub').textContent=(isMgr?'管理者模式':'單位模式')+' · '+S.todayStr;
-
-  // 管理者顯示更多頁籤
   if(isMgr){
     ['import','report','depts','line'].forEach(t=>document.getElementById('nb-'+t).style.display='flex');
   }
-  // 載入 Line 設定
   const savedToken=localStorage.getItem('yilan_line_token')||'';
   const savedNotify=JSON.parse(localStorage.getItem('yilan_line_notify')||'null');
   if(savedToken)S.lineToken=savedToken;
   if(savedNotify)S.lineNotify=savedNotify;
-
   await loadData();
   renderTab();
 }
 
 function logout(){
-  S.me=null;S.generatedReport='';S.parsedTasks=[];
+  S.me=null;S.generatedReport='';S.parsedTasks=[];S.searchQ='';S.filterStatus='';S.filterDept='';
   document.getElementById('app').style.display='none';
   document.getElementById('login-wrap').style.display='flex';
   document.getElementById('li').value='';
@@ -491,11 +603,9 @@ async function loadData(){
   setSyn('ok');
 }
 
-// 篩選我可以看/操作的任務
 function visibleTasks(){
   const all=Object.values(S.tasks);
   if(S.isMgr)return all;
-  // 單位只看分配給自己單位的
   return all.filter(t=>t.deptId===S.deptId||(S.depts.find(d=>d.contact===S.me)?.id===t.deptId));
 }
 
@@ -526,63 +636,121 @@ function renderBoard(){
 
   let html=`
     <div class="stats">
-      <div class="sc"><div class="sv">${tasks.length}</div><div class="sl">總任務</div></div>
-      <div class="sc"><div class="sv" style="color:var(--red)">${overdue.length}</div><div class="sl">逾期</div></div>
-      <div class="sc"><div class="sv" style="color:var(--amber)">${thisWeek.filter(t=>!DONE_ST.has(t.status||'')).length}</div><div class="sl">本週待辦</div></div>
-      <div class="sc"><div class="sv" style="color:var(--green)">${done.length}</div><div class="sl">已完成</div></div>
+      <div class="sc" onclick="setBoardView('all')" title="查看全部任務">
+        <div class="sv">${tasks.length}</div><div class="sl">總任務</div>
+      </div>
+      <div class="sc" onclick="setBoardView('overdue')" title="查看逾期任務">
+        <div class="sv" style="color:var(--red)">${overdue.length}</div><div class="sl">逾期 ⚠️</div>
+      </div>
+      <div class="sc" onclick="setBoardView('thisweek')" title="查看本週待辦">
+        <div class="sv" style="color:var(--amber)">${thisWeek.filter(t=>!DONE_ST.has(t.status||'')).length}</div><div class="sl">本週待辦</div>
+      </div>
+      <div class="sc" onclick="setBoardView('done')" title="查看已完成">
+        <div class="sv" style="color:var(--green)">${done.length}</div><div class="sl">已完成 ✓</div>
+      </div>
     </div>
-    <div style="display:flex;justify-content:flex-end;margin:-4px 0 10px">
-      <button class="ra ra-xl" onclick="exportControlTable()" style="font-size:12px;padding:7px 14px;border-radius:8px">📥 匯出專案控管表</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:-4px 0 10px">
+      <div style="display:flex;gap:6px">
+        <button onclick="setBoardView('biweek')" style="font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid ${S.boardView==='biweek'?'var(--navy)':'var(--border-s)'};background:${S.boardView==='biweek'?'var(--navy)':'#fff'};color:${S.boardView==='biweek'?'#fff':'var(--muted)'};cursor:pointer;font-family:inherit;font-weight:600">雙週看板</button>
+        <button onclick="setBoardView('all')" style="font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid ${S.boardView==='all'?'var(--navy)':'var(--border-s)'};background:${S.boardView==='all'?'var(--navy)':'#fff'};color:${S.boardView==='all'?'#fff':'var(--muted)'};cursor:pointer;font-family:inherit;font-weight:600">全部</button>
+      </div>
+      <button class="ra ra-xl" onclick="exportControlTable()" style="font-size:12px;padding:6px 12px;border-radius:8px">📥 匯出控管表</button>
     </div>
     <div class="ai-bar" id="ai-bar"><div class="ai-spin"></div><span id="ai-txt">🐠 小福處理中...</span></div>`;
 
-  // 管理者顯示新增與會議匯入
-  if(S.isMgr){
-    html+=renderAddPanel()+renderMeetingPanel();
-  }
+  if(S.isMgr){html+=renderAddPanel()+renderMeetingPanel();}
 
-  // 雙週看板
-  html+=`<div class="dual-week">
-    <div class="week-col">
-      <div class="week-hdr current">
-        <span class="week-title">📅 本週</span>
-        <span class="week-date">${S.weekLabel[0]}</span>
-        <span class="week-cnt">${thisWeek.length}</span>
-      </div>
-      <div class="week-body">
-        ${overdue.length?`<div class="section-label" style="color:var(--red)">⚠️ 逾期</div>${overdue.map(t=>renderTaskCard(t,'sm')).join('')}`:''}
-        ${thisWeek.length?thisWeek.map(t=>renderTaskCard(t,'sm')).join(''):'<div class="empty">本週無任務</div>'}
-      </div>
-    </div>
-    <div class="week-col">
-      <div class="week-hdr next">
-        <span class="week-title">🔭 下週預視</span>
-        <span class="week-date">${S.weekLabel[1]}</span>
-        <span class="week-cnt">${nextWeek.length}</span>
-      </div>
-      <div class="week-body">
-        ${nextWeek.length?nextWeek.map(t=>renderTaskCard(t,'sm')).join(''):'<div class="empty">下週暫無任務</div>'}
-      </div>
-    </div>
-  </div>`;
-
-  // 其他任務（無截止日）
-  const others=tasks.filter(t=>!isThisWeek(t)&&!isNextWeek(t)&&!isOverdue(t)&&!DONE_ST.has(t.status||''));
-  if(others.length){
-    html+=`<div class="section-label" style="margin-top:10px">📂 其他進行中任務</div>`;
-    html+=others.map(t=>renderTaskCard(t,'full')).join('');
-  }
-
-  // 已完成（摺疊）
-  if(done.length){
-    html+=`<details style="margin-top:10px"><summary style="font-size:11px;color:var(--hint);cursor:pointer;user-select:none;padding:4px 0">✅ 已完成 ${done.length} 項</summary>${done.map(t=>renderTaskCard(t,'full')).join('')}</details>`;
-  }
+  html+=renderSearchBar();
+  html+='<div id="board-content"></div>';
 
   document.getElementById('main').innerHTML=html;
-  // 重新綁定事件
+
   if(S.addOpen)document.getElementById('add-body')?.classList.add('op');
   if(S.meetOpen)document.getElementById('meet-body')?.classList.add('op');
   if(S.parsedTasks.length>0)document.getElementById('parsed-tasks')?.classList.add('op');
+
+  renderBoardContent();
+
+  // 重新綁 search input 事件（innerHTML 後重掛）
+  document.getElementById('search-inp')?.addEventListener('input',function(){onSearchInput(this.value);});
+}
+
+function setBoardView(view){
+  S.boardView=view;
+  renderBoard();
+}
+
+function renderBoardContent(){
+  const tasks=visibleTasks();
+  const filtered=applyFilters(tasks);
+  const overdue=filtered.filter(t=>isOverdue(t));
+  const thisWeek=filtered.filter(t=>isThisWeek(t)&&!isOverdue(t));
+  const nextWeek=filtered.filter(t=>isNextWeek(t));
+  const done=filtered.filter(t=>DONE_ST.has(t.status||''));
+
+  let html='';
+
+  if(S.searchQ||S.filterStatus||S.filterDept){
+    // 搜尋結果模式
+    if(filtered.length===0){
+      html='<div class="empty">🔍 找不到符合條件的任務</div>';
+    } else {
+      html+=`<div class="section-label" style="margin-bottom:6px">找到 ${filtered.length} 項結果</div>`;
+      html+=filtered.map(t=>renderTaskCard(t,'full')).join('');
+    }
+  } else if(S.boardView==='biweek'){
+    // 雙週看板模式
+    html+=`<div class="dual-week">
+      <div class="week-col">
+        <div class="week-hdr current">
+          <span class="week-title">📅 本週</span>
+          <span class="week-date">${S.weekLabel[0]}</span>
+          <span class="week-cnt">${thisWeek.length+overdue.length}</span>
+        </div>
+        <div class="week-body">
+          ${overdue.length?`<div class="section-label" style="color:var(--red)">⚠️ 逾期</div>${overdue.map(t=>renderTaskCard(t,'sm')).join('')}`:''}
+          ${thisWeek.length?thisWeek.map(t=>renderTaskCard(t,'sm')).join(''):'<div class="empty">本週無任務</div>'}
+        </div>
+      </div>
+      <div class="week-col">
+        <div class="week-hdr next">
+          <span class="week-title">🔭 下週預視</span>
+          <span class="week-date">${S.weekLabel[1]}</span>
+          <span class="week-cnt">${nextWeek.length}</span>
+        </div>
+        <div class="week-body">
+          ${nextWeek.length?nextWeek.map(t=>renderTaskCard(t,'sm')).join(''):'<div class="empty">下週暫無任務</div>'}
+        </div>
+      </div>
+    </div>`;
+    const others=tasks.filter(t=>!isThisWeek(t)&&!isNextWeek(t)&&!isOverdue(t)&&!DONE_ST.has(t.status||''));
+    if(others.length){
+      html+=`<div class="section-label" style="margin-top:10px">📂 其他進行中任務</div>`;
+      html+=others.map(t=>renderTaskCard(t,'full')).join('');
+    }
+    if(done.length){
+      html+=`<details style="margin-top:10px"><summary style="font-size:11px;color:var(--hint);cursor:pointer;user-select:none;padding:4px 0">✅ 已完成 ${done.length} 項</summary>${done.map(t=>renderTaskCard(t,'full')).join('')}</details>`;
+    }
+  } else if(S.boardView==='overdue'){
+    html+=`<div class="section-label" style="color:var(--red);margin-bottom:6px">⚠️ 逾期任務（${overdue.length}）</div>`;
+    html+=overdue.length?overdue.map(t=>renderTaskCard(t,'full')).join(''):'<div class="empty">✓ 目前無逾期任務</div>';
+  } else if(S.boardView==='thisweek'){
+    html+=`<div class="section-label" style="margin-bottom:6px">📅 本週待辦（${thisWeek.length}）</div>`;
+    if(overdue.length) html+=`<div class="section-label" style="color:var(--red);margin-top:8px">⚠️ 逾期</div>`+overdue.map(t=>renderTaskCard(t,'full')).join('');
+    html+=thisWeek.length?thisWeek.map(t=>renderTaskCard(t,'full')).join(''):'<div class="empty">本週無待辦任務</div>';
+  } else if(S.boardView==='done'){
+    html+=`<div class="section-label" style="color:var(--green);margin-bottom:6px">✅ 已完成（${done.length}）</div>`;
+    html+=done.length?done.map(t=>renderTaskCard(t,'full')).join(''):'<div class="empty">尚無完成任務</div>';
+  } else {
+    // all
+    const active=filtered.filter(t=>!DONE_ST.has(t.status||''));
+    html+=`<div class="section-label" style="margin-bottom:6px">📋 全部任務（${filtered.length}）</div>`;
+    html+=active.map(t=>renderTaskCard(t,'full')).join('');
+    if(done.length) html+=`<details style="margin-top:10px"><summary style="font-size:11px;color:var(--hint);cursor:pointer;user-select:none;padding:4px 0">✅ 已完成 ${done.length} 項</summary>${done.map(t=>renderTaskCard(t,'full')).join('')}</details>`;
+  }
+
+  const bc=document.getElementById('board-content');
+  if(bc) bc.innerHTML=html;
 }
 
 function renderTaskCard(t,size='full'){
@@ -602,12 +770,16 @@ function renderTaskCard(t,size='full'){
         <div class="tc-meta">
           <span class="st-chip" style="background:${STATUS_BG[st]};color:${STATUS_TC[st]}">${escH(st)}</span>
           ${dept?`<span class="dept-chip" style="background:${dept.color}18;color:${dept.color};border-color:${dept.color}33">${escH(dept.name)}</span>`:''}
-          ${(()=>{if(!t.dueDate)return'';const cls='date-chip';const sty=overdue?' style="color:var(--red)"':'';return'<span class="'+cls+'"'+sty+'>'+(overdue?'\u26a0\ufe0f ':'\uD83D\uDCC5 ')+escH(t.dueDate)+'</span>';})()}
+          ${t.category?`<span class="date-chip">${escH(t.category)}</span>`:''}
+          ${(()=>{if(!t.dueDate)return'';const cls='date-chip';const sty=overdue?' style="color:var(--red)"':'';return'<span class="'+cls+'"'+sty+'>'+(overdue?'⚠️ ':'\uD83D\uDCC5 ')+escH(t.dueDate)+'</span>';})()}
           ${t.fromMeeting?`<span class="meet-chip">📋 會議</span>`:''}
           ${updToday?`<span style="font-size:9px;color:var(--green);font-weight:700">✓今日更新</span>`:''}
         </div>
       </div>
-      ${canEdit?`<button class="tc-edit-btn" onclick="event.stopPropagation();openEdit('${t.id}')">填進度</button>`:''}
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        ${S.isMgr?`<button class="tc-edit-btn" onclick="event.stopPropagation();openTaskEditModal('${t.id}')" style="color:var(--navy);border-color:var(--navy-l)">✏️ 編輯</button>`:''}
+        ${canEdit?`<button class="tc-edit-btn" onclick="event.stopPropagation();openEdit('${t.id}')">填進度</button>`:''}
+      </div>
     </div>
     <div class="tc-body" id="tb-${t.id}">
       ${t.desc?`<div class="tc-detail">${escH(t.desc)}</div>`:''}
@@ -617,6 +789,87 @@ function renderTaskCard(t,size='full'){
   </div>`;
 }
 
+// ══ 任務編輯 Modal（管理者用完整編輯）══
+function openTaskEditModal(id){
+  const t=S.tasks[id];if(!t)return;
+  const body=document.getElementById('edit-modal-body');
+  body.innerHTML=`
+    <div class="af"><label>任務標題 *</label><input type="text" id="em-title" value="${escH(t.title)}" placeholder="任務標題"></div>
+    <div class="af-grid">
+      <div class="af"><label>分配單位</label>
+        <select id="em-dept"><option value="">未分配</option>${S.depts.map(d=>`<option value="${d.id}"${t.deptId===d.id?' selected':''}>${escH(d.name)}</option>`).join('')}</select>
+      </div>
+      <div class="af"><label>分類（Cat）</label>
+        <select id="em-cat">${CAT_OPTS.map(c=>`<option value="${c}"${(t.category||t.cat||'')===c?' selected':''}>${c||'未分類'}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="af-grid">
+      <div class="af"><label>狀態</label>
+        <select id="em-status">${STATUS_OPTS.map(s=>`<option${s===(t.status||'進行中')?' selected':''}>${s}</option>`).join('')}</select>
+      </div>
+      <div class="af"><label>截止日期</label>
+        <input type="date" id="em-due" value="${t.dueDate?t.dueDate.replace(/\//g,'-'):''}">
+      </div>
+    </div>
+    <div class="af"><label>完成日期（New Date）</label>
+      <input type="date" id="em-completed" value="${t.completedDate?t.completedDate.replace(/\//g,'-'):''}">
+    </div>
+    <div class="af-grid">
+      <div class="af"><label>Owner 負責人</label><input type="text" id="em-owner" value="${escH(t.owner||'')}" placeholder="負責人"></div>
+      <div class="af"><label>協同人員</label><input type="text" id="em-coowner" value="${escH(t.coowner||'')}" placeholder="協同/監督"></div>
+    </div>
+    <div class="af"><label>說明</label><textarea id="em-desc" rows="2">${escH(t.desc||'')}</textarea></div>
+    <div class="af"><label>備註</label><input type="text" id="em-note" value="${escH(t.comments||t.note||'')}" placeholder="備註"></div>
+    <div class="modal-footer">
+      <button class="modal-btn-save" onclick="saveTaskEdit('${id}')">💾 儲存</button>
+      <button class="modal-btn-del" onclick="deleteTask('${id}')">🗑 刪除</button>
+      <button class="modal-btn-cancel" onclick="closeEditModal()">取消</button>
+    </div>`;
+  document.getElementById('edit-modal').classList.add('op');
+}
+
+function closeEditModal(){
+  document.getElementById('edit-modal').classList.remove('op');
+}
+
+async function saveTaskEdit(id){
+  const t=S.tasks[id];if(!t)return;
+  const title=document.getElementById('em-title')?.value.trim();
+  if(!title){alert('請填入任務標題');return;}
+  const dueRaw=document.getElementById('em-due')?.value||'';
+  const compRaw=document.getElementById('em-completed')?.value||'';
+  t.title=title;
+  t.deptId=document.getElementById('em-dept')?.value||'';
+  t.category=document.getElementById('em-cat')?.value||'';
+  t.status=document.getElementById('em-status')?.value||'進行中';
+  t.dueDate=dueRaw?dueRaw.replace(/-/g,'/'):'';
+  t.completedDate=compRaw?compRaw.replace(/-/g,'/'):'';
+  t.owner=document.getElementById('em-owner')?.value.trim()||'';
+  t.coowner=document.getElementById('em-coowner')?.value.trim()||'';
+  t.desc=document.getElementById('em-desc')?.value.trim()||'';
+  t.comments=document.getElementById('em-note')?.value.trim()||'';
+  t.lastUpdated=S.todayStr;
+  t.lastUpdatedBy=S.me;
+  setSyn('sv');
+  await fbPatch(P_TASKS+'/'+id,t);
+  setSyn('ok');
+  closeEditModal();
+  toast('✓ 專案已更新');
+  renderBoard();
+}
+
+async function deleteTask(id){
+  if(!confirm('確定要刪除此任務？此動作無法復原。'))return;
+  delete S.tasks[id];
+  setSyn('sv');
+  await fbDel(P_TASKS+'/'+id);
+  setSyn('ok');
+  closeEditModal();
+  toast('✓ 任務已刪除','var(--red)');
+  renderBoard();
+}
+
+// ══ 快速編輯（填進度）══
 function renderAddPanel(){
   return `<div class="add-panel">
     <div class="add-hdr" onclick="togAdd()">
@@ -636,9 +889,13 @@ function renderAddPanel(){
         <div class="af"><label>狀態</label>
           <select id="af-status">${STATUS_OPTS.map(s=>`<option>${s}</option>`).join('')}</select>
         </div>
-        <div class="af"><label>週次</label>
-          <select id="af-week"><option value="this">本週</option><option value="next">下週</option><option value="other">其他</option></select>
+        <div class="af"><label>分類</label>
+          <select id="af-cat">${CAT_OPTS.map(c=>`<option value="${c}">${c||'未分類'}</option>`).join('')}</select>
         </div>
+      </div>
+      <div class="af-grid">
+        <div class="af"><label>Owner</label><input type="text" id="af-owner" placeholder="負責人"></div>
+        <div class="af"><label>協同人員</label><input type="text" id="af-coowner" placeholder="協同/監督"></div>
       </div>
       <div class="af"><label>說明（選填）</label><textarea id="af-desc" placeholder="任務詳細說明或背景..."></textarea></div>
       <div class="add-btns">
@@ -677,6 +934,7 @@ function renderQEdit(t){
   const nextSeq=(t.progress||'').split('\n').filter(Boolean).length+1;
   return `<div class="qedit" id="qe-${t.id}">
     <div class="qe-row"><span class="qe-lbl">狀態</span><select class="qe-sel" id="qs-${t.id}">${STATUS_OPTS.map(s=>`<option${s===(t.status||'進行中')?' selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="qe-row"><span class="qe-lbl">截止日期</span><input type="date" class="qe-inp" id="qd-${t.id}" value="${t.dueDate?t.dueDate.replace(/\//g,'-'):''}"></div>
     <div class="qe-row"><span class="qe-lbl">今日進度</span></div>
     <textarea class="qe-ta" id="qu-${t.id}" placeholder="一句話進度（自動加 ${nextSeq}.${todayShort()} ...）"></textarea>
     <div class="qe-btns">
@@ -713,8 +971,8 @@ function togMeet(){
   document.getElementById('meet-body')?.classList.toggle('op',S.meetOpen);
 }
 function resetAddForm(){
-  ['af-title','af-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['af-dept','af-status','af-week'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
+  ['af-title','af-desc','af-owner','af-coowner'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['af-dept','af-status','af-cat'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
   const d=document.getElementById('af-due');if(d)d.value='';
 }
 
@@ -727,8 +985,11 @@ async function addTask(){
   const due=dueRaw?dueRaw.replace(/-/g,'/'):'';
   const status=document.getElementById('af-status')?.value||'尚未開始';
   const desc=document.getElementById('af-desc')?.value.trim()||'';
+  const category=document.getElementById('af-cat')?.value||'';
+  const owner=document.getElementById('af-owner')?.value.trim()||'';
+  const coowner=document.getElementById('af-coowner')?.value.trim()||'';
   const id='t'+Date.now();
-  const task={id,title,deptId,dueDate:due,status,desc,progress:'',createdAt:S.todayStr,lastUpdated:'',fromMeeting:false};
+  const task={id,title,deptId,dueDate:due,status,desc,category,owner,coowner,progress:'',createdAt:S.todayStr,lastUpdated:'',fromMeeting:false};
   S.tasks[id]=task;
   setSyn('sv');
   await fbSet(P_TASKS+'/'+id,task);
@@ -736,7 +997,6 @@ async function addTask(){
   resetAddForm();
   S.addOpen=false;
   toast('✓ 任務已新增');
-  // Line Notify 推播
   if(S.lineNotify.newTask){
     const dept=S.depts.find(d=>d.id===deptId)?.name||'未分配';
     lineNotify(`🏭 新任務已分配\n\n📌 ${title}\n🏢 負責單位：${dept}\n📅 截止日期：${due||'未設定'}\n\n請登入系統填寫進度。`);
@@ -748,13 +1008,16 @@ async function addTask(){
 async function saveTask(id){
   const ns=document.getElementById('qs-'+id)?.value||'';
   const txt=document.getElementById('qu-'+id)?.value.trim()||'';
-  if(!txt&&!ns){closeEdit(id);return;}
+  const newDueRaw=document.getElementById('qd-'+id)?.value||'';
+  const newDue=newDueRaw?newDueRaw.replace(/-/g,'/'):'';
+  if(!txt&&!ns&&!newDue){closeEdit(id);return;}
   setSyn('sv');
   const t=S.tasks[id];if(!t)return;
   const prevLines=(t.progress||'').split('\n').filter(Boolean);
   const seq=prevLines.length+1;
   if(txt)t.progress=[...prevLines,`${seq}.${todayShort()} ${txt}`].join('\n');
   if(ns)t.status=ns;
+  if(newDue)t.dueDate=newDue;
   t.lastUpdated=S.todayStr;
   t.lastUpdatedBy=S.me;
   await fbPatch(P_TASKS+'/'+id,t);
@@ -772,11 +1035,9 @@ async function parseMeetingTasks(){
   if(!ta){alert('請貼入會議記錄內容');return;}
   if(btn)btn.disabled=true;
   if(st){st.style.display='block';st.style.color='var(--purple)';st.textContent='🐠 小福正在解析行動項目...';}
-
   const system=`你是會議記錄解析助理。從會議記錄或行動項目中提取任務，回傳 JSON 陣列。
 每個任務格式：{"title":"任務標題","dept":"負責單位（若有）","dueDate":"YYYY/MM/DD（若有，否則空字串）","desc":"補充說明（若有）"}
 只回傳 JSON 陣列，不要其他文字。`;
-
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system,messages:[{role:'user',content:`從以下會議記錄提取行動項目：\n\n${ta}`}]})});
     const data=await res.json();
@@ -816,7 +1077,6 @@ async function importParsedTasks(){
   setSyn('sv');
   for(const t of selected){
     const id='t'+Date.now()+Math.random().toString(36).slice(2,6);
-    // 嘗試匹配單位
     const matchDept=S.depts.find(d=>d.name.includes(t.dept)||t.dept.includes(d.name));
     const task={id,title:t.title,deptId:matchDept?.id||'',dueDate:t.dueDate||'',status:'尚未開始',desc:t.desc||'',progress:'',createdAt:S.todayStr,lastUpdated:'',fromMeeting:true};
     S.tasks[id]=task;
@@ -827,7 +1087,6 @@ async function importParsedTasks(){
   S.parsedTasks=[];
   S.meetOpen=false;
   toast(`✓ 已匯入 ${selected.length} 項任務`);
-  // Line Notify 推播
   if(S.lineNotify.importTask&&selected.length>0){
     const taskList=selected.map(t=>`• ${t.title}${t.dept?' → '+t.dept:''}`).join('\n');
     lineNotify(`📋 會議記錄匯入 ${selected.length} 項任務\n\n${taskList}\n\n請各單位登入系統確認。`);
@@ -841,7 +1100,6 @@ function renderReport(){
   const done=tasks.filter(t=>DONE_ST.has(t.status||'')).length;
   const active=tasks.filter(t=>!DONE_ST.has(t.status||'')).length;
   const updToday=tasks.filter(t=>t.lastUpdated===S.todayStr).length;
-
   document.getElementById('main').innerHTML=`
     <div class="report-box">
       <div class="rb-title">🐠 小福週報產出</div>
@@ -850,14 +1108,12 @@ function renderReport(){
         <strong style="color:var(--purple)">本週任務 ${tasks.length} 項，今日已更新 ${updToday} 項</strong>
       </div>
       <div class="stats" style="margin-bottom:12px">
-        <div class="sc"><div class="sv" style="color:var(--amber)">${active}</div><div class="sl">進行中</div></div>
-        <div class="sc"><div class="sv" style="color:var(--green)">${done}</div><div class="sl">已完成</div></div>
-        <div class="sc"><div class="sv" style="color:var(--red)">${tasks.filter(t=>isOverdue(t)).length}</div><div class="sl">逾期</div></div>
-        <div class="sc"><div class="sv" style="color:var(--blue)">${tasks.filter(t=>isNextWeek(t)).length}</div><div class="sl">下週待辦</div></div>
+        <div class="sc" style="cursor:default"><div class="sv" style="color:var(--amber)">${active}</div><div class="sl">進行中</div></div>
+        <div class="sc" style="cursor:default"><div class="sv" style="color:var(--green)">${done}</div><div class="sl">已完成</div></div>
+        <div class="sc" style="cursor:default"><div class="sv" style="color:var(--red)">${tasks.filter(t=>isOverdue(t)).length}</div><div class="sl">逾期</div></div>
+        <div class="sc" style="cursor:default"><div class="sv" style="color:var(--blue)">${tasks.filter(t=>isNextWeek(t)).length}</div><div class="sl">下週待辦</div></div>
       </div>
-      <button class="gen-btn" id="gen-btn" onclick="genReport()">
-        🐠 一鍵產出週報
-      </button>
+      <button class="gen-btn" id="gen-btn" onclick="genReport()">🐠 一鍵產出週報</button>
       <div class="rpt-status" id="rpt-status"></div>
     </div>
     <div class="rpt-result${S.generatedReport?' op':''}" id="rpt-result">
@@ -880,13 +1136,11 @@ async function genReport(){
   const st=document.getElementById('rpt-status');
   if(btn)btn.disabled=true;
   if(st){st.style.display='block';st.style.color='var(--purple)';st.textContent='🐠 小福正在撰寫週報...';}
-
   const tasks=Object.values(S.tasks);
   const thisW=tasks.filter(t=>isThisWeek(t));
   const nextW=tasks.filter(t=>isNextWeek(t));
   const overdueT=tasks.filter(t=>isOverdue(t));
   const done=tasks.filter(t=>DONE_ST.has(t.status||''));
-
   const system=`你是宜蘭廠區工作控管的週報助理，協助廠區主管 Louis Lin 產出每週工作報告。
 請根據任務資料，自動判斷重點，用繁體中文產出正式週報，格式如下：
 
@@ -915,7 +1169,6 @@ async function genReport(){
 Louis Lin 敬上
 
 請直接輸出週報，不要任何說明。`;
-
   const user=`本週（${S.weekLabel[0]}）任務資料：
 
 已完成（${done.length}項）：
@@ -933,15 +1186,12 @@ ${overdueT.map(t=>`- ${t.title}，期限：${t.dueDate}`).join('\n')||'無'}
 
 下週預計（${nextW.length}項）：
 ${nextW.map(t=>`- ${t.title}（${t.dueDate}）`).join('\n')||'無'}`;
-
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system,messages:[{role:'user',content:user}]})});
     const data=await res.json();
     S.generatedReport=(data.content||[]).map(c=>c.text||'').join('');
-    // 存回 Firebase
     await fbPatch(P_REPORTS+'/'+S.todayStr.replace(/\//g,'_'),{report:S.generatedReport,week:S.weekLabel[0],ts:Date.now()});
     if(st){st.style.color='var(--green)';st.textContent='✓ 週報已產出！';}
-    // Line Notify 推播週報摘要
     if(S.lineNotify.weekReport){
       const lines=S.generatedReport.split('\n').filter(Boolean).slice(0,8).join('\n');
       lineNotify(`📊 宜蘭廠區週報已產出\n週次：${S.weekLabel[0]}\n\n${lines}\n\n（完整內容請查看系統或 Email）`);
@@ -963,21 +1213,17 @@ function sendMail(){
 function cpLine(){if(!S.generatedReport){alert('請先產出週報');return;}navigator.clipboard.writeText(S.generatedReport).then(()=>toast('✓ 已複製，請貼到 Line'));}
 function cpReport(){if(!S.generatedReport){alert('請先產出週報');return;}navigator.clipboard.writeText(S.generatedReport).then(()=>toast('✓ 已複製'));}
 
-// ══ 專案控管表匯出（比照現有 Excel 格式）══
+// ══ 專案控管表匯出 ══
 function exportControlTable(){
   const tasks=Object.values(S.tasks);
   const wb=XLSX.utils.book_new();
   const today=S.todayStr;
-
-  // 依部門排序任務
   const sorted=[...tasks].sort((a,b)=>{
     const da=S.depts.findIndex(d=>d.id===a.deptId);
     const db=S.depts.findIndex(d=>d.id===b.deptId);
     if(da!==db)return da-db;
     return(a.createdAt||'').localeCompare(b.createdAt||'');
   });
-
-  // 計算各部門內的項次
   const deptCounters={};
   const rows=sorted.map(t=>{
     const deptName=S.depts.find(d=>d.id===t.deptId)?.name||'未分配';
@@ -985,71 +1231,32 @@ function exportControlTable(){
     deptCounters[deptName]++;
     const seq=String(deptCounters[deptName]).padStart(2,'0');
     const no=`${deptName}-${seq}`;
-
     const prog=(t.progress||'').trim();
-    const owner=t.owner||'';
-    const coowner=t.coowner||'';
     const loginDate=t.createdAt?new Date(t.createdAt.replace(/\//g,'-')):null;
     const dueDate=t.dueDate?new Date(t.dueDate.replace(/\//g,'-')):null;
-    const newDate=t.completedDate?new Date(t.completedDate.replace(/\//g,'-')):null;
-    const statusOrNew=newDate||t.status||'';
-
-    return[
-      seq,                           // A 項次
-      no,                            // B 編號
-      deptName,                      // C 部門別
-      t.category||t.cat||'',         // D Cat. 分類
-      t.title||'',                   // E Description 敘述
-      prog,                          // F AR & Update 狀況更新
-      owner,                         // G Owner 負責人
-      coowner,                       // H 協同/監督人員
-      loginDate,                     // I Log-in Date 登錄日期
-      dueDate,                       // J Due Date 預計完成日期
-      statusOrNew,                   // K New Date / 修改完成日期
-      t.comments||t.note||''         // L Comments 備註
-    ];
+    const compDate=t.completedDate?new Date(t.completedDate.replace(/\//g,'-')):null;
+    return[seq,no,deptName,t.category||t.cat||'',t.title||'',prog,t.owner||'',t.coowner||'',loginDate,dueDate,compDate,t.comments||t.note||''];
   });
-
-  const headers=[
-    '項次','編號','部門別','Cat.\n分類',
-    'Description\n敘述','AR & Update\n狀況更新',
-    'Owner\n負責人','協同/監督人員',
-    'Log-in Date\n登錄日期','Due Date\n預計\n完成日期',
-    'New Date\n修改\n完成日期','Comments\n備註'
-  ];
-
+  const headers=['項次','編號','部門別','Cat.\n分類','Description\n敘述','AR & Update\n狀況更新','Owner\n負責人','協同/監督人員','Log-in Date\n登錄日期','Due Date\n預計\n完成日期','New Date\n修改\n完成日期','Comments\n備註'];
   const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
-
-  ws['!cols']=[
-    {wch:6},{wch:16},{wch:10},{wch:10},
-    {wch:36},{wch:44},
-    {wch:12},{wch:14},
-    {wch:13},{wch:13},
-    {wch:13},{wch:20}
-  ];
-
-  // 日期格式設定
+  ws['!cols']=[{wch:6},{wch:16},{wch:10},{wch:10},{wch:36},{wch:44},{wch:12},{wch:14},{wch:13},{wch:13},{wch:13},{wch:20}];
   rows.forEach((r,i)=>{
-    [8,9].forEach(col=>{
+    [8,9,10].forEach(col=>{
       const cellRef=XLSX.utils.encode_cell({r:i+1,c:col});
       const cell=ws[cellRef];
       if(cell&&cell.v instanceof Date){cell.t='d';cell.z='YYYY/MM/DD';}
     });
   });
-
   XLSX.utils.book_append_sheet(wb,ws,'專案控管表');
   const dateStr=today.replace(/\//g,'');
   XLSX.writeFile(wb,`宜蘭廠區專案控管表_${dateStr}.xlsx`);
   toast('✓ 專案控管表已下載');
 }
 
-// ══ Excel 匯出 ══
 function exportExcel(){
   const tasks=Object.values(S.tasks);
   const wb=XLSX.utils.book_new();
   const today=S.todayStr;
-
-  // Sheet1：任務總表
   const headers=['任務標題','負責單位','狀態','截止日期','來源','最新進度','最後更新','建立日期'];
   const rows=tasks.map(t=>{
     const dept=S.depts.find(d=>d.id===t.deptId)?.name||'未分配';
@@ -1061,29 +1268,12 @@ function exportExcel(){
   ws1['!cols']=[{wch:30},{wch:10},{wch:10},{wch:12},{wch:10},{wch:40},{wch:12},{wch:12}];
   ws1['!merges']=[{s:{r:0,c:0},e:{r:0,c:7}}];
   XLSX.utils.book_append_sheet(wb,ws1,'任務總表');
-
-  // Sheet2：本週進度
   const thisWeekTasks=tasks.filter(t=>isThisWeek(t)||isOverdue(t));
-  const ws2=XLSX.utils.aoa_to_sheet([
-    [`本週工作進度（${S.weekLabel[0]}）`,...Array(4).fill('')],
-    ['任務標題','負責單位','狀態','截止日期','進度說明'],
-    ...thisWeekTasks.map(t=>{
-      const dept=S.depts.find(d=>d.id===t.deptId)?.name||'未分配';
-      const progLines=(t.progress||'').split('\n').filter(Boolean);
-      return[t.title,dept,t.status||'進行中',t.dueDate||'',progLines.map(l=>l.replace(/^\d+\.\S+\s/,'')).join('\n')];
-    })
-  ]);
+  const ws2=XLSX.utils.aoa_to_sheet([[`本週工作進度（${S.weekLabel[0]}）`,...Array(4).fill('')],['任務標題','負責單位','狀態','截止日期','進度說明'],...thisWeekTasks.map(t=>{const dept=S.depts.find(d=>d.id===t.deptId)?.name||'未分配';const progLines=(t.progress||'').split('\n').filter(Boolean);return[t.title,dept,t.status||'進行中',t.dueDate||'',progLines.map(l=>l.replace(/^\d+\.\S+\s/,'')).join('\n')];})]);
   ws2['!cols']=[{wch:30},{wch:10},{wch:10},{wch:12},{wch:50}];
   ws2['!merges']=[{s:{r:0,c:0},e:{r:0,c:4}}];
   XLSX.utils.book_append_sheet(wb,ws2,'本週進度');
-
-  // Sheet3：週報文字
-  if(S.generatedReport){
-    const ws3=XLSX.utils.aoa_to_sheet([[S.generatedReport]]);
-    ws3['!cols']=[{wch:80}];
-    XLSX.utils.book_append_sheet(wb,ws3,'週報全文');
-  }
-
+  if(S.generatedReport){const ws3=XLSX.utils.aoa_to_sheet([[S.generatedReport]]);ws3['!cols']=[{wch:80}];XLSX.utils.book_append_sheet(wb,ws3,'週報全文');}
   const dateStr=today.replace(/\//g,'');
   XLSX.writeFile(wb,`宜蘭廠區工作控管_${dateStr}.xlsx`);
   toast('✓ Excel 已下載');
@@ -1098,9 +1288,12 @@ function renderDepts(){
     const dActive=dTasks.filter(t=>!DONE_ST.has(t.status||'')).length;
     const dUpdToday=dTasks.filter(t=>t.lastUpdated===S.todayStr).length;
     return `<div class="dept-card">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-        <div style="width:10px;height:10px;border-radius:50%;background:${d.color};flex-shrink:0"></div>
-        <div class="dept-name">${escH(d.name)}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${d.color};flex-shrink:0"></div>
+          <div class="dept-name">${escH(d.name)}</div>
+        </div>
+        ${S.isMgr?`<button onclick="editDept('${d.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--muted);font-family:inherit">編輯</button>`:''}
       </div>
       <div class="dept-contact">聯絡人：${escH(d.contact)}</div>
       <div class="dept-stats">
@@ -1115,10 +1308,10 @@ function renderDepts(){
     <div style="background:var(--navy-l);border:1px solid #C8D8F0;border-radius:var(--radius);padding:14px;margin-bottom:12px">
       <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">📊 各單位回報概況</div>
       <div class="stats">
-        <div class="sc"><div class="sv">${S.depts.length}</div><div class="sl">單位數</div></div>
-        <div class="sc"><div class="sv" style="color:var(--green)">${S.depts.filter(d=>tasks.some(t=>t.deptId===d.id&&t.lastUpdated===S.todayStr)).length}</div><div class="sl">今日回報</div></div>
-        <div class="sc"><div class="sv" style="color:var(--red)">${S.depts.filter(d=>tasks.filter(t=>t.deptId===d.id).some(t=>isOverdue(t))).length}</div><div class="sl">有逾期</div></div>
-        <div class="sc"><div class="sv">${tasks.length}</div><div class="sl">總任務</div></div>
+        <div class="sc" style="cursor:default"><div class="sv">${S.depts.length}</div><div class="sl">單位數</div></div>
+        <div class="sc" style="cursor:default"><div class="sv" style="color:var(--green)">${S.depts.filter(d=>tasks.some(t=>t.deptId===d.id&&t.lastUpdated===S.todayStr)).length}</div><div class="sl">今日回報</div></div>
+        <div class="sc" style="cursor:default"><div class="sv" style="color:var(--red)">${S.depts.filter(d=>tasks.filter(t=>t.deptId===d.id).some(t=>isOverdue(t))).length}</div><div class="sl">有逾期</div></div>
+        <div class="sc" style="cursor:default"><div class="sv">${tasks.length}</div><div class="sl">總任務</div></div>
       </div>
     </div>
     ${deptHtml}
@@ -1130,6 +1323,33 @@ function renderDepts(){
       </div>
       <button onclick="addDept()" style="padding:8px 16px;border:none;border-radius:var(--radius-s);background:var(--navy);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">新增單位</button>
     </div>`;
+}
+
+function editDept(id){
+  const d=S.depts.find(x=>x.id===id);if(!d)return;
+  const body=document.getElementById('edit-modal-body');
+  body.innerHTML=`
+    <div class="af"><label>單位名稱 *</label><input type="text" id="ed-name" value="${escH(d.name)}"></div>
+    <div class="af"><label>聯絡人 *</label><input type="text" id="ed-contact" value="${escH(d.contact)}"></div>
+    <div class="af"><label>顏色</label><input type="color" id="ed-color" value="${d.color}" style="width:100%;height:36px;padding:2px 4px;border:1px solid var(--border-s);border-radius:var(--radius-s)"></div>
+    <div class="modal-footer">
+      <button class="modal-btn-save" onclick="saveDeptEdit('${id}')">💾 儲存</button>
+      <button class="modal-btn-cancel" onclick="closeEditModal()">取消</button>
+    </div>`;
+  document.getElementById('edit-modal').querySelector('.modal-title span').textContent='✏️ 編輯單位';
+  document.getElementById('edit-modal').classList.add('op');
+}
+
+async function saveDeptEdit(id){
+  const d=S.depts.find(x=>x.id===id);if(!d)return;
+  const name=document.getElementById('ed-name')?.value.trim();
+  const contact=document.getElementById('ed-contact')?.value.trim();
+  if(!name||!contact){alert('請填入名稱與聯絡人');return;}
+  d.name=name;d.contact=contact;d.color=document.getElementById('ed-color')?.value||d.color;
+  await fbSet(P_DEPTS,S.depts);
+  closeEditModal();
+  toast('✓ 單位已更新');
+  renderDepts();
 }
 
 async function addDept(){
@@ -1145,7 +1365,7 @@ async function addDept(){
   renderDepts();
 }
 
-// ══ 會議匯入頁（獨立頁籤） ══
+// ══ 會議匯入頁（獨立頁籤）══
 function renderImport(){
   document.getElementById('main').innerHTML=`
     <div style="background:var(--purple-l);border:1px solid #DDD6FE;border-radius:var(--radius);padding:14px;margin-bottom:12px">
@@ -1173,20 +1393,9 @@ function renderImport(){
 async function lineNotify(message){
   if(!S.lineToken){return;}
   try{
-    // 因瀏覽器 CORS 限制，透過免費 Proxy 發送
-    await fetch('https://notify-api.line.me/api/notify',{
-      method:'POST',
-      headers:{
-        'Authorization':'Bearer '+S.lineToken,
-        'Content-Type':'application/x-www-form-urlencoded',
-      },
-      body:'message='+encodeURIComponent(message),
-      mode:'no-cors'
-    });
+    await fetch('https://notify-api.line.me/api/notify',{method:'POST',headers:{'Authorization':'Bearer '+S.lineToken,'Content-Type':'application/x-www-form-urlencoded'},body:'message='+encodeURIComponent(message),mode:'no-cors'});
     toast('✓ Line 推播已發送','#06C755');
-  }catch(e){
-    console.warn('Line Notify 發送失敗（瀏覽器限制，建議透過 Zapier 轉發）',e);
-  }
+  }catch(e){console.warn('Line Notify 發送失敗',e);}
 }
 
 function renderLineSettings(){
@@ -1206,7 +1415,6 @@ function renderLineSettings(){
       </div>
       <div class="line-status" id="line-status"></div>
     </div>
-
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px">
       <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px">推播時機設定</div>
       <div class="line-toggle-row">
@@ -1226,7 +1434,6 @@ function renderLineSettings(){
         <label class="toggle"><input type="checkbox" id="ln-overdue" ${ln.overdue?'checked':''} onchange="saveLineNotify()"><span class="toggle-slider"></span></label>
       </div>
     </div>
-
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px">
       <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px">🔔 手動推播</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:10px">立即推播自訂訊息到 Line</div>
