@@ -547,7 +547,7 @@ function renderTaskCard(t,size='full'){
         <div class="tc-meta">
           <span class="st-chip" style="background:${STATUS_BG[st]};color:${STATUS_TC[st]}">${escH(st)}</span>
           ${dept?`<span class="dept-chip" style="background:${dept.color}18;color:${dept.color};border-color:${dept.color}33">${escH(dept.name)}</span>`:''}
-          ${t.dueDate?`<span class="date-chip${overdue?' style=color:var(--red)'':''}">${overdue?'⚠️ ':'📅 '}${escH(t.dueDate)}</span>`:''}
+          ${(()=>{if(!t.dueDate)return'';const cls='date-chip';const sty=overdue?' style="color:var(--red)"':'';return'<span class="'+cls+'"'+sty+'>'+(overdue?'\u26a0\ufe0f ':'\uD83D\uDCC5 ')+escH(t.dueDate)+'</span>';})()}
           ${t.fromMeeting?`<span class="meet-chip">📋 會議</span>`:''}
           ${updToday?`<span style="font-size:9px;color:var(--green);font-weight:700">✓今日更新</span>`:''}
         </div>
