@@ -404,7 +404,8 @@ let S={
   searchQ:'',          // 搜尋關鍵字
   filterStatus:'',     // 篩選狀態
   filterDept:'',       // 篩選單位
-  boardView:'biweek',  // 'biweek' | 'all' | 'overdue' | 'thisweek' | 'done'
+  boardView:'biweek',  // 'biweek' | 'this' | 'next' | 'all' | 'overdue' | 'done'
+  allExpanded:false,   // 一鍵展開/收合狀態
 };
 
 function todayStr(){const n=new Date();return `${n.getFullYear()}/${(n.getMonth()+1).toString().padStart(2,'0')}/${n.getDate().toString().padStart(2,'0')}`;}
@@ -634,6 +635,11 @@ function renderBoard(){
   const urgent=overdue.length+thisWeek.filter(t=>!DONE_ST.has(t.status||'')).length;
   if(urgent>0){badge.style.display='inline';badge.textContent=urgent;}else badge.style.display='none';
 
+  function wbtn(view,label){
+    const active=S.boardView===view;
+    return `<button onclick="setBoardView('${view}')" style="font-size:11px;padding:5px 11px;border-radius:6px;border:1px solid ${active?'var(--navy)':'var(--border-s)'};background:${active?'var(--navy)':'#fff'};color:${active?'#fff':'var(--muted)'};cursor:pointer;font-family:inherit;font-weight:${active?700:500};transition:all .15s">${label}</button>`;
+  }
+
   let html=`
     <div class="stats">
       <div class="sc" onclick="setBoardView('all')" title="查看全部任務">
@@ -642,25 +648,35 @@ function renderBoard(){
       <div class="sc" onclick="setBoardView('overdue')" title="查看逾期任務">
         <div class="sv" style="color:var(--red)">${overdue.length}</div><div class="sl">逾期 ⚠️</div>
       </div>
-      <div class="sc" onclick="setBoardView('thisweek')" title="查看本週待辦">
+      <div class="sc" onclick="setBoardView('this')" title="查看本週待辦">
         <div class="sv" style="color:var(--amber)">${thisWeek.filter(t=>!DONE_ST.has(t.status||'')).length}</div><div class="sl">本週待辦</div>
       </div>
       <div class="sc" onclick="setBoardView('done')" title="查看已完成">
         <div class="sv" style="color:var(--green)">${done.length}</div><div class="sl">已完成 ✓</div>
       </div>
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin:-4px 0 10px">
-      <div style="display:flex;gap:6px">
-        <button onclick="setBoardView('biweek')" style="font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid ${S.boardView==='biweek'?'var(--navy)':'var(--border-s)'};background:${S.boardView==='biweek'?'var(--navy)':'#fff'};color:${S.boardView==='biweek'?'#fff':'var(--muted)'};cursor:pointer;font-family:inherit;font-weight:600">雙週看板</button>
-        <button onclick="setBoardView('all')" style="font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid ${S.boardView==='all'?'var(--navy)':'var(--border-s)'};background:${S.boardView==='all'?'var(--navy)':'#fff'};color:${S.boardView==='all'?'#fff':'var(--muted)'};cursor:pointer;font-family:inherit;font-weight:600">全部</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:-4px 0 10px;gap:6px">
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${wbtn('biweek','📅 本週+下週')}
+        ${wbtn('this','📅 本週')}
+        ${wbtn('next','🔭 下週')}
+        ${wbtn('all','📋 全部')}
       </div>
-      <button class="ra ra-xl" onclick="exportControlTable()" style="font-size:12px;padding:6px 12px;border-radius:8px">📥 匯出控管表</button>
+      <button class="ra ra-xl" onclick="exportControlTable()" style="font-size:11px;padding:5px 10px;border-radius:8px;white-space:nowrap">📥 匯出</button>
     </div>
     <div class="ai-bar" id="ai-bar"><div class="ai-spin"></div><span id="ai-txt">🐠 小福處理中...</span></div>`;
 
   if(S.isMgr){html+=renderAddPanel()+renderMeetingPanel();}
 
-  html+=renderSearchBar();
+  // 展開/收合工具列
+  html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    ${renderSearchBar()}
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center">
+    <button onclick="expandAll()" style="font-size:11px;padding:4px 10px;border:1px solid var(--border-s);border-radius:6px;background:#fff;color:var(--muted);cursor:pointer;font-family:inherit">⬇ 全部展開</button>
+    <button onclick="collapseAll()" style="font-size:11px;padding:4px 10px;border:1px solid var(--border-s);border-radius:6px;background:#fff;color:var(--muted);cursor:pointer;font-family:inherit">⬆ 全部收合</button>
+    ${(S.filterStatus||S.filterDept)?`<span style="font-size:11px;color:var(--blue);background:var(--blue-l);padding:3px 8px;border-radius:20px">篩選中</span>`:''}
+  </div>`;
   html+='<div id="board-content"></div>';
 
   document.getElementById('main').innerHTML=html;
@@ -691,7 +707,6 @@ function renderBoardContent(){
   let html='';
 
   if(S.searchQ||S.filterStatus||S.filterDept){
-    // 搜尋結果模式
     if(filtered.length===0){
       html='<div class="empty">🔍 找不到符合條件的任務</div>';
     } else {
@@ -699,7 +714,6 @@ function renderBoardContent(){
       html+=filtered.map(t=>renderTaskCard(t,'full')).join('');
     }
   } else if(S.boardView==='biweek'){
-    // 雙週看板模式
     html+=`<div class="dual-week">
       <div class="week-col">
         <div class="week-hdr current">
@@ -731,13 +745,30 @@ function renderBoardContent(){
     if(done.length){
       html+=`<details style="margin-top:10px"><summary style="font-size:11px;color:var(--hint);cursor:pointer;user-select:none;padding:4px 0">✅ 已完成 ${done.length} 項</summary>${done.map(t=>renderTaskCard(t,'full')).join('')}</details>`;
     }
+  } else if(S.boardView==='this'){
+    // 本週單頁
+    html+=`<div style="background:var(--navy);border-radius:var(--radius) var(--radius) 0 0;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:13px;font-weight:700;color:#fff">📅 本週任務</span>
+      <span style="font-size:11px;color:rgba(255,255,255,.7)">${S.weekLabel[0]}</span>
+      <span style="font-size:11px;background:rgba(255,255,255,.2);color:#fff;padding:2px 8px;border-radius:20px">${overdue.length+thisWeek.length} 項</span>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);padding:10px;margin-bottom:12px">
+      ${overdue.length?`<div class="section-label" style="color:var(--red);margin-bottom:4px">⚠️ 逾期（${overdue.length}）</div>${overdue.map(t=>renderTaskCard(t,'full')).join('')}<div style="height:6px"></div>`:''}
+      ${thisWeek.length?thisWeek.map(t=>renderTaskCard(t,'full')).join(''):'<div class="empty">本週無任務</div>'}
+    </div>`;
+  } else if(S.boardView==='next'){
+    // 下週單頁
+    html+=`<div style="background:var(--teal);border-radius:var(--radius) var(--radius) 0 0;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:13px;font-weight:700;color:#fff">🔭 下週預視</span>
+      <span style="font-size:11px;color:rgba(255,255,255,.7)">${S.weekLabel[1]}</span>
+      <span style="font-size:11px;background:rgba(255,255,255,.2);color:#fff;padding:2px 8px;border-radius:20px">${nextWeek.length} 項</span>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);padding:10px;margin-bottom:12px">
+      ${nextWeek.length?nextWeek.map(t=>renderTaskCard(t,'full')).join(''):'<div class="empty">下週暫無任務</div>'}
+    </div>`;
   } else if(S.boardView==='overdue'){
     html+=`<div class="section-label" style="color:var(--red);margin-bottom:6px">⚠️ 逾期任務（${overdue.length}）</div>`;
     html+=overdue.length?overdue.map(t=>renderTaskCard(t,'full')).join(''):'<div class="empty">✓ 目前無逾期任務</div>';
-  } else if(S.boardView==='thisweek'){
-    html+=`<div class="section-label" style="margin-bottom:6px">📅 本週待辦（${thisWeek.length}）</div>`;
-    if(overdue.length) html+=`<div class="section-label" style="color:var(--red);margin-top:8px">⚠️ 逾期</div>`+overdue.map(t=>renderTaskCard(t,'full')).join('');
-    html+=thisWeek.length?thisWeek.map(t=>renderTaskCard(t,'full')).join(''):'<div class="empty">本週無待辦任務</div>';
   } else if(S.boardView==='done'){
     html+=`<div class="section-label" style="color:var(--green);margin-bottom:6px">✅ 已完成（${done.length}）</div>`;
     html+=done.length?done.map(t=>renderTaskCard(t,'full')).join(''):'<div class="empty">尚無完成任務</div>';
@@ -948,6 +979,16 @@ function renderQEdit(t){
 function togTask(id){
   const b=document.getElementById('tb-'+id),a=document.getElementById('ta-'+id);
   if(!b)return;const op=b.classList.toggle('op');if(a)a.classList.toggle('op',op);
+}
+function expandAll(){
+  document.querySelectorAll('.tc-body').forEach(b=>b.classList.add('op'));
+  document.querySelectorAll('.tc-arr').forEach(a=>a.classList.add('op'));
+}
+function collapseAll(){
+  document.querySelectorAll('.tc-body').forEach(b=>b.classList.remove('op'));
+  document.querySelectorAll('.tc-arr').forEach(a=>a.classList.remove('op'));
+  document.querySelectorAll('.qedit').forEach(q=>q.classList.remove('op'));
+  document.querySelectorAll('.task-card').forEach(c=>c.classList.remove('editing'));
 }
 function openEdit(id){
   document.getElementById('tb-'+id)?.classList.add('op');
