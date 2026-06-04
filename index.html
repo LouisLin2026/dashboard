@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>宜蘭廠區工作控管</title>
+<title>宜蘭廠區工作控管 v10</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 :root{
   --bg:#F7F6F3;--surface:#FFF;--border:#E4E2DC;--border-s:#CBC9C2;
@@ -70,9 +71,10 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 
 /* ── 統計 (可點擊按鈕版) ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
-.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 6px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .15s,transform .1s;user-select:none}
-.sc:hover{box-shadow:var(--shadow-m);transform:translateY(-1px)}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 6px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .15s,transform .1s;user-select:none;position:relative}
+.sc:hover{box-shadow:var(--shadow-m);transform:translateY(-2px);border-color:var(--navy)}
 .sc:active{transform:translateY(0)}
+.sc::after{content:'▶';position:absolute;bottom:3px;right:5px;font-size:7px;color:var(--hint);opacity:.5}
 .sv{font-size:20px;font-weight:700;color:var(--navy);font-family:'DM Mono',monospace}
 .sl{font-size:10px;color:var(--muted);margin-top:1px}
 
@@ -243,6 +245,25 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .fchip{padding:5px 12px;border:1px solid var(--border-s);border-radius:20px;font-family:inherit;font-size:12px;cursor:pointer;background:var(--surface);color:var(--muted)}
 .fchip.active{background:var(--navy);color:#fff;border-color:var(--navy)}
 
+/* -- file upload -- */
+.file-drop{border:2px dashed var(--border-s);border-radius:var(--radius);padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);margin-bottom:8px}
+.file-drop:hover,.file-drop.drag{border-color:var(--purple);background:var(--purple-l)}
+.file-drop input[type=file]{display:none}
+.fdico{font-size:26px;margin-bottom:5px}
+.flbl{font-size:11px;color:var(--muted);line-height:1.6}
+.flbl strong{color:var(--purple)}
+.fbar{display:flex;align-items:center;gap:8px;background:var(--green-l);border:1px solid var(--green);border-radius:var(--radius-s);padding:7px 11px;margin-bottom:8px;font-size:12px;color:var(--green);font-weight:600}
+/* -- xl diff -- */
+.xdr{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:var(--radius-s);margin-bottom:5px;font-size:12px}
+.xdr-new{background:#E8F5ED;border:1px solid #A3D9B1}
+.xdr-upd{background:#FEF3E0;border:1px solid #F5C97A}
+.xdr-skip{background:var(--bg);border:1px solid var(--border);opacity:.6}
+.xdb{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;margin-top:1px}
+.xdb-new{background:var(--green);color:#fff}
+.xdb-upd{background:var(--amber);color:#fff}
+.xdb-skip{background:var(--hint);color:#fff}
+.xdi{flex:1}.xdt{font-weight:600;color:var(--text);margin-bottom:2px}
+.xdm{font-size:11px;color:var(--muted)}.xdc{font-size:11px;color:var(--amber);margin-top:2px}
 /* ── 通用 ── */
 .empty{text-align:center;padding:24px;color:var(--hint);font-size:12px}
 .loading{text-align:center;padding:32px;color:var(--hint)}
@@ -346,6 +367,10 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     </button>
     <button class="nav-btn" id="nb-line" onclick="swTab('line')" style="display:none">
       <span class="ico">💬</span>Line 設定
+    </button>
+    <button class="nav-btn" id="nb-dupcheck" onclick="swTab('dupcheck')" style="display:none">
+      <span class="ico">🔍</span>重複檢查
+      <span class="nbadge" id="badge-dup" style="display:none">0</span>
     </button>
   </div>
 
@@ -577,7 +602,7 @@ async function _doLogin(name,isMgr,deptId){
   S.weekLabel=[getWeekLabel(0),getWeekLabel(1)];
   document.getElementById('hdr-sub').textContent=(isMgr?'管理者模式':'單位模式')+' · '+S.todayStr;
   if(isMgr){
-    ['import','report','depts','line'].forEach(t=>document.getElementById('nb-'+t).style.display='flex');
+    ['import','report','depts','line','dupcheck'].forEach(t=>document.getElementById('nb-'+t).style.display='flex');
   }
   const savedToken=localStorage.getItem('yilan_line_token')||'';
   const savedNotify=JSON.parse(localStorage.getItem('yilan_line_notify')||'null');
@@ -613,7 +638,7 @@ function visibleTasks(){
 // ══ Tab ══
 function swTab(t){
   S.tab=t;
-  ['board','import','report','depts','line'].forEach(n=>document.getElementById('nb-'+n)?.classList.toggle('active',n===t));
+  ['board','import','report','depts','line','dupcheck'].forEach(n=>document.getElementById('nb-'+n)?.classList.toggle('active',n===t));
   renderTab();
 }
 function renderTab(){
@@ -622,6 +647,7 @@ function renderTab(){
   else if(S.tab==='report')renderReport();
   else if(S.tab==='depts')renderDepts();
   else if(S.tab==='line')renderLineSettings();
+  else if(S.tab==='dupcheck')renderDupCheck();
 }
 
 // ══ 雙週看板 ══
@@ -706,7 +732,7 @@ function renderBoardContent(){
 
   let html='';
 
-  if(S.searchQ||S.filterStatus||S.filterDept){
+  if((S.searchQ||S.filterStatus||S.filterDept)&&S.boardView!=='biweek'){
     if(filtered.length===0){
       html='<div class="empty">🔍 找不到符合條件的任務</div>';
     } else {
@@ -717,13 +743,13 @@ function renderBoardContent(){
     html+=`<div class="dual-week">
       <div class="week-col">
         <div class="week-hdr current">
-          <span class="week-title">📅 本週</span>
+          <span class="week-title">📅 本週${S.searchQ?` 🔍`:''}${S.filterStatus||S.filterDept?' ⚙️':''}</span>
           <span class="week-date">${S.weekLabel[0]}</span>
           <span class="week-cnt">${thisWeek.length+overdue.length}</span>
         </div>
         <div class="week-body">
           ${overdue.length?`<div class="section-label" style="color:var(--red)">⚠️ 逾期</div>${overdue.map(t=>renderTaskCard(t,'sm')).join('')}`:''}
-          ${thisWeek.length?thisWeek.map(t=>renderTaskCard(t,'sm')).join(''):'<div class="empty">本週無任務</div>'}
+          ${thisWeek.length?thisWeek.map(t=>renderTaskCard(t,'sm')).join(''):(S.searchQ?'<div class="empty">無符合結果</div>':'<div class="empty">本週無任務</div>')}
         </div>
       </div>
       <div class="week-col">
@@ -733,11 +759,11 @@ function renderBoardContent(){
           <span class="week-cnt">${nextWeek.length}</span>
         </div>
         <div class="week-body">
-          ${nextWeek.length?nextWeek.map(t=>renderTaskCard(t,'sm')).join(''):'<div class="empty">下週暫無任務</div>'}
+          ${nextWeek.length?nextWeek.map(t=>renderTaskCard(t,'sm')).join(''):(S.searchQ?'<div class="empty">無符合結果</div>':'<div class="empty">下週暫無任務</div>')}
         </div>
       </div>
     </div>`;
-    const others=tasks.filter(t=>!isThisWeek(t)&&!isNextWeek(t)&&!isOverdue(t)&&!DONE_ST.has(t.status||''));
+    const others=filtered.filter(t=>!isThisWeek(t)&&!isNextWeek(t)&&!isOverdue(t)&&!DONE_ST.has(t.status||''));
     if(others.length){
       html+=`<div class="section-label" style="margin-top:10px">📂 其他進行中任務</div>`;
       html+=others.map(t=>renderTaskCard(t,'full')).join('');
@@ -808,7 +834,9 @@ function renderTaskCard(t,size='full'){
         </div>
       </div>
       <div style="display:flex;gap:4px;flex-shrink:0">
-        ${S.isMgr?`<button class="tc-edit-btn" onclick="event.stopPropagation();openTaskEditModal('${t.id}')" style="color:var(--navy);border-color:var(--navy-l)">✏️ 編輯</button>`:''}
+        ${S.isMgr?`<button class="tc-edit-btn" onclick="event.stopPropagation();openTaskEditModal('${t.id}')" style="color:var(--navy);border-color:var(--navy-l)">✏️ 編輯</button>`
+          :(canEdit?`<button class="tc-edit-btn" onclick="event.stopPropagation();openTaskEditModal('${t.id}')" style="color:var(--navy);border-color:var(--navy-l)">✏️ 修改</button>`:'')
+        }
         ${canEdit?`<button class="tc-edit-btn" onclick="event.stopPropagation();openEdit('${t.id}')">填進度</button>`:''}
       </div>
     </div>
@@ -853,7 +881,7 @@ function openTaskEditModal(id){
     <div class="af"><label>備註</label><input type="text" id="em-note" value="${escH(t.comments||t.note||'')}" placeholder="備註"></div>
     <div class="modal-footer">
       <button class="modal-btn-save" onclick="saveTaskEdit('${id}')">💾 儲存</button>
-      <button class="modal-btn-del" onclick="deleteTask('${id}')">🗑 刪除</button>
+      ${S.isMgr?`<button class="modal-btn-del" onclick="deleteTask('${id}')">🗑 刪除</button>`:''}
       <button class="modal-btn-cancel" onclick="closeEditModal()">取消</button>
     </div>`;
   document.getElementById('edit-modal').classList.add('op');
@@ -865,6 +893,20 @@ function closeEditModal(){
 
 async function saveTaskEdit(id){
   const t=S.tasks[id];if(!t)return;
+  // 若標題有改，做重複比對
+  var newTitle=document.getElementById('et-title-'+id)?.value.trim()||t.title;
+  if(newTitle!==t.title){
+    var fakeT={title:newTitle,
+      desc:document.getElementById('et-desc-'+id)?.value||'',
+      comments:(t.comments||''),progress:(t.progress||'')};
+    var dupH=findSimilar(fakeT,id); // excludeId=id 排除自己
+    if(dupH&&dupH.score>=0.5){
+      var ex=dupH.task;
+      var dn=S.depts.find(function(d){return d.id===ex.deptId;})||{name:''};
+      var ok=confirm('⚠️ 修改後標題疑似與現有任務重複（'+Math.round(dupH.score*100)+'%）\n\n現有：'+ex.title+'\n單位：'+dn.name+'\n\n確定繼續儲存？');
+      if(!ok)return;
+    }
+  }
   const title=document.getElementById('em-title')?.value.trim();
   if(!title){alert('請填入任務標題');return;}
   const dueRaw=document.getElementById('em-due')?.value||'';
@@ -966,6 +1008,7 @@ function renderQEdit(t){
   return `<div class="qedit" id="qe-${t.id}">
     <div class="qe-row"><span class="qe-lbl">狀態</span><select class="qe-sel" id="qs-${t.id}">${STATUS_OPTS.map(s=>`<option${s===(t.status||'進行中')?' selected':''}>${s}</option>`).join('')}</select></div>
     <div class="qe-row"><span class="qe-lbl">截止日期</span><input type="date" class="qe-inp" id="qd-${t.id}" value="${t.dueDate?t.dueDate.replace(/\//g,'-'):''}"></div>
+    <div class="qe-row"><span class="qe-lbl">完成日期</span><input type="date" class="qe-inp" id="qc-${t.id}" value="${t.completedDate?t.completedDate.replace(/\//g,'-'):''}"></div>
     <div class="qe-row"><span class="qe-lbl">今日進度</span></div>
     <textarea class="qe-ta" id="qu-${t.id}" placeholder="一句話進度（自動加 ${nextSeq}.${todayShort()} ...）"></textarea>
     <div class="qe-btns">
@@ -1021,6 +1064,17 @@ function resetAddForm(){
 async function addTask(){
   const title=document.getElementById('af-title')?.value.trim();
   if(!title){alert('請填入任務標題');return;}
+  // 即時重複提示
+  var dupHint=findSimilar({title:title,
+    desc:document.getElementById('af-desc')?.value||'',
+    comments:'',progress:'',owner:document.getElementById('af-owner')?.value||''});
+  if(dupHint&&dupHint.score>=0.5){
+    var existT=dupHint.task;
+    var deptN=S.depts.find(function(d){return d.id===existT.deptId;})||{name:''};
+    var pct=Math.round(dupHint.score*100);
+    var ok=confirm('⚠️ 疑似與現有任務重複（相似度'+pct+'%）\n\n現有：'+existT.title+'\n單位：'+deptN.name+'　期限：'+(existT.dueDate||'未設定')+'\n\n確定要開新案？（取消則放棄新增）');
+    if(!ok)return;
+  }
   const deptId=document.getElementById('af-dept')?.value||'';
   const dueRaw=document.getElementById('af-due')?.value||'';
   const due=dueRaw?dueRaw.replace(/-/g,'/'):'';
@@ -1051,7 +1105,9 @@ async function saveTask(id){
   const txt=document.getElementById('qu-'+id)?.value.trim()||'';
   const newDueRaw=document.getElementById('qd-'+id)?.value||'';
   const newDue=newDueRaw?newDueRaw.replace(/-/g,'/'):'';
-  if(!txt&&!ns&&!newDue){closeEdit(id);return;}
+  const newCompRaw=document.getElementById('qc-'+id)?.value||'';
+  const newComp=newCompRaw?newCompRaw.replace(/-/g,'/'):'';
+  if(!txt&&!ns&&!newDue&&!newComp){closeEdit(id);return;}
   setSyn('sv');
   const t=S.tasks[id];if(!t)return;
   const prevLines=(t.progress||'').split('\n').filter(Boolean);
@@ -1059,6 +1115,7 @@ async function saveTask(id){
   if(txt)t.progress=[...prevLines,`${seq}.${todayShort()} ${txt}`].join('\n');
   if(ns)t.status=ns;
   if(newDue)t.dueDate=newDue;
+  if(newComp)t.completedDate=newComp;
   t.lastUpdated=S.todayStr;
   t.lastUpdatedBy=S.me;
   await fbPatch(P_TASKS+'/'+id,t);
@@ -1069,23 +1126,82 @@ async function saveTask(id){
 }
 
 // ══ 會議記錄解析 ══
-async function parseMeetingTasks(){
+function parseMeetingTasks(){
   const btn=document.getElementById('parse-btn');
   const st=document.getElementById('meet-status');
   const ta=document.getElementById('meet-ta')?.value.trim();
   if(!ta){alert('請貼入會議記錄內容');return;}
   if(btn)btn.disabled=true;
   if(st){st.style.display='block';st.style.color='var(--purple)';st.textContent='🐠 小福正在解析行動項目...';}
-  const system=`你是會議記錄解析助理。從會議記錄或行動項目中提取任務，回傳 JSON 陣列。
-每個任務格式：{"title":"任務標題","dept":"負責單位（若有）","dueDate":"YYYY/MM/DD（若有，否則空字串）","desc":"補充說明（若有）"}
-只回傳 JSON 陣列，不要其他文字。`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system,messages:[{role:'user',content:`從以下會議記錄提取行動項目：\n\n${ta}`}]})});
-    const data=await res.json();
-    const raw=(data.content||[]).map(c=>c.text||'').join('');
-    const clean=raw.replace(/```json|```/g,'').trim();
-    S.parsedTasks=JSON.parse(clean);
-    if(st){st.style.color='var(--green)';st.textContent=`✓ 解析完成，共 ${S.parsedTasks.length} 項行動項目`;}
+    // ── 本地規則解析（不需 API，無 CORS 問題）──
+    const lines=ta.split('\n');
+    const results=[];
+    // 日期正則
+    const dateRe=/(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/;
+    const dueLabelRe=/期限[：:是]?\s*|Due\s*Date[：:\s]|完成日期[：:]/i;
+    // 單位關鍵字
+    const deptKws=['設備課','生產課','品保課','製造部','廠務課','廠務部','管理部','採購部','資訊部','研發部','業務部','人資','倉管','品管','工務','副總','Louis','阿穆','阿昌','廖課','林祿偉','瑞祥','Terrence','Jackey','Danny'];
+    // 行動項目觸發詞
+    const actionRe=/^[\-\*\•·▸►]|^\d+[\.)、]/;
+    // 任務動詞
+    const taskVerbRe=/確認|安排|提供|製作|設計|盤點|建立|推動|整理|調整|測試|聯繫|規劃|評估|取得|通知|完成|協調|撰寫|制定/;
+    for(let i=0;i<lines.length;i++){
+      let line=lines[i].trim();
+      if(!line||line.length<6)continue;
+      // 判斷是否像行動項目
+      const isAction=actionRe.test(line)||
+        (line.includes('：')&&(dueLabelRe.test(line)||taskVerbRe.test(line)))||
+        (line.includes(',')&&dateRe.test(line)&&taskVerbRe.test(line));
+      if(!isAction)continue;
+      // 去掉前綴符號
+      line=line.replace(/^[\-\*\•·▸►]\s*/,'').replace(/^\d+[\.)、]\s*/,'');
+      // 提取日期
+      let dueDate='';
+      const dm=line.match(dateRe);
+      if(dm){
+        dueDate=dm[1]+'/'+dm[2].padStart(2,'0')+'/'+dm[3].padStart(2,'0');
+      }
+      // 提取單位
+      let dept='';
+      // 格式1: "單位：任務" 或 "單位：任務，期限"
+      const colonIdx=line.indexOf('：');
+      if(colonIdx>0&&colonIdx<12){
+        const pre=line.slice(0,colonIdx);
+        if(deptKws.some(k=>pre.includes(k))||pre.length<=8){
+          dept=pre.replace(/負責人[：:]?/,'').trim();
+        }
+      }
+      // 格式2: 負責人：XXX 在行末
+      const ownerM=line.match(/負責人[：:]([^，,。]+)/);
+      if(ownerM&&!dept)dept=ownerM[1].trim();
+      // 格式3: 掃描行內關鍵字
+      if(!dept){
+        for(const k of deptKws){if(line.includes(k)){dept=k;break;}}
+      }
+      // 清理標題：去掉期限、負責人部分
+      let title=line
+        .replace(/，?期限[：:]?\s*\d{4}[\/-]\d{1,2}[\/-]\d{1,2}/g,'')
+        .replace(/，?Due\s*Date[：:]?\s*\d{4}[\/-]\d{1,2}[\/-]\d{1,2}/gi,'')
+        .replace(/，?負責人[：:]([^，,。]+)/g,'')
+        .replace(/，?Owner[：:]([^，,。]+)/gi,'')
+        .trim();
+      // 去掉開頭的「單位：」
+      if(dept&&title.startsWith(dept)){
+        title=title.slice(dept.length).replace(/^[：:\s]+/,'').trim();
+      }
+      if(title.length<4)continue;
+      results.push({title,dept,dueDate,desc:''});
+    }
+    if(results.length===0){
+      // 若規則完全沒解析到，把每一行當一個任務（基本模式）
+      lines.filter(l=>l.trim().length>6).forEach(l=>{
+        const dm=l.match(dateRe);
+        results.push({title:l.trim().replace(/^[\-\*\•·▸►\d\.)、]\s*/,'').slice(0,80),dept:'',dueDate:dm?dm[1]+'/'+dm[2].padStart(2,'0')+'/'+dm[3].padStart(2,'0'):'',desc:''});
+      });
+    }
+    S.parsedTasks=results;
+    if(st){st.style.color='var(--green)';st.textContent='✓ 解析完成，共 '+S.parsedTasks.length+' 項行動項目';}
     renderParsedTasks();
   }catch(e){
     if(st){st.style.color='var(--red)';st.textContent='❌ 解析失敗：'+e.message;}
@@ -1093,48 +1209,173 @@ async function parseMeetingTasks(){
   if(btn)btn.disabled=false;
 }
 
+// ── 標題相似度比對（bigram jaccard）──
+function titleSim(a,b){
+  if(!a||!b)return 0;
+  a=a.replace(/\s/g,'');b=b.replace(/\s/g,'');
+  if(a===b)return 1;
+  function bigrams(s){var set={};for(var i=0;i<s.length-1;i++){var k=s[i]+s[i+1];set[k]=1;}return set;}
+  var ba=bigrams(a),bb=bigrams(b);
+  var inter=0,union=Object.assign({},ba,bb);
+  for(var k in ba){if(bb[k])inter++;}
+  var total=Object.keys(union).length;
+  return total?inter/total:0;
+}
+// ── 內容相似度（關鍵詞交集，去除停用詞）──
+function contentSim(a,b){
+  if(!a||!b)return 0;
+  var stop={'的':1,'了':1,'在':1,'是':1,'與':1,'及':1,'並':1,'以':1,'由':1,'由於':1,'對':1,'將':1,'已':1,'需':1,'為':1,'要':1,'有':1,'無':1,'或':1,'等':1,'後':1,'前':1,'中':1,'上':1,'下':1};
+  function kws(s){return s.replace(/[，。、：:（）\(\)\s\[\]【】]/g,' ').split(' ').filter(function(w){return w.length>=2&&!stop[w];});}
+  var ka=kws(a),kb=kws(b);
+  if(!ka.length||!kb.length)return 0;
+  var inter=ka.filter(function(w){return kb.indexOf(w)>=0;}).length;
+  return inter/Math.max(ka.length,kb.length);
+}
+// ── 把任務所有欄位合成一段比對文字 ──
+function taskFullText(t){
+  // 進度記錄去掉序號前綴（如「1.06/04 」），只保留文字
+  var prog=(t.progress||'').split('\n').map(function(l){
+    return l.replace(/^\d+\.\S+\s*/,'');
+  }).join(' ');
+  return [
+    t.title||'',
+    t.desc||'',
+    t.comments||'',
+    t.category||'',
+    t.owner||'',
+    t.coowner||'',
+    prog
+  ].join(' ');
+}
+// ── 找現有任務中最相似的（標題+完整內容）──
+function findSimilar(parsed,excludeId){
+  var best=null,bestScore=0;
+  // 組合解析出來的內容文字
+  var parsedFull=[parsed.title||'',parsed.desc||'',parsed.comments||'',parsed.progress||''].join(' ');
+  Object.values(S.tasks).forEach(function(t){
+    if(excludeId&&t.id===excludeId)return;
+    var ts=titleSim(parsed.title,t.title);
+    var ds=contentSim(parsedFull, taskFullText(t));
+    // 標題相似度權重60%，完整內容40%
+    var score=ts*0.6+ds*0.4;
+    if(score>bestScore){bestScore=score;best=t;}
+  });
+  return bestScore>=0.45?{task:best,score:bestScore}:null;
+}
+
 function renderParsedTasks(){
-  const box=document.getElementById('parsed-tasks');
-  const list=document.getElementById('pt-list');
+  var box=document.getElementById('parsed-tasks');
+  var list=document.getElementById('pt-list');
   if(!box||!list)return;
   box.classList.add('op');
-  list.innerHTML=S.parsedTasks.map((t,i)=>`
-    <div class="pt-item">
-      <input type="checkbox" class="pt-check" id="ptc-${i}" checked>
-      <div class="pt-info">
-        <div class="pt-title">${escH(t.title)}</div>
-        <div class="pt-meta">
-          ${t.dept?`單位：${escH(t.dept)}　`:''}
-          ${t.dueDate?`期限：${escH(t.dueDate)}　`:''}
-          ${t.desc?escH(t.desc):''}
-        </div>
-      </div>
-    </div>`).join('');
+  box.style.display='block';
+  // 預先比對每項
+  list.innerHTML=S.parsedTasks.map(function(t,i){
+    var sim=findSimilar(t);
+    var simHtml='';
+    var actionHtml='';
+    if(sim){
+      var pct=Math.round(sim.score*100);
+      var existDept=S.depts.find(function(d){return d.id===sim.task.deptId;})||{name:''};
+      simHtml='<div style="margin-top:5px;padding:6px 8px;background:#FEF3E0;border:1px solid #F5C97A;border-radius:6px;font-size:11px;color:#92400E">'+
+        '<span style="font-weight:700;color:var(--amber)">⚠️ 疑似重複（相似度'+pct+'%）</span><br>'+
+        '現有：<strong>'+escH(sim.task.title)+'</strong>'+
+        (existDept.name?' ／'+escH(existDept.name):'')+
+        (sim.task.dueDate?' ／期限:'+escH(sim.task.dueDate):'')+
+        (sim.task.status?' ／'+escH(sim.task.status):'')+
+      '</div>';
+      actionHtml='<div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">'+
+        '<label style="display:flex;align-items:center;gap:3px;font-size:11px;cursor:pointer;padding:3px 8px;border:1px solid var(--green);border-radius:20px;color:var(--green)">'+
+          '<input type="radio" name="act'+i+'" value="merge" checked style="accent-color:var(--green)"> 合併更新現有項目</label>'+
+        '<label style="display:flex;align-items:center;gap:3px;font-size:11px;cursor:pointer;padding:3px 8px;border:1px solid var(--navy);border-radius:20px;color:var(--navy)">'+
+          '<input type="radio" name="act'+i+'" value="new" style="accent-color:var(--navy)"> 開新案</label>'+
+        '<label style="display:flex;align-items:center;gap:3px;font-size:11px;cursor:pointer;padding:3px 8px;border:1px solid var(--hint);border-radius:20px;color:var(--hint)">'+
+          '<input type="radio" name="act'+i+'" value="skip" style="accent-color:var(--hint)"> 跳過</label>'+
+      '</div>';
+      // 存在 parsedTasks 上供 import 時讀取
+      t._simId=sim.task.id;
+    } else {
+      t._simId=null;
+      actionHtml='<div style="font-size:11px;color:var(--green);margin-top:4px">✨ 新任務</div>';
+    }
+    return '<div class="pt-item" id="pti-'+i+'" style="border-radius:var(--radius-s);border:1px solid var(--border);padding:9px;margin-bottom:7px;background:var(--surface)">'+
+      '<div style="display:flex;align-items:flex-start;gap:8px">'+
+        '<input type="checkbox" class="pt-check" id="ptc-'+i+'" checked style="margin-top:3px;accent-color:var(--navy);flex-shrink:0">'+
+        '<div style="flex:1">'+
+          '<div class="pt-title" style="font-weight:600;font-size:13px;margin-bottom:2px">'+escH(t.title)+'</div>'+
+          '<div class="pt-meta" style="font-size:11px;color:var(--muted)">'+
+            (t.dept?'單位：'+escH(t.dept)+'　':'')+
+            (t.dueDate?'期限：<strong style="color:var(--navy)">'+escH(t.dueDate)+'</strong>　':'')+
+          '</div>'+
+          simHtml+
+          actionHtml+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
 }
 
 async function importParsedTasks(){
-  const selected=S.parsedTasks.filter((_,i)=>document.getElementById('ptc-'+i)?.checked);
+  var selected=[];
+  for(var i=0;i<S.parsedTasks.length;i++){
+    var chk=document.getElementById('ptc-'+i);
+    if(!chk||chk.checked)selected.push(i);
+  }
+  if(!selected.length&&S.parsedTasks.length>0){
+    for(var j=0;j<S.parsedTasks.length;j++)selected.push(j);
+  }
   if(!selected.length){alert('請至少勾選一項');return;}
   setSyn('sv');
-  for(const t of selected){
-    const id='t'+Date.now()+Math.random().toString(36).slice(2,6);
-    const matchDept=S.depts.find(d=>d.name.includes(t.dept)||t.dept.includes(d.name));
-    const task={id,title:t.title,deptId:matchDept?.id||'',dueDate:t.dueDate||'',status:'尚未開始',desc:t.desc||'',progress:'',createdAt:S.todayStr,lastUpdated:'',fromMeeting:true};
-    S.tasks[id]=task;
-    await fbSet(P_TASKS+'/'+id,task);
-    await new Promise(r=>setTimeout(r,80));
+  var nNew=0,nMerge=0,nSkip=0;
+  for(var si=0;si<selected.length;si++){
+    var i=selected[si];
+    var t=S.parsedTasks[i];
+    var actEl=document.querySelector('input[name="act'+i+'"]:checked');
+    var act=actEl?actEl.value:(t._simId?'merge':'new');
+    if(act==='skip'){nSkip++;continue;}
+    var matchDept=S.depts.find(function(d){
+      return t.dept&&(d.name.includes(t.dept)||t.dept.includes(d.name));
+    });
+    if(act==='merge'&&t._simId){
+      var exist=S.tasks[t._simId];
+      if(!exist)continue;
+      if(t.dueDate&&t.dueDate!==exist.dueDate){
+        if(exist.dueDate)exist.completedDate=exist.dueDate;
+        exist.dueDate=t.dueDate;
+      }
+      if(matchDept&&!exist.deptId)exist.deptId=matchDept.id;
+      var prevLines=(exist.progress||'').split('\n').filter(Boolean);
+      var note='[會議更新] '+t.title.slice(0,40);
+      if(!(exist.progress||'').includes(note.slice(0,20))){
+        exist.progress=prevLines.concat([String(prevLines.length+1)+'.'+todayShort()+' '+note]).join('\n');
+      }
+      exist.lastUpdated=S.todayStr;
+      exist.fromMeeting=true;
+      await new Promise(function(r){setTimeout(r,60);});
+      await fbPatch(P_TASKS+'/'+exist.id,exist);
+      nMerge++;
+    } else {
+      await new Promise(function(r){setTimeout(r,80);});
+      var id='t'+Date.now()+Math.random().toString(36).slice(2,6);
+      var task={id:id,title:t.title,deptId:matchDept?matchDept.id:'',
+        dueDate:t.dueDate||'',completedDate:'',status:'尚未開始',
+        desc:t.desc||'',progress:'',category:'',owner:'',coowner:'',comments:'',
+        createdAt:S.todayStr,lastUpdated:'',fromMeeting:true};
+      S.tasks[id]=task;
+      await fbSet(P_TASKS+'/'+id,task);
+      nNew++;
+    }
   }
   setSyn('ok');
   S.parsedTasks=[];
   S.meetOpen=false;
-  toast(`✓ 已匯入 ${selected.length} 項任務`);
-  if(S.lineNotify.importTask&&selected.length>0){
-    const taskList=selected.map(t=>`• ${t.title}${t.dept?' → '+t.dept:''}`).join('\n');
-    lineNotify(`📋 會議記錄匯入 ${selected.length} 項任務\n\n${taskList}\n\n請各單位登入系統確認。`);
+  var msg='✓ 新增 '+nNew+' 項、合併更新 '+nMerge+' 項'+(nSkip?'、跳過 '+nSkip+' 項':'');
+  toast(msg,'var(--green)');
+  if(S.lineNotify&&S.lineNotify.importTask&&(nNew+nMerge)>0){
+    lineNotify('📋 會議記錄匯入完成\n新增 '+nNew+' 項、合併更新 '+nMerge+' 項');
   }
   renderBoard();
 }
-
 // ══ 週報頁 ══
 function renderReport(){
   const tasks=Object.values(S.tasks);
@@ -1228,14 +1469,39 @@ ${overdueT.map(t=>`- ${t.title}，期限：${t.dueDate}`).join('\n')||'無'}
 下週預計（${nextW.length}項）：
 ${nextW.map(t=>`- ${t.title}（${t.dueDate}）`).join('\n')||'無'}`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system,messages:[{role:'user',content:user}]})});
-    const data=await res.json();
-    S.generatedReport=(data.content||[]).map(c=>c.text||'').join('');
+    // ── 本地模板產出週報（不需 API）──
+    const today=new Date();
+    const fmt=d=>d?d.replace(/\//g,'/'):'';
+    let rpt='';
+    rpt+='主旨：【週報】宜蘭廠區工作進度 '+S.weekLabel[0]+'\n\n';
+    rpt+='各位主管，您好：\n\n';
+    rpt+='以下為本週（'+S.weekLabel[0]+'）宜蘭廠區工作進度彙整，請惠覽。\n\n';
+    rpt+='【一、本週已完成事項（'+done.length+' 項）】\n';
+    if(done.length){done.forEach((t,i)=>{rpt+=(i+1)+'. '+t.title+'（'+( S.depts.find(d=>d.id===t.deptId)?.name||'未分配')+'）\n';});}else{rpt+='本週無完成項目\n';}
+    rpt+='\n【二、進行中任務（'+tasks.filter(t=>!DONE_ST.has(t.status||'')).length+' 項）】\n';
+    tasks.filter(t=>!DONE_ST.has(t.status||'')).forEach((t,i)=>{
+      const progLines=(t.progress||'').split('\n').filter(Boolean);
+      const latest=progLines.length?progLines[progLines.length-1].replace(/^\d+\.\S+\s/,''):'無最新進度';
+      rpt+=(i+1)+'. '+t.title+'（'+( S.depts.find(d=>d.id===t.deptId)?.name||'未分配')+'，'+(t.status||'進行中')+'）\n';
+      rpt+='   進度：'+latest+'\n';
+      if(t.dueDate)rpt+='   期限：'+fmt(t.dueDate)+'\n';
+    });
+    if(overdueT.length){
+      rpt+='\n【三、逾期項目（'+overdueT.length+' 項，請關注）】\n';
+      overdueT.forEach((t,i)=>{rpt+=(i+1)+'. '+t.title+'，期限：'+fmt(t.dueDate)+'\n';});
+    }
+    rpt+='\n【四、下週工作計畫（'+nextW.length+' 項）】\n';
+    if(nextW.length){nextW.forEach((t,i)=>{rpt+=(i+1)+'. '+t.title+'（'+fmt(t.dueDate)+'）\n';});}else{rpt+='依進度滾動安排\n';}
+    rpt+='\n【五、需主管協助事項】\n';
+    if(overdueT.length){rpt+='請協助督導以下逾期項目推進：\n';overdueT.slice(0,3).forEach(t=>{rpt+='• '+t.title+'\n';});}
+    else{rpt+='無\n';}
+    rpt+='\n以上，謝謝。\nLouis Lin 敬上';
+    S.generatedReport=rpt;
     await fbPatch(P_REPORTS+'/'+S.todayStr.replace(/\//g,'_'),{report:S.generatedReport,week:S.weekLabel[0],ts:Date.now()});
     if(st){st.style.color='var(--green)';st.textContent='✓ 週報已產出！';}
     if(S.lineNotify.weekReport){
       const lines=S.generatedReport.split('\n').filter(Boolean).slice(0,8).join('\n');
-      lineNotify(`📊 宜蘭廠區週報已產出\n週次：${S.weekLabel[0]}\n\n${lines}\n\n（完整內容請查看系統或 Email）`);
+      lineNotify('📊 宜蘭廠區週報已產出\n週次：'+S.weekLabel[0]+'\n\n'+lines+'\n\n（完整內容請查看系統）');
     }
   }catch(e){
     if(st){st.style.color='var(--red)';st.textContent='❌ 失敗：'+e.message;}
@@ -1408,26 +1674,363 @@ async function addDept(){
 
 // ══ 會議匯入頁（獨立頁籤）══
 function renderImport(){
-  document.getElementById('main').innerHTML=`
-    <div style="background:var(--purple-l);border:1px solid #DDD6FE;border-radius:var(--radius);padding:14px;margin-bottom:12px">
-      <div style="font-size:13px;font-weight:700;color:var(--purple);margin-bottom:5px">🐠 從會議記錄匯入任務</div>
-      <div style="font-size:12px;color:#6D28D9;margin-bottom:12px;line-height:1.6">
-        貼上小福產出的會議記錄（行動項目區塊），小福自動解析成任務清單，可選擇要匯入的項目並指定單位。
-      </div>
-      <textarea class="meet-ta" id="meet-ta" placeholder="貼上會議記錄內容...\n行動項目如：\n- 設備課：確認 TNA 裝機時程，期限 6/15\n- 生產部：提供本月產能數據，期限 6/10\n- 廠務課：完成空調維修，6/20 前" style="min-height:140px"></textarea>
-      <button class="meet-parse-btn" id="parse-btn" onclick="parseMeetingTasks()">
-        🐠 解析行動項目
-      </button>
-      <div class="meet-status" id="meet-status"></div>
-    </div>
-    <div class="parsed-tasks" id="parsed-tasks" style="display:none">
-      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">解析結果（勾選要匯入的項目）</div>
-      <div id="pt-list"></div>
-      <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:7px">
-        <button class="pt-import-btn" onclick="importParsedTasks()" style="background:var(--navy)">✅ 匯入選取任務</button>
-        <button onclick="S.parsedTasks=[];document.getElementById('parsed-tasks').style.display='none';document.getElementById('meet-ta').value=''" style="padding:9px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--muted);font-family:inherit;font-size:13px">清空重填</button>
-      </div>
-    </div>`;
+  document.getElementById('main').innerHTML=
+    '<div style="background:var(--purple-l);border:1px solid #DDD6FE;border-radius:var(--radius);padding:14px;margin-bottom:12px">'+
+      '<div style="font-size:13px;font-weight:700;color:var(--purple);margin-bottom:4px">🐠 從會議記錄匯入任務</div>'+
+      '<div style="font-size:11px;color:#6D28D9;margin-bottom:10px;line-height:1.6">支援上傳 Word / Excel / 純文字，或貼上文字。</div>'+
+      '<div class="file-drop" onclick="document.getElementById(\'meet-fi\').click()"'+
+        ' ondragover="event.preventDefault();this.classList.add(\'drag\')"'+
+        ' ondragleave="this.classList.remove(\'drag\')"'+
+        ' ondrop="event.preventDefault();this.classList.remove(\'drag\');handleMeetFile(event.dataTransfer.files[0])">'+
+        '<input type="file" id="meet-fi" accept=".docx,.doc,.xlsx,.xls,.txt,.csv" onchange="handleMeetFile(this.files[0])">'+
+        '<div class="fdico">📎</div>'+
+        '<div class="flbl">拖曳或點擊上傳<br><strong>.docx / .xlsx / .txt / .csv</strong></div>'+
+      '</div>'+
+      '<div id="meet-fbar" style="display:none" class="fbar">'+
+        '<span>📄</span><span id="meet-fname"></span>'+
+        '<button onclick="clearMeetFile()" style="margin-left:auto;border:none;background:none;cursor:pointer;color:var(--green);font-size:14px">✕</button>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 6px">'+
+        '<div style="flex:1;height:1px;background:var(--border)"></div>'+
+        '<span style="font-size:11px;color:var(--hint)">或直接貼上文字</span>'+
+        '<div style="flex:1;height:1px;background:var(--border)"></div>'+
+      '</div>'+
+      '<textarea class="meet-ta" id="meet-ta" placeholder="貼上會議記錄內容..." style="min-height:100px"></textarea>'+
+      '<button class="meet-parse-btn" id="parse-btn" onclick="parseMeetingTasks()">🐠 小福解析行動項目</button>'+
+      '<div class="meet-status" id="meet-status"></div>'+
+    '</div>'+
+    '<div id="parsed-tasks" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px">'+
+      '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">解析結果（勾選要匯入的項目）</div>'+
+      '<div id="pt-list"></div>'+
+      '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:7px">'+
+        '<button class="pt-import-btn" onclick="importParsedTasks()" style="background:var(--navy)">✅ 匯入選取任務</button>'+
+        '<button onclick="clearMeetImport()" style="padding:9px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--muted);font-family:inherit;font-size:13px">清空重填</button>'+
+      '</div>'+
+    '</div>'+
+    '<div style="background:var(--green-l);border:1px solid #A3D9B1;border-radius:var(--radius);padding:14px;margin-bottom:12px">'+
+      '<div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px">📊 上傳專案控管表 Excel 自動比對更新</div>'+
+      '<div style="font-size:11px;color:#2A5C3F;margin-bottom:10px;line-height:1.6">上傳匯出的<strong>專案控管表 Excel</strong>，自動比對現有任務，新增未存在項目、更新已修改欄位。</div>'+
+      '<div class="file-drop" onclick="document.getElementById(\'xl-fi\').click()"'+
+        ' ondragover="event.preventDefault();this.classList.add(\'drag\')"'+
+        ' ondragleave="this.classList.remove(\'drag\')"'+
+        ' ondrop="event.preventDefault();this.classList.remove(\'drag\');handleXlFile(event.dataTransfer.files[0])">'+
+        '<input type="file" id="xl-fi" accept=".xlsx,.xls" onchange="handleXlFile(this.files[0])">'+
+        '<div class="fdico">📂</div>'+
+        '<div class="flbl">拖曳或點擊上傳<br><strong>宜蘭廠區專案控管表_*.xlsx</strong></div>'+
+      '</div>'+
+      '<div id="xl-fbar" style="display:none" class="fbar">'+
+        '<span>📊</span><span id="xl-fname"></span>'+
+        '<button onclick="clearXlFile()" style="margin-left:auto;border:none;background:none;cursor:pointer;color:var(--green);font-size:14px">✕</button>'+
+      '</div>'+
+      '<div id="xl-status" style="display:none;font-size:12px;margin-top:7px"></div>'+
+    '</div>'+
+    '<div id="xl-diff-panel" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'+
+        '<div style="font-size:13px;font-weight:700;color:var(--navy)">📋 比對結果</div>'+
+        '<div id="xl-diff-sum" style="font-size:11px;color:var(--muted)"></div>'+
+      '</div>'+
+      '<div id="xl-diff-list"></div>'+
+      '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:7px">'+
+        '<button id="xl-apply-btn" onclick="applyXlDiff()" style="padding:9px;border:none;border-radius:var(--radius-s);background:var(--green);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">✅ 套用所有更新</button>'+
+        '<button onclick="clearXlFile()" style="padding:9px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;cursor:pointer;color:var(--muted);font-family:inherit;font-size:13px">取消</button>'+
+      '</div>'+
+    '</div>';
+}
+
+// ── 會議記錄檔案上傳 ──
+async function handleMeetFile(file){
+  if(!file)return;
+  document.getElementById('meet-fbar').style.display='flex';
+  document.getElementById('meet-fname').textContent=file.name;
+  var st=document.getElementById('meet-status');
+  st.style.display='block';st.style.color='var(--purple)';st.textContent='📖 正在讀取檔案...';
+  try{
+    var text='';
+    var ext=file.name.split('.').pop().toLowerCase();
+    if(ext==='docx'||ext==='doc'){
+      var ab=await file.arrayBuffer();
+      var res=await mammoth.extractRawText({arrayBuffer:ab});
+      text=res.value;
+    } else if(ext==='xlsx'||ext==='xls'){
+      var ab2=await file.arrayBuffer();
+      var wb2=XLSX.read(ab2,{type:'array'});
+      text=wb2.SheetNames.map(function(sn){return XLSX.utils.sheet_to_csv(wb2.Sheets[sn]);}).join('\n');
+    } else {
+      text=await file.text();
+    }
+    document.getElementById('meet-ta').value=text;
+    st.style.color='var(--green)';st.textContent='✓ 已讀取 '+file.name+'，請按解析按鈕';
+  } catch(e){
+    st.style.color='var(--red)';st.textContent='❌ 讀取失敗：'+e.message;
+  }
+}
+function clearMeetFile(){
+  document.getElementById('meet-fi').value='';
+  document.getElementById('meet-fbar').style.display='none';
+  document.getElementById('meet-fname').textContent='';
+}
+function clearMeetImport(){
+  S.parsedTasks=[];
+  document.getElementById('parsed-tasks').style.display='none';
+  document.getElementById('meet-ta').value='';
+  clearMeetFile();
+}
+
+// ── Excel 比對更新 ──
+var _xlDiff=[];
+
+async function handleXlFile(file){
+  if(!file)return;
+  document.getElementById('xl-fbar').style.display='flex';
+  document.getElementById('xl-fname').textContent=file.name;
+  var st=document.getElementById('xl-status');
+  var panel=document.getElementById('xl-diff-panel');
+  st.style.display='block';st.style.color='var(--amber)';st.textContent='📊 正在讀取 Excel...';
+  panel.style.display='none';
+  try{
+    var ab=await file.arrayBuffer();
+    var wb=XLSX.read(ab,{type:'array',cellDates:true});
+    var sheetName=wb.SheetNames.find(function(n){return n.includes('專案')||n.includes('控管');})||wb.SheetNames[0];
+    var ws=wb.Sheets[sheetName];
+    var rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,dateNF:'YYYY/MM/DD'});
+    var hdrIdx=rows.findIndex(function(r){return r.some(function(cell){return String(cell||'').includes('Description')||String(cell||'').includes('敘述');});});
+    if(hdrIdx<0)hdrIdx=0;
+    var hdr=rows[hdrIdx];
+    function col(kws){return hdr.findIndex(function(h){return kws.some(function(k){return String(h||'').includes(k);});});}
+    var iT=col(['Description','敘述']);
+    var iDp=col(['部門','負責單位','部門別']);
+    var iCt=col(['Cat','分類']);
+    var iOw=col(['Owner','負責人']);
+    var iCo=col(['協同','監督']);
+    var iDu=col(['Due Date','預計完成','完成日期']);
+    var iCp=col(['New Date','修改']);
+    var iPr=col(['AR','Update','狀況']);
+    var iNt=col(['Comments','備註']);
+    function fD(s){if(!s)return'';var m=String(s).match(/(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+      return m?m[1]+'/'+m[2].padStart(2,'0')+'/'+m[3].padStart(2,'0'):'';}
+    function sC(row,i){return i>=0?String(row[i]||'').trim():'';}
+    var dRows=rows.slice(hdrIdx+1).filter(function(r){return iT>=0&&r[iT]&&String(r[iT]).trim();});
+    var existing=Object.values(S.tasks);
+    _xlDiff=[];
+    for(var ri=0;ri<dRows.length;ri++){
+      var row=dRows[ri];
+      var title=sC(row,iT),deptName=sC(row,iDp),cat=sC(row,iCt);
+      var owner=sC(row,iOw),coown=sC(row,iCo);
+      var due=fD(sC(row,iDu)),comp=fD(sC(row,iCp));
+      var prog=sC(row,iPr),note=sC(row,iNt);
+      var mDept=S.depts.find(function(d){return d.name===deptName||(deptName&&d.name.includes(deptName));});
+      var eM=existing.find(function(t){
+        var tt=(t.title||'').trim();if(!title||!tt)return false;
+        var ml=Math.min(title.length,tt.length);if(ml<4)return tt===title;
+        var cl=Math.floor(ml*.75);return tt===title||tt.slice(0,cl)===title.slice(0,cl);
+      });
+      if(eM){
+        var changes=[];
+        if(due&&due!==eM.dueDate)changes.push('截止日期:'+due);
+        if(comp&&comp!==eM.completedDate)changes.push('完成日期:'+comp);
+        if(cat&&cat!==(eM.category||''))changes.push('分類:'+cat);
+        if(owner&&owner!==(eM.owner||''))changes.push('Owner:'+owner);
+        if(coown&&coown!==(eM.coowner||''))changes.push('協同:'+coown);
+        if(note&&note!==(eM.comments||eM.note||''))changes.push('備註:更新');
+        if(prog&&!(eM.progress||'').includes(prog.slice(0,Math.min(20,prog.length))))changes.push('進度:新增');
+        if(changes.length>0){
+          _xlDiff.push({type:'update',id:eM.id,title:title,deptName:deptName,changes:changes,data:{due:due,comp:comp,cat:cat,owner:owner,coown:coown,note:note,prog:prog,mDept:mDept}});
+        } else {
+          _xlDiff.push({type:'skip',id:eM.id,title:title,deptName:deptName,changes:[]});
+        }
+      } else {
+        _xlDiff.push({type:'new',title:title,deptName:deptName,data:{due:due,comp:comp,cat:cat,owner:owner,coown:coown,note:note,prog:prog,mDept:mDept}});
+      }
+    }
+    var nN=_xlDiff.filter(function(d){return d.type==='new';}).length;
+    var nU=_xlDiff.filter(function(d){return d.type==='update';}).length;
+    var nS=_xlDiff.filter(function(d){return d.type==='skip';}).length;
+    document.getElementById('xl-diff-sum').textContent='新增 '+nN+' 項　更新 '+nU+' 項　無變更 '+nS+' 項';
+    document.getElementById('xl-diff-list').innerHTML=_xlDiff.map(function(d,i){
+      var rc=d.type==='new'?'xdr-new':d.type==='update'?'xdr-upd':'xdr-skip';
+      var bt=d.type==='new'?'新增':d.type==='update'?'更新':'無變更';
+      var bc=d.type==='new'?'xdb-new':d.type==='update'?'xdb-upd':'xdb-skip';
+      var chg=d.changes&&d.changes.length?'<div class="xdc">📝 '+d.changes.join('　')+'</div>':'';
+      var dis=d.type==='skip'?' disabled':'';
+      var chk=d.type!=='skip'?' checked':'';
+      return '<div class="xdr '+rc+'">'+
+        '<input type="checkbox" id="xld'+i+'"'+chk+dis+' style="flex-shrink:0;margin-top:3px;accent-color:var(--navy)">'+
+        '<span class="xdb '+bc+'">'+bt+'</span>'+
+        '<div class="xdi"><div class="xdt">'+escH(d.title)+'</div>'+
+        '<div class="xdm">'+(d.deptName?escH(d.deptName):'-')+'</div>'+chg+'</div></div>';
+    }).join('');
+    panel.style.display='block';
+    st.style.color='var(--green)';st.textContent='✓ 比對完成：新增 '+nN+'、更新 '+nU+'、無變更 '+nS;
+  } catch(e){
+    st.style.color='var(--red)';st.textContent='❌ 讀取失敗：'+e.message;
+    console.error(e);
+  }
+}
+
+function clearXlFile(){
+  var fi=document.getElementById('xl-fi');if(fi)fi.value='';
+  var fb=document.getElementById('xl-fbar');if(fb)fb.style.display='none';
+  var fn=document.getElementById('xl-fname');if(fn)fn.textContent='';
+  var p=document.getElementById('xl-diff-panel');if(p)p.style.display='none';
+  var s=document.getElementById('xl-status');if(s)s.style.display='none';
+  _xlDiff=[];
+}
+
+async function applyXlDiff(){
+  var btn=document.getElementById('xl-apply-btn');
+  if(btn)btn.disabled=true;
+  var sel=_xlDiff.filter(function(_,i){var el=document.getElementById('xld'+i);return el&&el.checked;});
+  var nN=0,nU=0;
+  setSyn('sv');
+  for(var i=0;i<sel.length;i++){
+    var d=sel[i];
+    if(d.type==='new'){
+      await new Promise(function(r){setTimeout(r,60);});
+      var id='t'+Date.now()+Math.random().toString(36).slice(2,6);
+      var task={id:id,title:d.title,deptId:d.data.mDept?d.data.mDept.id:'',
+        dueDate:d.data.due||'',completedDate:d.data.comp||'',
+        status:d.data.comp?'已完成':'尚未開始',
+        category:d.data.cat||'',owner:d.data.owner||'',coowner:d.data.coown||'',
+        desc:'',comments:d.data.note||'',
+        progress:d.data.prog?'1.'+todayShort()+' '+d.data.prog:'',
+        createdAt:S.todayStr,lastUpdated:d.data.prog?S.todayStr:'',fromMeeting:false};
+      S.tasks[id]=task;
+      await fbSet(P_TASKS+'/'+id,task);
+      nN++;
+    } else if(d.type==='update'){
+      var t=S.tasks[d.id];if(!t)continue;
+      if(d.data.due)t.dueDate=d.data.due;
+      if(d.data.comp){t.completedDate=d.data.comp;t.status='已完成';}
+      if(d.data.cat)t.category=d.data.cat;
+      if(d.data.owner)t.owner=d.data.owner;
+      if(d.data.coown)t.coowner=d.data.coown;
+      if(d.data.note)t.comments=d.data.note;
+      if(d.data.prog&&!(t.progress||'').includes(d.data.prog.slice(0,Math.min(20,d.data.prog.length)))){
+        var prev=(t.progress||'').split('\n').filter(Boolean);
+        t.progress=prev.concat([String(prev.length+1)+'.'+todayShort()+' [Excel同步] '+d.data.prog]).join('\n');
+      }
+      t.lastUpdated=S.todayStr;t.lastUpdatedBy='Excel匯入';
+      await fbPatch(P_TASKS+'/'+d.id,t);
+      nU++;
+    }
+  }
+  setSyn('ok');
+  toast('✓ 已新增 '+nN+' 項、更新 '+nU+' 項','var(--green)');
+  clearXlFile();
+  swTab('board');
+}
+
+// ══ 重複任務全庫掃描 ══
+function renderDupCheck(){
+  var tasks=Object.values(S.tasks);
+  // 兩兩比對，找出相似度>=0.45的配對（每對只算一次）
+  var pairs=[];
+  for(var i=0;i<tasks.length;i++){
+    for(var j=i+1;j<tasks.length;j++){
+      var a=tasks[i],b=tasks[j];
+      if(DONE_ST.has(a.status||'')||DONE_ST.has(b.status||''))continue;
+      var ts=titleSim(a.title,b.title);
+      var ds=contentSim(taskFullText(a),taskFullText(b));
+      // 標題60% + 完整內容（desc/進度/備註/owner）40%
+      var score=ts*0.6+ds*0.4;
+      if(score>=0.45)pairs.push({a:a,b:b,score:score});
+    }
+  }
+  pairs.sort(function(x,y){return y.score-x.score;});
+  // 更新 badge
+  var badge=document.getElementById('badge-dup');
+  if(badge){if(pairs.length>0){badge.style.display='inline';badge.textContent=pairs.length;}else badge.style.display='none';}
+  function deptName(t){return(S.depts.find(function(d){return d.id===t.deptId;})||{name:'未分配'}).name;}
+  var html='';
+  if(pairs.length===0){
+    html='<div class="empty">🎉 沒有發現重複任務，資料庫很乾淨！</div>';
+  } else {
+    html=pairs.map(function(p,pi){
+      var pct=Math.round(p.score*100);
+      var color=p.score>=0.75?'var(--red)':p.score>=0.55?'var(--amber)':'var(--muted)';
+      return '<div style="border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px;background:var(--surface)">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+          '<span style="font-size:12px;font-weight:700;padding:2px 9px;border-radius:20px;background:'+color+';color:#fff">相似度 '+pct+'%</span>'+
+          '<span style="font-size:11px;color:var(--muted)">進行中任務對比</span>'+
+        '</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'+
+          '<div style="padding:8px;background:var(--bg);border-radius:var(--radius-s);font-size:12px">'+
+            '<div style="font-weight:700;margin-bottom:3px">'+escH(p.a.title)+'</div>'+
+            '<div style="color:var(--muted)">'+escH(deptName(p.a))+'　'+(p.a.dueDate?'期限:'+p.a.dueDate:'')+'</div>'+
+            '<div style="color:var(--muted);margin-top:2px">'+escH(p.a.status||'進行中')+(p.a.owner?'　負責:'+escH(p.a.owner):'')+'</div>'+
+            (p.a.desc?'<div style="color:var(--hint);margin-top:3px;font-size:10px;overflow:hidden;max-height:36px">'+escH(p.a.desc.slice(0,60))+(p.a.desc.length>60?'…':'')+'</div>':'')+
+            (p.a.progress?'<div style="color:var(--hint);margin-top:2px;font-size:10px">進度：'+escH(p.a.progress.split('\n').filter(Boolean).pop()||'').replace(/^\d+\.\S+\s*/,'').slice(0,50)+'</div>':'')+
+          '</div>'+
+          '<div style="padding:8px;background:var(--bg);border-radius:var(--radius-s);font-size:12px">'+
+            '<div style="font-weight:700;margin-bottom:3px">'+escH(p.b.title)+'</div>'+
+            '<div style="color:var(--muted)">'+escH(deptName(p.b))+'　'+(p.b.dueDate?'期限:'+p.b.dueDate:'')+'</div>'+
+            '<div style="color:var(--muted);margin-top:2px">'+escH(p.b.status||'進行中')+(p.b.owner?'　負責:'+escH(p.b.owner):'')+'</div>'+
+            (p.b.desc?'<div style="color:var(--hint);margin-top:3px;font-size:10px;overflow:hidden;max-height:36px">'+escH(p.b.desc.slice(0,60))+(p.b.desc.length>60?'…':'')+'</div>':'')+
+            (p.b.progress?'<div style="color:var(--hint);margin-top:2px;font-size:10px">進度：'+escH(p.b.progress.split('\n').filter(Boolean).pop()||'').replace(/^\d+\.\S+\s*/,'').slice(0,50)+'</div>':'')+
+          '</div>'+
+        '</div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+          '<button onclick="mergeDup(\''+p.a.id+'\',\''+p.b.id+'\','+pi+')" style="padding:6px 14px;border:none;border-radius:20px;background:var(--green);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔗 合併（保留左側）</button>'+
+          '<button onclick="mergeDup(\''+p.b.id+'\',\''+p.a.id+'\','+pi+')" style="padding:6px 14px;border:none;border-radius:20px;background:var(--navy);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">🔗 合併（保留右側）</button>'+
+          '<button onclick="skipDup('+pi+')" style="padding:6px 14px;border:1px solid var(--border-s);border-radius:20px;background:#fff;color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer">忽略此對</button>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+  }
+  document.getElementById('main').innerHTML=
+    '<div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">'+
+      '<div>'+
+        '<div style="font-size:14px;font-weight:700;color:var(--navy)">🔍 重複任務檢查</div>'+
+        '<div style="font-size:11px;color:var(--muted);margin-top:2px">僅掃描進行中任務。相似度≥45%標記為疑似重複。</div>'+
+      '</div>'+
+      '<button onclick="renderDupCheck()" style="padding:6px 12px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:#fff;font-family:inherit;font-size:12px;cursor:pointer">🔄 重新掃描</button>'+
+    '</div>'+
+    '<div id="dup-list">'+html+'</div>';
+  // 存 pairs 供合併用
+  S._dupPairs=pairs;
+}
+
+// ── 合併重複任務（保留 keepId，刪除 delId）──
+async function mergeDup(keepId,delId,pairIdx){
+  var keep=S.tasks[keepId],del=S.tasks[delId];
+  if(!keep||!del)return;
+  var ok=confirm('確定合併？\n保留：'+keep.title+'\n刪除：'+del.title+'\n\n進度記錄與截止日期將合併到保留項目。');
+  if(!ok)return;
+  setSyn('sv');
+  // 合併截止日期（取較晚的）
+  if(del.dueDate&&(!keep.dueDate||del.dueDate>keep.dueDate))keep.dueDate=del.dueDate;
+  // 合併完成日期
+  if(del.completedDate&&!keep.completedDate)keep.completedDate=del.completedDate;
+  // 合併進度記錄
+  if(del.progress){
+    var prev=(keep.progress||'').split('\n').filter(Boolean);
+    var delLines=del.progress.split('\n').filter(Boolean);
+    delLines.forEach(function(ln){
+      prev.push(String(prev.length+1)+'.'+todayShort()+' [合併自:'+del.title.slice(0,15)+'] '+ln.replace(/^\d+\.\S+\s/,''));
+    });
+    keep.progress=prev.join('\n');
+  }
+  // 合併備註
+  if(del.comments&&del.comments!==keep.comments){
+    keep.comments=(keep.comments?keep.comments+'；':'')+del.comments;
+  }
+  keep.lastUpdated=S.todayStr;
+  // 儲存保留任務
+  await fbPatch(P_TASKS+'/'+keepId,keep);
+  // 刪除被合併任務
+  delete S.tasks[delId];
+  await fbSet(P_TASKS+'/'+delId,null);
+  setSyn('ok');
+  toast('✓ 合併完成，已刪除重複任務','var(--green)');
+  renderDupCheck();
+}
+
+// ── 忽略某對（從當次掃描移除，不實際刪除）──
+function skipDup(pairIdx){
+  if(!S._dupPairs)return;
+  S._dupPairs.splice(pairIdx,1);
+  // 重繪 dup-list
+  renderDupCheck();
 }
 
 // ══ Line Notify ══
