@@ -3,20 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>宜蘭廠區工作控管 v11.4</title>
+<title>宜蘭廠區工作控管 v11.5</title>
 <!-- ============================================================
   CHANGELOG
-  v11.4 RC2 (2026-06-25) — WO-106 BUG-001 修正
-    BUG：v11.2 CHANGELOG 條目含巢狀 <!-- 標記，導致 HTML comment 在
-         第 3,565 字元處提前關閉，v11.1 開發紀錄（WO-101/Sprint/
-         Today Console Foundation/Firebase/Task Engine）外洩至 DOM。
-    修正：將 CHANGELOG 中的 [COPILOT_CONTRACT] 移除巢狀 HTML comment 語法。
-    範圍：僅修正 CHANGELOG 文字，零功能變動。
-  v11.4 RC1 (2026-06-25) — WO-104 / WO-105｜Copilot Integration + Deployment Package
-    詳細紀錄見 RELEASE_NOTES.md
-  v11.3 (2026-06-25) — WO-103｜Event Schema 補強（lifecycle/retryCount/eventHash/revision）
+  v11.5 (2026-06-25) — WO-107 Rev.A｜Register Center
+    新增 Register Center（📋 Register nav tab，管理者限定）
+    PMO Summary：Task/Risk/Decision/Schedule 四張統計卡（總計/待處理/本週/逾期）
+    Task Register：讀 /yilan/tasks，搜尋/排序/狀態顯示/Traceability
+    Risk Register：讀 /yilan/risks，嚴重度/狀態/供應商/設備/Traceability
+    Decision Register：讀 /yilan/decisions，狀態/決策者/Traceability
+    Schedule Register：讀 /yilan/schedule，備註/Traceability
+    jumpToInboxEvent()：從 Register 一鍵跳回來源 Inbox Event（完整 Traceability）
+    _migrateRegisters()：登入自動建立 risks/decisions/schedule 節點（Idempotent）
+    新 Firebase 路徑：/yilan/schedule（+/yilan/risks /yilan/decisions 已存在）
+    零功能回歸：Inbox/Task Engine/Today Console/Weekly Report 完全不動
+  v11.4 RC2 (2026-06-25) — WO-106 BUG-001 修正（巢狀 HTML comment 洩漏）
+  v11.4 RC1 (2026-06-25) — WO-104/WO-105｜Copilot Integration + Deployment Package
+  v11.3 (2026-06-25) — WO-103｜Event Schema 補強
   v11.2 (2026-06-25) — WO-102｜Multi-source Event Intake，Inbox Engine，Approval Gate
-    Power Automate 欄位契約見末端 [COPILOT_CONTRACT] 區塊
   v11.1 (2026-06-25) — WO-101｜Today Console Foundation
   v11   — Full Integration（既有基線）
 ============================================================ -->
@@ -434,6 +438,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
       <span class="ico">📬</span>收件匣
       <span class="nbadge" id="badge-inbox" style="display:none">0</span>
     </button>
+    <button class="nav-btn" id="nb-register" onclick="swTab('register')" style="display:none">
+      <span class="ico">📋</span>Register
+    </button>
   </div>
 
   <div class="content" id="main"></div>
@@ -452,6 +459,7 @@ const P_REPORTS='yilan/reports';
 const P_INBOX    ='yilan/inbox';
 const P_RISKS    ='yilan/risks';
 const P_DECISIONS='yilan/decisions';
+const P_SCHEDULE ='yilan/schedule'; // v11.5
 
 async function fbGet(p){try{const r=await fetch(`${FB}/${p}.json`);if(!r.ok)return null;return r.json();}catch(e){return null;}}
 async function fbSet(p,v){try{await fetch(`${FB}/${p}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});return true;}catch(e){return false;}}
@@ -497,6 +505,14 @@ let S={
   filterDept:'',       // 篩選單位
   boardView:'biweek',  // 'biweek' | 'this' | 'next' | 'all' | 'overdue' | 'done'
   allExpanded:false,   // 一鍵展開/收合狀態
+  // v11.5 Register Center
+  registerTab:'task',
+  registerSearch:'',
+  registerSort:'date_desc',
+  risks:{},
+  decisions:{},
+  schedule:{},
+  _registerLoaded:false,
   // v11.2 Inbox
   inboxTab:'pending',      // 'pending'|'approved'|'skipped'
   inboxSrcFilter:'all',    // 'all'|'outlook'|'teams'|'onedrive'|'meeting'|'manual'
@@ -880,14 +896,15 @@ async function _doLogin(name,isMgr,deptId){
   S.weekLabel=[getWeekLabel(0),getWeekLabel(1)];
   document.getElementById('hdr-sub').textContent=(isMgr?'管理者模式':'單位模式')+' · '+S.todayStr;
   if(isMgr){
-    ['import','report','depts','line','dupcheck','inbox'].forEach(t=>document.getElementById('nb-'+t).style.display='flex');
+    ['import','report','depts','line','dupcheck','inbox','register'].forEach(t=>document.getElementById('nb-'+t).style.display='flex');
   }
   const savedToken=localStorage.getItem('yilan_line_token')||'';
   const savedNotify=JSON.parse(localStorage.getItem('yilan_line_notify')||'null');
   if(savedToken)S.lineToken=savedToken;
   if(savedNotify)S.lineNotify=savedNotify;
   await loadData();
-  if(isMgr) await _runMigration(); // WO-105：首次部署自動建立 inbox 節點
+  if(isMgr) await _runMigration();        // WO-105：建立 inbox 節點
+  if(isMgr) await _migrateRegisters();    // WO-107：建立 risks/decisions/schedule 節點
   renderTab();
   // V4.0：每日逾期 Line 自動提醒（啟用且有逾期任務時推播今日重點）
   if(S.lineNotify.overdue&&S.lineToken){
@@ -922,7 +939,7 @@ function visibleTasks(){
 // ══ Tab ══
 function swTab(t){
   S.tab=t;
-  ['board','import','report','depts','line','dupcheck','inbox'].forEach(n=>document.getElementById('nb-'+n)?.classList.toggle('active',n===t));
+  ['board','import','report','depts','line','dupcheck','inbox','register'].forEach(n=>document.getElementById('nb-'+n)?.classList.toggle('active',n===t));
   renderTab();
 }
 function renderTab(){
@@ -933,6 +950,7 @@ function renderTab(){
   else if(S.tab==='line')renderLineSettings();
   else if(S.tab==='dupcheck')renderDupCheck();
   else if(S.tab==='inbox')renderInbox();
+  else if(S.tab==='register')renderRegister();
 }
 
 // ══ 雙週看板 ══
@@ -2773,6 +2791,253 @@ function _updateInboxBadge(){
   Robag | OMS | CLO | VM | Install Kit | FAT | SAT
 ────────────────────────────────────────────────────── -->
 */
+
+// ══ v11.5 REGISTER CENTER ════════════════════════════════════
+// WO-107 Rev.A | PMO Daily Working Portal | Single Source of Truth
+
+async function _migrateRegisters(){
+  var paths=[P_RISKS,P_DECISIONS,P_SCHEDULE];
+  for(var i=0;i<paths.length;i++){
+    try{
+      var ex=await fbGet(paths[i]);
+      if(ex===null){
+        await fbSet(paths[i]+'/_meta',{initialized:true,version:'v11.5',migratedAt:new Date().toISOString()});
+        console.log('[MigrateRegisters] Created: '+paths[i]);
+      }
+    }catch(e){console.warn('[MigrateRegisters] Failed: '+paths[i],e);}
+  }
+}
+
+async function loadRegister(force){
+  if(!force&&S._registerLoaded)return;
+  setSyn('sv');
+  var rR=await fbGet(P_RISKS),rD=await fbGet(P_DECISIONS),rS=await fbGet(P_SCHEDULE);
+  S.risks=(rR&&typeof rR==='object')?rR:{};
+  S.decisions=(rD&&typeof rD==='object')?rD:{};
+  S.schedule=(rS&&typeof rS==='object')?rS:{};
+  S._registerLoaded=true;
+  setSyn('ok');
+}
+
+function _isThisWeek(d){
+  if(!d)return false;
+  try{
+    var dt=new Date((d+'').replace(/\//g,'-'));
+    var now=new Date();
+    return dt>=new Date(now-7*24*60*60*1000)&&dt<=now;
+  }catch(e){return false;}
+}
+
+function _riskSev(r){
+  var p=(r.probability||'M').toUpperCase(),im=(r.impact||'M').toUpperCase();
+  if(p==='H'&&im==='H')return{label:'緊急',c:'#dc2626',bg:'#fef2f2'};
+  if(p==='H'||im==='H')return{label:'高',c:'var(--amber)',bg:'var(--amber-l)'};
+  if(p==='M'&&im==='M')return{label:'中',c:'var(--blue)',bg:'var(--blue-l)'};
+  return{label:'低',c:'var(--teal)',bg:'var(--teal-l)'};
+}
+
+function _regStats(items,type){
+  var all=Object.values(items).filter(function(x){return !x._meta;});
+  var total=all.length,pending=0,overdue=0,thisWeek=0;
+  all.forEach(function(r){
+    if(type==='task'){if(r.status&&r.status!=='完成'&&r.status!=='取消')pending++;}
+    else if(type==='risk'){if(r.status==='Open')pending++;}
+    else if(type==='decision'){if(r.status==='待決策')pending++;}
+    else pending+=1;
+    if(type==='task'&&r.dueDate&&r.dueDate<S.todayStr&&r.status!=='完成')overdue++;
+    if(_isThisWeek(r.createdAt))thisWeek++;
+  });
+  return{total:total,pending:pending,overdue:overdue,thisWeek:thisWeek};
+}
+
+function _srcLink(eid){
+  if(!eid)return'';
+  return' <button onclick="jumpToInboxEvent(\''+escH(eid)+'\')" style="font-size:11px;padding:2px 8px;border-radius:5px;border:1px solid var(--border-s);background:var(--surface);color:var(--blue);font-family:inherit;cursor:pointer" title="'+escH(eid)+'">↗ 來源</button>';
+}
+
+function _regEmpty(label){
+  return'<div style="text-align:center;padding:40px 20px;color:var(--hint);font-size:14px">'+label+'尚無資料</div>';
+}
+
+function _regApply(items,fields){
+  var q=(S.registerSearch||'').toLowerCase().trim();
+  var list=q?items.filter(function(r){return fields.some(function(f){return((r[f]||'').toString().toLowerCase()).includes(q);});}):items;
+  var so=S.registerSort||'date_desc';
+  return list.slice().sort(function(a,b){
+    if(so==='date_asc')return(a.createdAt||'')>(b.createdAt||'')?1:-1;
+    if(so==='title')return(a.title||'').localeCompare(b.title||'','zh-TW');
+    if(so==='severity'){var sv={緊急:4,高:3,中:2,低:1};return(sv[_riskSev(b).label]||0)-(sv[_riskSev(a).label]||0);}
+    return(b.createdAt||'')>(a.createdAt||'')?1:-1;
+  });
+}
+
+function _renderTaskReg(items){
+  var list=_regApply(items,['title','desc','owner','deptId','status']);
+  if(!list.length)return _regEmpty('Task ');
+  var stC={'完成':'var(--teal)','進行中':'var(--blue)','尚未開始':'var(--muted)','擱置':'var(--amber)'};
+  return list.map(function(t){
+    var sc=stC[t.status]||'var(--hint)';
+    var ovd=t.dueDate&&t.dueDate<S.todayStr&&t.status!=='完成';
+    return'<div style="border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);margin-bottom:8px;padding:12px 14px">'+
+      '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px">'+
+        '<span style="font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid '+sc+';color:'+sc+';background:var(--bg);white-space:nowrap;flex-shrink:0">'+escH(t.status||'—')+'</span>'+
+        '<div style="font-weight:600;font-size:14px;flex:1">'+escH(t.title||'—')+'</div>'+
+        (t.sourceEventId?_srcLink(t.sourceEventId):'<span style="font-size:10px;color:var(--hint)">手動建立</span>')+
+      '</div>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)">'+
+        (t.owner?'<span>負責人：'+escH(t.owner)+'</span>':'')+
+        (t.dueDate?'<span style="color:'+(ovd?'var(--amber)':'var(--muted)')+'">截止：'+escH(t.dueDate)+'</span>':'')+
+        '<span style="margin-left:auto;color:var(--hint)">建立：'+escH(t.createdAt||'—')+'</span>'+
+      '</div>'+
+      (t.progress?'<div style="font-size:12px;color:var(--muted);margin-top:4px;background:var(--bg);padding:5px 8px;border-radius:5px">'+escH((t.progress||'').slice(0,80))+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function _renderRiskReg(items){
+  var list=_regApply(items,['id','title','supplier','equipment','owner','status']);
+  if(!list.length)return _regEmpty('Risk ');
+  return list.map(function(r){
+    var sv=_riskSev(r);
+    return'<div style="border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);margin-bottom:8px;padding:12px 14px">'+
+      '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px">'+
+        '<span style="font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid '+sv.c+';color:'+sv.c+';background:'+sv.bg+';white-space:nowrap;flex-shrink:0;font-weight:600">'+sv.label+'</span>'+
+        '<div style="font-weight:600;font-size:14px;flex:1">'+escH(r.title||'—')+'</div>'+
+        (r.status==='Open'?
+          '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#fef2f2;color:#dc2626;border:1px solid #dc2626;white-space:nowrap">Open</span>':
+          '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--teal-l);color:var(--teal);border:1px solid var(--teal);white-space:nowrap">'+escH(r.status||'Closed')+'</span>'+
+        '')+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--hint);margin-bottom:5px">'+escH(r.id||'—')+_srcLink(r.sourceEventId||'')+'</div>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)">'+
+        (r.supplier?'<span>🏭 '+escH(r.supplier)+'</span>':'')+
+        (r.equipment?'<span>⚙️ '+escH(r.equipment)+'</span>':'')+
+        (r.owner?'<span>負責人：'+escH(r.owner)+'</span>':'')+
+        '<span>P:'+escH(r.probability||'?')+' I:'+escH(r.impact||'?')+'</span>'+
+        '<span style="margin-left:auto;color:var(--hint)">'+escH(r.createdAt||'—')+'</span>'+
+      '</div>'+
+      (r.mitigation?'<div style="font-size:12px;color:var(--muted);margin-top:5px;background:var(--bg);padding:5px 8px;border-radius:5px">緩解：'+escH(r.mitigation)+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function _renderDecisionReg(items){
+  var list=_regApply(items,['id','title','approvedBy','owner','status']);
+  if(!list.length)return _regEmpty('Decision ');
+  var stC={'待決策':'var(--amber)','已決策':'var(--teal)','取消':'var(--muted)'};
+  return list.map(function(d){
+    var sc=stC[d.status]||'var(--muted)';
+    return'<div style="border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);margin-bottom:8px;padding:12px 14px">'+
+      '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px">'+
+        '<span style="font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid '+sc+';color:'+sc+';background:var(--bg);white-space:nowrap;flex-shrink:0">'+escH(d.status||'—')+'</span>'+
+        '<div style="font-weight:600;font-size:14px;flex:1">'+escH(d.title||'—')+'</div>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--hint);margin-bottom:5px">'+escH(d.id||'—')+_srcLink(d.sourceEventId||'')+'</div>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)">'+
+        (d.owner?'<span>負責人：'+escH(d.owner)+'</span>':'')+
+        (d.approvedBy?'<span>決策者：'+escH(d.approvedBy)+'</span>':'')+
+        '<span style="margin-left:auto;color:var(--hint)">'+escH(d.createdAt||'—')+'</span>'+
+      '</div>'+
+      (d.impact?'<div style="font-size:12px;color:var(--muted);margin-top:5px;background:var(--bg);padding:5px 8px;border-radius:5px">影響：'+escH(d.impact)+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function _renderScheduleReg(items){
+  var list=_regApply(items,['note']);
+  if(!list.length)return _regEmpty('Schedule ');
+  return list.map(function(s){
+    return'<div style="border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);margin-bottom:8px;padding:12px 14px">'+
+      '<div style="font-weight:600;font-size:14px;margin-bottom:4px">'+escH(s.note||'—')+'</div>'+
+      '<div style="display:flex;gap:10px;font-size:12px;color:var(--muted)">'+
+        _srcLink(s.sourceEventId||'')+
+        '<span style="margin-left:auto;color:var(--hint)">建立：'+escH(s.createdAt||'—')+'</span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function renderRegister(){
+  var main=document.getElementById('main');
+  if(!S._registerLoaded) main.innerHTML='<div class="loading"><div class="lspin"></div>載入 Register...</div>';
+  await loadRegister();
+  var taskItems=Object.values(S.tasks||{}).filter(function(x){return !x._meta;});
+  var riskItems=Object.values(S.risks).filter(function(x){return !x._meta;});
+  var decItems=Object.values(S.decisions).filter(function(x){return !x._meta;});
+  var schItems=Object.values(S.schedule).filter(function(x){return !x._meta;});
+  var ts=_regStats(S.tasks||{},'task'),rs=_regStats(S.risks,'risk');
+  var ds=_regStats(S.decisions,'decision'),ss=_regStats(S.schedule,'schedule');
+
+  function sumCard(t,icon,label,st,cnt){
+    var active=S.registerTab===t;
+    var na=active?'#fff':'var(--navy)',mc=active?'rgba(255,255,255,.6)':'var(--muted)';
+    return'<div onclick="setRegisterTab(\''+t+'\')" style="flex:1;min-width:130px;border:1px solid '+(active?'var(--navy)':'var(--border)')+';border-radius:var(--radius);background:'+(active?'var(--navy)':'var(--surface)')+';padding:11px 12px;cursor:pointer;transition:all .15s">'+
+      '<div style="font-size:13px;font-weight:700;color:'+na+';margin-bottom:8px">'+icon+' '+label+(cnt?' <span style="font-size:10px;padding:1px 5px;background:'+(active?'rgba(255,255,255,.25)':'var(--border)')+';border-radius:8px">'+cnt+'</span>':'')+'</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">'+
+        '<div><div style="font-size:9px;color:'+mc+'">總計</div><div style="font-size:15px;font-weight:700;color:'+na+'">'+st.total+'</div></div>'+
+        '<div><div style="font-size:9px;color:'+mc+'">待處理</div><div style="font-size:15px;font-weight:700;color:'+(st.pending>0&&!active?'var(--amber)':na)+'">'+st.pending+'</div></div>'+
+        '<div><div style="font-size:9px;color:'+mc+'">本週新增</div><div style="font-size:14px;font-weight:600;color:'+na+'">'+st.thisWeek+'</div></div>'+
+        '<div><div style="font-size:9px;color:'+mc+'">逾期</div><div style="font-size:14px;font-weight:600;color:'+(st.overdue>0&&!active?'var(--amber)':na)+'">'+st.overdue+'</div></div>'+
+      '</div>'+
+    '</div>';
+  }
+
+  var cards=[
+    sumCard('task','📋','Task',ts,taskItems.length),
+    sumCard('risk','⚠️','Risk',rs,riskItems.length),
+    sumCard('decision','🏛️','Decision',ds,decItems.length),
+    sumCard('schedule','📅','Schedule',ss,schItems.length)
+  ].join('');
+
+  var tabIcon={task:'📋',risk:'⚠️',decision:'🏛️',schedule:'📅'};
+  var tabLabel={task:'Task',risk:'Risk',decision:'Decision',schedule:'Schedule'};
+  var tabCnt={task:taskItems.length,risk:riskItems.length,decision:decItems.length,schedule:schItems.length};
+  var tabs=['task','risk','decision','schedule'].map(function(t){
+    var active=S.registerTab===t,cnt=tabCnt[t];
+    return'<button onclick="setRegisterTab(\''+t+'\')" style="padding:8px 14px;border-radius:8px;border:1px solid '+(active?'var(--navy)':'var(--border)')+';background:'+(active?'var(--navy)':'var(--surface)')+';color:'+(active?'#fff':'var(--muted)')+';font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s">'+
+      tabIcon[t]+' '+tabLabel[t]+(cnt?' <span style="font-size:10px;padding:1px 5px;background:'+(active?'rgba(255,255,255,.25)':'var(--border)')+';border-radius:8px">'+cnt+'</span>':'')+
+    '</button>';
+  }).join('');
+
+  var sortOpts=[{v:'date_desc',l:'日期 ↓'},{v:'date_asc',l:'日期 ↑'},{v:'title',l:'標題 A-Z'}];
+  if(S.registerTab==='risk') sortOpts.push({v:'severity',l:'嚴重度 ↓'});
+
+  var content={
+    task:_renderTaskReg(taskItems),
+    risk:_renderRiskReg(riskItems),
+    decision:_renderDecisionReg(decItems),
+    schedule:_renderScheduleReg(schItems)
+  }[S.registerTab]||'';
+
+  main.innerHTML=
+    '<div style="padding:16px">'+
+      '<div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:2px">📋 Register Center</div>'+
+      '<div style="font-size:12px;color:var(--muted);margin-bottom:14px">PMO Daily Working Portal · Single Source of Truth</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">'+cards+'</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">'+tabs+'</div>'+
+      '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">'+
+        '<input id="reg-s" placeholder="🔍 搜尋..." value="'+escH(S.registerSearch)+'" oninput="setRegisterSearch(this.value)" style="flex:1;min-width:160px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">'+
+        '<select onchange="setRegisterSort(this.value)" style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">'+
+          sortOpts.map(function(o){return'<option value="'+o.v+'"'+(S.registerSort===o.v?' selected':'')+'>'+o.l+'</option>';}).join('')+
+        '</select>'+
+      '</div>'+
+      content+
+    '</div>';
+}
+
+function setRegisterTab(t){S.registerTab=t;S.registerSearch='';S.registerSort='date_desc';renderRegister();}
+function setRegisterSearch(q){S.registerSearch=q;renderRegister();}
+function setRegisterSort(v){S.registerSort=v;renderRegister();}
+
+async function jumpToInboxEvent(eid){
+  if(!eid)return;
+  await loadInbox(false);
+  var e=S.inbox[eid];
+  if(e){S.inboxTab=e.status||'approved';}else{S.inboxTab='approved';}
+  swTab('inbox');
+  toast('已切換至收件匣：'+eid,'var(--blue)');
+}
+
 
 // ══ 初始化 ══
 initLogin();
