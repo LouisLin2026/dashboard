@@ -3,7 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>宜蘭廠區工作控管 v12.2</title>
+<title>宜蘭廠區工作控管 v11.4</title>
+<!-- ============================================================
+  CHANGELOG
+  v11.4 RC2 (2026-06-25) — WO-106 BUG-001 修正
+    BUG：v11.2 CHANGELOG 條目含巢狀 <!-- 標記，導致 HTML comment 在
+         第 3,565 字元處提前關閉，v11.1 開發紀錄（WO-101/Sprint/
+         Today Console Foundation/Firebase/Task Engine）外洩至 DOM。
+    修正：將 CHANGELOG 中的 [COPILOT_CONTRACT] 移除巢狀 HTML comment 語法。
+    範圍：僅修正 CHANGELOG 文字，零功能變動。
+  v11.4 RC1 (2026-06-25) — WO-104 / WO-105｜Copilot Integration + Deployment Package
+    詳細紀錄見 RELEASE_NOTES.md
+  v11.3 (2026-06-25) — WO-103｜Event Schema 補強（lifecycle/retryCount/eventHash/revision）
+  v11.2 (2026-06-25) — WO-102｜Multi-source Event Intake，Inbox Engine，Approval Gate
+    Power Automate 欄位契約見末端 [COPILOT_CONTRACT] 區塊
+  v11.1 (2026-06-25) — WO-101｜Today Console Foundation
+  v11   — Full Integration（既有基線）
+============================================================ -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -290,56 +306,29 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .ds-rtitle{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ds-rmeta{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ds-send{width:100%;padding:8px;border:none;border-radius:var(--radius-s);background:#06C755;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;margin-top:9px}
-
-/* ── V12 專案層 ── */
-.proj-chip{font-size:9px;padding:1px 6px;border-radius:20px;background:var(--navy-l);color:var(--navy);border:1px solid #C8D8F0;font-weight:600}
-.mode-toggle{display:flex;background:var(--surface);border:1px solid var(--border-s);border-radius:var(--radius-s);padding:3px;margin-bottom:10px}
-.mt-btn{flex:1;padding:7px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:5px;transition:all .15s}
-.mt-btn.active{background:var(--navy);color:#fff}
-.proj-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;box-shadow:var(--shadow)}
-.proj-hdr{display:flex;align-items:center;gap:8px;padding:11px 12px;cursor:pointer}
-.proj-hdr:hover{background:var(--bg)}
-.proj-arr{font-size:10px;color:var(--hint);transition:transform .15s;flex-shrink:0}
-.proj-arr.op{transform:rotate(90deg)}
-.proj-hd-info{flex:1;min-width:0}
-.proj-name{font-size:13px;font-weight:700;color:var(--navy)}
-.proj-sub{font-size:10px;color:var(--hint);font-family:'DM Mono',monospace;margin-top:1px}
-.proj-health{font-size:14px;font-weight:700;font-family:'DM Mono',monospace;padding:3px 11px;border-radius:20px;flex-shrink:0}
-.proj-mini{display:flex;gap:10px;flex-wrap:wrap;padding:0 12px 9px;font-size:11px;color:var(--muted)}
-.proj-body{display:none;padding:8px 10px 10px;border-top:1px solid var(--border);background:var(--bg)}
-.proj-body.op{display:block}
-.proj-rank-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.prk-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px}
-.prk-title{font-size:11px;font-weight:700;margin-bottom:6px}
-.pr-row{display:flex;align-items:center;gap:6px;padding:4px 0;cursor:pointer;border-bottom:1px solid var(--border)}
-.pr-row:last-child{border-bottom:none}
-.pr-rank{font-size:11px;font-weight:700;font-family:'DM Mono',monospace;color:var(--hint);width:13px;flex-shrink:0;text-align:center}
-.pr-name{flex:1;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pr-score{font-size:10px;font-weight:700;font-family:'DM Mono',monospace;padding:1px 7px;border-radius:20px;flex-shrink:0}
-.proj-focus{background:linear-gradient(135deg,var(--red-l),var(--amber-l));border:1px solid #F5C97A;border-radius:var(--radius);padding:12px 13px;margin-bottom:12px;cursor:pointer}
-.pf-title{font-size:12px;font-weight:700;color:var(--amber);margin-bottom:7px}
-.pf-main{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
-.pf-name{font-size:15px;font-weight:700;color:var(--text)}
-.pf-health{font-size:12px;font-weight:700;font-family:'DM Mono',monospace;padding:3px 10px;border-radius:20px;flex-shrink:0}
-.pf-reasons{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:4px}
-.pf-advice{font-size:12px;font-weight:600;color:var(--purple)}
-.proj-grid6{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.pg6-v{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;text-align:center;line-height:1.1}
-.pg6-l{font-size:9px;color:var(--muted);text-align:center;margin-top:1px}
-
-/* ── V12.2 Microsoft Teams 通知 ── */
-.teams-setting-card{background:var(--surface);border:2px solid var(--navy);border-radius:var(--radius);padding:14px;margin-bottom:12px}
-.teams-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:5px;display:flex;align-items:center;gap:6px}
-.teams-inp{width:100%;padding:9px 11px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:'DM Mono',monospace;font-size:11px;background:var(--bg);color:var(--text);outline:none;margin-bottom:8px}
-.teams-inp:focus{border-color:var(--navy);background:#fff}
-.teams-btn{padding:9px 16px;border:none;border-radius:var(--radius-s);background:var(--navy);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
-.teams-btn-2{padding:9px 14px;border:1px solid var(--navy);border-radius:var(--radius-s);background:#fff;color:var(--navy);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
-.teams-status{font-size:12px;margin-top:8px;display:none}
-.teams-alert{background:linear-gradient(135deg,var(--red-l),#fff);border:1px solid var(--red);border-radius:var(--radius);padding:11px 13px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
-.ta-info{flex:1;min-width:0}
-.ta-t{font-size:12px;font-weight:700;color:var(--red)}
-.ta-s{font-size:12px;color:var(--text);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ta-btn{flex-shrink:0;padding:8px 12px;border:none;border-radius:var(--radius-s);background:var(--red);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+/* ── v11.1 Today Console（沿用既有色票/變數/卡片樣式）── */
+.today-console{margin-bottom:12px}
+.tc-head{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tc-head .tc-date{font-size:10px;font-weight:400;color:var(--muted)}
+.tc-sec{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 11px;margin-bottom:8px;box-shadow:var(--shadow)}
+.tc-sec:last-child{margin-bottom:0}
+.tc-sec-t{font-size:11px;font-weight:700;color:var(--purple);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.tc-row{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:6px 8px;margin-bottom:4px;cursor:pointer;transition:border-color .15s}
+.tc-row:last-child{margin-bottom:0}
+.tc-row:hover{border-color:var(--navy)}
+.tc-rank{font-size:11px;font-weight:700;font-family:'DM Mono',monospace;color:var(--hint);flex-shrink:0;width:13px;text-align:center}
+.tc-chip{font-size:11px;font-weight:700;padding:1px 8px;border-radius:20px;flex-shrink:0;font-family:'DM Mono',monospace;min-width:22px;text-align:center}
+.tc-wait{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0;background:var(--amber-l);color:var(--amber);white-space:nowrap}
+.tc-info{flex:1;min-width:0}
+.tc-title{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-meta{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc-empty{font-size:11px;color:var(--muted);padding:3px 2px}
+.tc-reserve{font-size:11px;color:var(--hint);padding:6px 2px}
+.tc-qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:6px}
+.tc-qbtn{padding:9px 6px;border:1px solid var(--border-s);border-radius:var(--radius-s);background:var(--surface);color:var(--text);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s}
+.tc-qbtn:hover{border-color:var(--navy);color:var(--navy)}
+.tc-qico{font-size:16px;line-height:1}
+.tc-line{width:100%;padding:7px;border:none;border-radius:var(--radius-s);background:#06C755;color:#fff;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;margin-top:7px}
 </style>
 </head>
 <body>
@@ -425,9 +414,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
       <span class="ico">📋</span>雙週看板
       <span class="nbadge" id="badge-board" style="display:none">0</span>
     </button>
-    <button class="nav-btn" id="nb-project" onclick="swTab('project')" style="display:none">
-      <span class="ico">📊</span>專案管理
-    </button>
     <button class="nav-btn" id="nb-import" onclick="swTab('import')" style="display:none">
       <span class="ico">📥</span>會議匯入
     </button>
@@ -438,11 +424,15 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
       <span class="ico">🏢</span>單位管理
     </button>
     <button class="nav-btn" id="nb-line" onclick="swTab('line')" style="display:none">
-      <span class="ico">📨</span>通知設定
+      <span class="ico">💬</span>Line 設定
     </button>
     <button class="nav-btn" id="nb-dupcheck" onclick="swTab('dupcheck')" style="display:none">
       <span class="ico">🔍</span>重複檢查
       <span class="nbadge" id="badge-dup" style="display:none">0</span>
+    </button>
+    <button class="nav-btn" id="nb-inbox" onclick="swTab('inbox')" style="display:none">
+      <span class="ico">📬</span>收件匣
+      <span class="nbadge" id="badge-inbox" style="display:none">0</span>
     </button>
   </div>
 
@@ -458,6 +448,10 @@ const P_TASKS  ='yilan/tasks';
 const P_DEPTS  ='yilan/depts';
 const P_META   ='yilan/meta';
 const P_REPORTS='yilan/reports';
+// v11.2 Event Intake
+const P_INBOX    ='yilan/inbox';
+const P_RISKS    ='yilan/risks';
+const P_DECISIONS='yilan/decisions';
 
 async function fbGet(p){try{const r=await fetch(`${FB}/${p}.json`);if(!r.ok)return null;return r.json();}catch(e){return null;}}
 async function fbSet(p,v){try{await fetch(`${FB}/${p}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(v)});return true;}catch(e){return false;}}
@@ -484,19 +478,6 @@ const DEFAULT_DEPTS=[
 const MANAGERS=['Louis','主管','廠長','Danny'];
 const MGR_PASSWORD='Bfy@90632323';
 
-// ══ V12 專案定義 ══
-// projectId → 顯示名稱（projectName）。舊資料無 projectId 一律視為 GENERAL，向下相容。
-const PROJECT_NAMES={
-  GENERAL:'一般任務',
-  PACKING_LINE:'包裝線升級專案',
-  OMS:'訂單管理系統 (OMS)',
-  VM3:'VM3 設備專案',
-  FSSC22000:'FSSC 22000 食安認證',
-  DIGITAL_SOP:'SOP 電子化專案',
-  MES:'MES 製造執行系統',
-};
-const DEFAULT_PROJECT_IDS=['GENERAL','PACKING_LINE','OMS','VM3','FSSC22000','DIGITAL_SOP','MES'];
-
 // ══ 狀態 ══
 let S={
   me:null, isMgr:false,
@@ -507,8 +488,6 @@ let S={
   addOpen:false, meetOpen:false,
   lineToken:'',
   lineNotify:{newTask:true,importTask:true,weekReport:true,overdue:false},
-  teamsWebhook:'',     // V12.2 Microsoft Teams Incoming Webhook URL
-  teamsAuto:false,     // V12.2 每日登入自動推播今日摘要
   parsedTasks:[],
   generatedReport:'',
   todayStr:'',
@@ -517,9 +496,11 @@ let S={
   filterStatus:'',     // 篩選狀態
   filterDept:'',       // 篩選單位
   boardView:'biweek',  // 'biweek' | 'this' | 'next' | 'all' | 'overdue' | 'done'
-  viewMode:'task',     // V12: 'task' | 'project'
-  _openProjects:{},    // V12: 專案模式展開狀態
   allExpanded:false,   // 一鍵展開/收合狀態
+  // v11.2 Inbox
+  inboxTab:'pending',      // 'pending'|'approved'|'skipped'
+  inboxSrcFilter:'all',    // 'all'|'outlook'|'teams'|'onedrive'|'meeting'|'manual'
+  inbox:{},                // 從 Firebase /inbox 載入的事件
 };
 
 function todayStr(){const n=new Date();return `${n.getFullYear()}/${(n.getMonth()+1).toString().padStart(2,'0')}/${n.getDate().toString().padStart(2,'0')}`;}
@@ -625,10 +606,7 @@ function renderDailySummary(){
   }else{
     top='<div class="ds-top-title">🔥 高風險任務</div><div style="font-size:11px;color:var(--muted);padding:4px 2px">目前無高風險任務 👍</div>';
   }
-  const sendBtn=S.isMgr?(
-    '<button class="ds-send" style="background:#1F3864" onclick="sendTeamsDigest()">📨 推播今日重點到 Teams</button>'+
-    '<button class="ds-send" style="background:#06C755;margin-top:6px" onclick="sendDailyDigest()">💬 推播到 Line（已停用）</button>'
-  ):'';
+  const sendBtn=S.isMgr?'<button class="ds-send" onclick="sendDailyDigest()">💬 推播今日重點到 Line</button>':'';
   return '<div class="daily-sum">'+
     '<div class="ds-title">🐠 AI 今日重點 <span style="font-size:10px;font-weight:400;color:var(--muted)">'+S.todayStr+'</span></div>'+
     '<div class="ds-stats">'+
@@ -640,6 +618,101 @@ function renderDailySummary(){
     sendBtn+
   '</div>';
 }
+// ── v11.1 今日控制台 Today Console（取代 AI 今日重點之顯示；純 UI，無 AI 邏輯）──
+function tcWaitReason(t){
+  const s=(t.title||'')+' '+(t.desc||'')+' '+(t.progress||'');
+  if(/廠商|供應商|外包|vendor/i.test(s))return '待廠商';
+  if(/材料|物料|備料|採購|缺料|料件|material/i.test(s))return '待料';
+  if(/主管|簽核|核准|批准|呈核|manager|approval/i.test(s))return '待主管';
+  if(/決策|決定|拍板|定案|方向|decision/i.test(s))return '待決策';
+  return '待處理';
+}
+function tcDueTs(t){return t.dueDate?new Date(t.dueDate.replace(/\//g,'-')).getTime():Infinity;}
+function renderTodayConsole(){
+  const tasks=visibleTasks();
+  const active=tasks.filter(t=>!DONE_ST.has(t.status||''));
+  const dn=t=>(S.depts.find(d=>d.id===t.deptId)||{name:'未分配'}).name;
+
+  // ① 今日焦點 Today's Focus：風險最高 TOP3（標題/單位/期限/風險分數）
+  const focus=sortByRisk(active.filter(t=>computeRiskScore(t)>0)).slice(0,3);
+  const s1=focus.length?focus.map(function(t,i){
+    const rs=computeRiskScore(t),rl=riskLevel(rs);
+    return '<div class="tc-row" onclick="focusTask(\''+t.id+'\')">'+
+      '<span class="tc-rank">'+(i+1)+'</span>'+
+      '<span class="tc-chip" style="background:'+rl.bg+';color:'+rl.color+'">'+rs+'</span>'+
+      '<div class="tc-info"><div class="tc-title">'+escH(t.title)+'</div>'+
+      '<div class="tc-meta">'+escH(dn(t))+(t.dueDate?'　期限 '+escH(t.dueDate):'　期限未設定')+(isOverdue(t)?'　⚠️逾期'+(daysFrom(t.dueDate)||0)+'天':'')+'</div></div>'+
+    '</div>';
+  }).join(''):'<div class="tc-empty">目前無高風險任務 👍</div>';
+
+  // ② 下一步行動 Next Actions：可執行（進行中/尚未開始），依期限近→遠、其次風險高→低，最多 5（不做 AI 生成）
+  const NEXT=new Set(['進行中','尚未開始']);
+  const next=active.filter(t=>NEXT.has(t.status||'進行中')).sort(function(a,b){
+    const da=tcDueTs(a),db=tcDueTs(b);
+    if(da!==db)return da-db;
+    return computeRiskScore(b)-computeRiskScore(a);
+  }).slice(0,5);
+  const s2=next.length?next.map(function(t){
+    return '<div class="tc-row" onclick="focusTask(\''+t.id+'\')">'+
+      '<span class="tc-chip" style="background:var(--blue-l);color:var(--blue)">→</span>'+
+      '<div class="tc-info"><div class="tc-title">'+escH(t.title)+'</div>'+
+      '<div class="tc-meta">'+escH(dn(t))+(t.dueDate?'　期限 '+escH(t.dueDate):'　期限未設定')+'</div></div>'+
+    '</div>';
+  }).join(''):'<div class="tc-empty">目前無待執行行動</div>';
+
+  // ③ 等待中 Waiting On：由既有狀態推導（待確認/已暫緩），原因標籤由關鍵字判讀（待廠商/待料/待主管/待決策）
+  const WAIT=new Set(['待確認','已暫緩']);
+  const waiting=active.filter(t=>WAIT.has(t.status||''));
+  const s3=waiting.length?waiting.map(function(t){
+    return '<div class="tc-row" onclick="focusTask(\''+t.id+'\')">'+
+      '<span class="tc-wait">'+tcWaitReason(t)+'</span>'+
+      '<div class="tc-info"><div class="tc-title">'+escH(t.title)+'</div>'+
+      '<div class="tc-meta">'+escH(dn(t))+'　'+escH(t.status||'')+'</div></div>'+
+    '</div>';
+  }).join(''):'<div class="tc-empty">目前無卡關項目 ✅ No current blockers</div>';
+
+  // ④ 最近決策 Recent Decisions：保留（Sprint 1.2 串接）
+  const s4='<div class="tc-reserve">目前尚無已確認決策（將於 Sprint 1.2 串接）</div>';
+
+  // ⑤ AI 策略 AI Strategy：僅保留 UI
+  const s5='<div class="tc-reserve">AI Strategy will be available in Sprint 1.2</div>';
+
+  // ⑥ 快速操作 Quick Actions：呼叫既有功能；無對應者顯示即將推出（不新增後端邏輯）
+  let qa='<div class="tc-qa">';
+  if(S.isMgr){
+    qa+='<button class="tc-qbtn" onclick="swTab(\'import\')"><span class="tc-qico">📥</span>會議匯入</button>';
+    qa+='<button class="tc-qbtn" onclick="swTab(\'report\')"><span class="tc-qico">📝</span>週報產出</button>';
+    qa+='<button class="tc-qbtn" onclick="tcNewTask()"><span class="tc-qico">➕</span>新增任務</button>';
+  }
+  qa+='<button class="tc-qbtn" onclick="tcSoon(\'Teams\')"><span class="tc-qico">👥</span>Teams</button>';
+  qa+='<button class="tc-qbtn" onclick="tcSoon(\'Project Mode\')"><span class="tc-qico">🗂️</span>Project Mode</button>';
+  qa+='</div>';
+
+  const lineBtn=S.isMgr?'<button class="tc-line" onclick="sendDailyDigest()">💬 推播今日重點到 Line</button>':'';
+
+  return '<div class="today-console">'+
+    '<div class="tc-head">🐠 今日控制台 <span style="color:var(--muted);font-weight:400">Today Console</span> <span class="tc-date">'+S.todayStr+'</span></div>'+
+    '<div class="tc-sec"><div class="tc-sec-t">🔥 今日焦點 Today\'s Focus</div>'+s1+lineBtn+'</div>'+
+    '<div class="tc-sec"><div class="tc-sec-t">→ 下一步行動 Next Actions</div>'+s2+'</div>'+
+    '<div class="tc-sec"><div class="tc-sec-t">⏳ 等待中 Waiting On</div>'+s3+'</div>'+
+    '<div class="tc-sec"><div class="tc-sec-t">✔️ 最近決策 Recent Decisions</div>'+s4+'</div>'+
+    '<div class="tc-sec"><div class="tc-sec-t">🤖 AI 策略 AI Strategy</div>'+s5+'</div>'+
+    '<div class="tc-sec"><div class="tc-sec-t">⚡ 快速操作 Quick Actions</div>'+qa+'</div>'+
+  '</div>';
+}
+// 快速操作：新增任務 → 切到看板、展開既有新增面板並聚焦標題（呼叫既有 togAdd / swTab）
+function tcNewTask(){
+  if(S.tab!=='board')swTab('board');
+  if(!S.addOpen)togAdd();
+  setTimeout(function(){
+    const panel=document.querySelector('.add-panel');
+    if(panel)panel.scrollIntoView({behavior:'smooth',block:'center'});
+    const el=document.getElementById('af-title');
+    if(el)el.focus();
+  },100);
+}
+// 快速操作：尚無對應後端功能者，提示即將推出（純 UI，不建立後端邏輯）
+function tcSoon(name){toast(name+' 整合將於後續 Sprint 推出','var(--blue)');}
 // ── 從摘要點擊跳到任務並展開 ──
 function focusTask(id){
   S.boardView='all';
@@ -668,310 +741,6 @@ function buildDailyDigest(){
 async function sendDailyDigest(){
   if(!S.lineToken){toast('請先到「Line 設定」儲存 Token','var(--amber)');return;}
   await lineNotify(buildDailyDigest());
-}
-
-// ══════════════════════════════════════════
-//  V12.2 Microsoft Teams 通知（Incoming Webhook，不影響資料 / 不用 Graph / 不用 Bot）
-// ══════════════════════════════════════════
-// ── 時間戳 YYYY/MM/DD HH:mm ──
-function nowStamp(){
-  const n=new Date();const p=function(x){return String(x).padStart(2,'0');};
-  return n.getFullYear()+'/'+p(n.getMonth()+1)+'/'+p(n.getDate())+' '+p(n.getHours())+':'+p(n.getMinutes());
-}
-// ── 組 MessageCard（classic Incoming Webhook 格式）──
-function teamsCard(title,text,themeColor){
-  return {
-    '@type':'MessageCard',
-    '@context':'http://schema.org/extensions',
-    themeColor:themeColor||'1F3864',
-    summary:title||'宜蘭廠區工作控管',
-    title:title||'宜蘭廠區工作控管',
-    text:String(text||'').replace(/\n/g,'  \n')   // markdown 強制換行
-  };
-}
-// ── 第二階段：統一 Teams 發送函式（一般 / AI摘要 / 高風險 皆由此送）──
-async function sendTeamsNotification(opts){
-  const url=S.teamsWebhook;
-  if(!url){toast('請先到「通知設定」儲存 Teams Webhook URL','var(--amber)');return false;}
-  let card;
-  if(typeof opts==='string')card=teamsCard('【宜蘭廠區工作控管】',opts,'1F3864');
-  else card=teamsCard(opts.title,opts.text,opts.themeColor);
-  try{
-    // Teams Webhook 不回傳 CORS 標頭，沿用 no-cors 觸發式送出；用 text/plain 讓 no-cors 允許帶 JSON body
-    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(card)});
-    toast('✓ Teams 通知已送出','#1F3864');
-    return true;
-  }catch(e){console.warn('Teams 通知送出失敗',e);toast('Teams 通知送出失敗','var(--red)');return false;}
-}
-// ── 取得目前最需關注（健康度最低且仍有進行中）的專案 ──
-function getWorstProject(){
-  const pool=visibleTasks();
-  const ids=allProjectIds().filter(function(pid){return pool.some(function(t){return getProjectId(t)===pid;});});
-  if(ids.length<2)return null;
-  const stats=ids.map(function(pid){return projectStats(pid);}).filter(function(s){return s.active>0;}).sort(function(a,b){return a.health-b.health;});
-  if(!stats.length)return null;
-  const w=stats[0];
-  const ptasks=pool.filter(function(t){return getProjectId(t)===w.pid&&!DONE_ST.has(t.status||'');});
-  const highRisk=ptasks.filter(function(t){return computeRiskScore(t)>=61;}).length;
-  const staleMax=ptasks.reduce(function(m,t){var d=daysFrom(t.lastUpdated||t.createdAt||'')||0;return d>m?d:m;},0);
-  return {stats:w,highRisk:highRisk,staleMax:staleMax};
-}
-// ── 第三階段：今日重點 Teams 推播內容 ──
-function buildTeamsDigest(){
-  const tasks=visibleTasks();
-  const overdue=tasks.filter(function(t){return isOverdue(t);});
-  const thisWeek=tasks.filter(function(t){return isThisWeek(t)&&!isOverdue(t)&&!DONE_ST.has(t.status||'');});
-  const nextWeek=tasks.filter(function(t){return isNextWeek(t)&&!DONE_ST.has(t.status||'');});
-  const top5=sortByRisk(tasks.filter(function(t){return !DONE_ST.has(t.status||'')&&computeRiskScore(t)>0;})).slice(0,5);
-  let text='📅 今日摘要\n';
-  text+='逾期任務：'+overdue.length+' 項\n';
-  text+='本週到期：'+thisWeek.length+' 項\n';
-  text+='下週到期：'+nextWeek.length+' 項\n';
-  text+='\n⚠ 高風險任務 TOP'+top5.length+'\n';
-  if(top5.length)top5.forEach(function(t,i){text+=(i+1)+'. '+t.title+'　風險 '+computeRiskScore(t)+'\n';});
-  else text+='（目前無高風險任務）\n';
-  const w=getWorstProject();
-  if(w&&w.stats.health<70){
-    text+='\n🎯 今日最需關注專案\n';
-    text+=projectName(w.stats.pid)+'\n';
-    text+='健康度：'+w.stats.health+'\n';
-    text+='原因：\n';
-    if(w.stats.overdue>0)text+='• 逾期 '+w.stats.overdue+' 項\n';
-    if(w.highRisk>0)text+='• 高風險 '+w.highRisk+' 項\n';
-    if(w.staleMax>0)text+='• '+w.staleMax+' 天未更新\n';
-  }
-  text+='\n產生時間：'+nowStamp();
-  return {title:'【宜蘭廠區工作控管】',text:text,themeColor:'1F3864'};
-}
-async function sendTeamsDigest(){
-  const ok=await sendTeamsNotification(buildTeamsDigest());
-  if(ok)markPushedToday();
-}
-// ── 第四階段：避免每日重複推播 ──
-function pushedToday(){return localStorage.getItem('yilan_teams_last_push')===S.todayStr;}
-function markPushedToday(){localStorage.setItem('yilan_teams_last_push',S.todayStr);}
-// ── 第五階段：高風險專案警示（每日每專案僅提醒一次）──
-function riskAlertedSet(){
-  try{const o=JSON.parse(localStorage.getItem('yilan_teams_risk_alerted')||'{}');if(o.date===S.todayStr)return new Set(o.ids||[]);}catch(e){}
-  return new Set();
-}
-function markRiskAlerted(pid){
-  const set=riskAlertedSet();set.add(pid);
-  localStorage.setItem('yilan_teams_risk_alerted',JSON.stringify({date:S.todayStr,ids:Array.from(set)}));
-}
-function renderTeamsRiskAlert(){
-  if(!S.teamsWebhook)return '';
-  const w=getWorstProject();
-  if(!w||w.stats.health>=45)return '';        // 僅健康度 < 45
-  if(riskAlertedSet().has(w.stats.pid))return '';// 今日已通知過則不顯示
-  return '<div class="teams-alert">'+
-    '<div class="ta-info"><div class="ta-t">🚨 偵測到高風險專案</div>'+
-      '<div class="ta-s">'+escH(projectName(w.stats.pid))+'　健康度 '+w.stats.health+'</div></div>'+
-    '<button class="ta-btn" onclick="sendTeamsRiskAlert(\''+w.stats.pid+'\')">📨 推播高風險專案</button>'+
-  '</div>';
-}
-async function sendTeamsRiskAlert(pid){
-  const s=projectStats(pid);
-  const pool=visibleTasks();
-  const ptasks=pool.filter(function(t){return getProjectId(t)===pid&&!DONE_ST.has(t.status||'');});
-  const highRisk=ptasks.filter(function(t){return computeRiskScore(t)>=61;}).length;
-  let text='🚨 高風險專案警示\n';
-  text+='專案：'+projectName(pid)+'\n';
-  text+='健康度：'+s.health+'\n';
-  text+='逾期：'+s.overdue+' 項\n';
-  text+='高風險任務：'+highRisk+' 項\n';
-  text+='\n建議：本週優先追蹤。\n';
-  text+='\n產生時間：'+nowStamp();
-  const ok=await sendTeamsNotification({title:'🚨 高風險專案警示',text:text,themeColor:'C0392B'});
-  if(ok){markRiskAlerted(pid);renderBoard();}
-}
-
-// ══════════════════════════════════════════
-//  V12 專案層（Project Layer）— 全部即時計算，不寫入既有資料
-// ══════════════════════════════════════════
-// ── 取得 projectId（舊資料預設 GENERAL）──
-function getProjectId(t){return (t&&t.projectId)?t.projectId:'GENERAL';}
-function projectName(pid){return PROJECT_NAMES[pid]||pid||'一般任務';}
-// ── 目前所有 projectId（預設清單 + 任務中出現的自訂代碼）──
-function allProjectIds(){
-  const set=DEFAULT_PROJECT_IDS.slice();
-  Object.values(S.tasks).forEach(function(t){const p=getProjectId(t);if(set.indexOf(p)<0)set.push(p);});
-  return set;
-}
-// ── 專案健康度 0~100（越高越健康）──
-function computeProjectHealth(s){
-  if(s.total===0)return 100;
-  let h=100;
-  h-=Math.round((100-s.completion)*0.30);   // 完成率：低→扣分（最多 30）
-  h-=Math.min(32,s.overdue*8);               // 逾期任務：每項 -8（上限 32）
-  h-=Math.round(Math.min(25,s.avgRisk*0.25));// 平均風險：avgRisk*0.25（上限 25）
-  h-=Math.min(16,s.stale*4);                 // 未更新任務（>14天）：每項 -4（上限 16）
-  return Math.max(0,Math.min(100,h));
-}
-function healthLevel(h){
-  if(h>=70)return{color:'var(--green)',bg:'var(--green-l)',label:'健康'};
-  if(h>=45)return{color:'var(--amber)',bg:'var(--amber-l)',label:'注意'};
-  return{color:'var(--red)',bg:'var(--red-l)',label:'高風險'};
-}
-// ── 單一專案統計（可指定任務池，預設 visibleTasks）──
-function projectStats(pid,pool){
-  const src=pool||visibleTasks();
-  const tasks=src.filter(function(t){return getProjectId(t)===pid;});
-  const total=tasks.length;
-  const done=tasks.filter(function(t){return DONE_ST.has(t.status||'');}).length;
-  const overdue=tasks.filter(function(t){return isOverdue(t);}).length;
-  const inProgress=tasks.filter(function(t){return !DONE_ST.has(t.status||'')&&!isOverdue(t);}).length;
-  const active=total-done;
-  const activeTasks=tasks.filter(function(t){return !DONE_ST.has(t.status||'');});
-  const avgRisk=activeTasks.length?Math.round(activeTasks.reduce(function(a,t){return a+computeRiskScore(t);},0)/activeTasks.length):0;
-  const completion=total?Math.round(done/total*100):0;
-  const stale=activeTasks.filter(function(t){var d=daysFrom(t.lastUpdated||t.createdAt||'');return d!==null&&d>14;}).length;
-  const health=computeProjectHealth({total:total,done:done,active:active,overdue:overdue,avgRisk:avgRisk,completion:completion,stale:stale});
-  return {pid:pid,total:total,done:done,overdue:overdue,inProgress:inProgress,active:active,avgRisk:avgRisk,completion:completion,stale:stale,health:health};
-}
-
-// ── 模式切換（任務模式 / 專案模式）──
-function renderModeToggle(){
-  const isTask=S.viewMode!=='project';
-  return '<div class="mode-toggle">'+
-    '<button class="mt-btn'+(isTask?' active':'')+'" onclick="setViewMode(\'task\')">📋 任務模式</button>'+
-    '<button class="mt-btn'+(!isTask?' active':'')+'" onclick="setViewMode(\'project\')">📊 專案模式</button>'+
-  '</div>';
-}
-function setViewMode(m){S.viewMode=m;renderBoard();}
-
-// ── 專案模式：依專案分組（風險高者在前）──
-function renderProjectMode(){
-  const bc=document.getElementById('board-content');if(!bc)return;
-  const pool=applyFilters(visibleTasks());
-  const ids=allProjectIds().filter(function(pid){return pool.some(function(t){return getProjectId(t)===pid;});});
-  const stats=ids.map(function(pid){return projectStats(pid,pool);}).sort(function(a,b){return a.health-b.health;});
-  if(!stats.length){bc.innerHTML='<div class="empty">無符合條件的專案</div>';return;}
-  bc.innerHTML=stats.map(function(s){
-    const hl=healthLevel(s.health);
-    const open=S._openProjects&&S._openProjects[s.pid];
-    const ptasks=sortByRisk(pool.filter(function(t){return getProjectId(t)===s.pid;}));
-    return '<div class="proj-card">'+
-      '<div class="proj-hdr" onclick="togProject(\''+s.pid+'\')">'+
-        '<span class="proj-arr'+(open?' op':'')+'">▶</span>'+
-        '<div class="proj-hd-info"><div class="proj-name">'+escH(projectName(s.pid))+'</div>'+
-          '<div class="proj-sub">'+escH(s.pid)+' · '+s.total+' 項</div></div>'+
-        '<span class="proj-health" style="background:'+hl.bg+';color:'+hl.color+'" title="健康度">'+s.health+'</span>'+
-      '</div>'+
-      '<div class="proj-mini"><span style="color:var(--green)">完成 '+s.done+'</span>'+
-        '<span style="color:var(--amber)">進行 '+s.inProgress+'</span>'+
-        '<span style="color:var(--red)">逾期 '+s.overdue+'</span>'+
-        '<span>風險均 '+s.avgRisk+'</span><span>完成率 '+s.completion+'%</span></div>'+
-      '<div class="proj-body'+(open?' op':'')+'" id="pj-'+s.pid+'">'+
-        (ptasks.length?ptasks.map(function(t){return renderTaskCard(t,'full');}).join(''):'<div class="empty">此專案無任務</div>')+
-      '</div>'+
-    '</div>';
-  }).join('');
-}
-function togProject(pid){
-  S._openProjects=S._openProjects||{};
-  S._openProjects[pid]=!S._openProjects[pid];
-  renderBoardContent();
-}
-function jumpProject(pid){
-  S.viewMode='project';S._openProjects={};S._openProjects[pid]=true;
-  renderBoard();
-  setTimeout(function(){var el=document.getElementById('pj-'+pid);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},90);
-}
-
-// ── 專案健康度排行（最佳 TOP5 / 高風險 TOP5）──
-function renderProjectRanking(){
-  const pool=visibleTasks();
-  const ids=allProjectIds().filter(function(pid){return pool.some(function(t){return getProjectId(t)===pid;});});
-  if(ids.length<2)return '';
-  const stats=ids.map(function(pid){return projectStats(pid);});
-  const best=stats.slice().sort(function(a,b){return b.health-a.health;}).slice(0,5);
-  const worst=stats.slice().sort(function(a,b){return a.health-b.health;}).slice(0,5);
-  function row(s,i){var hl=healthLevel(s.health);return '<div class="pr-row" onclick="jumpProject(\''+s.pid+'\')">'+
-    '<span class="pr-rank">'+(i+1)+'</span>'+
-    '<span class="pr-name">'+escH(projectName(s.pid))+'</span>'+
-    '<span class="pr-score" style="background:'+hl.bg+';color:'+hl.color+'">'+s.health+'</span></div>';}
-  return '<div class="proj-rank-wrap">'+
-    '<div class="prk-col"><div class="prk-title" style="color:var(--green)">🏆 最佳專案 TOP'+best.length+'</div>'+best.map(row).join('')+'</div>'+
-    '<div class="prk-col"><div class="prk-title" style="color:var(--red)">⚠️ 高風險專案 TOP'+worst.length+'</div>'+worst.map(row).join('')+'</div>'+
-  '</div>';
-}
-
-// ── AI 專案摘要：今日最需關注專案 ──
-function renderProjectFocus(){
-  const pool=visibleTasks();
-  const ids=allProjectIds().filter(function(pid){return pool.some(function(t){return getProjectId(t)===pid;});});
-  if(ids.length<2)return '';
-  const stats=ids.map(function(pid){return projectStats(pid);}).filter(function(s){return s.active>0;}).sort(function(a,b){return a.health-b.health;});
-  if(!stats.length)return '';
-  const w=stats[0];
-  if(w.health>=70)return ''; // 全部健康則不顯示
-  const hl=healthLevel(w.health);
-  const ptasks=pool.filter(function(t){return getProjectId(t)===w.pid&&!DONE_ST.has(t.status||'');});
-  const highRisk=ptasks.filter(function(t){return computeRiskScore(t)>=61;}).length;
-  const staleMax=ptasks.reduce(function(m,t){var d=daysFrom(t.lastUpdated||t.createdAt||'')||0;return d>m?d:m;},0);
-  const reasons=[];
-  if(w.overdue>0)reasons.push('逾期任務 '+w.overdue+' 項');
-  if(highRisk>0)reasons.push('高風險任務 '+highRisk+' 項');
-  if(staleMax>0)reasons.push(staleMax+' 天未更新');
-  if(w.completion<40)reasons.push('完成率僅 '+w.completion+'%');
-  return '<div class="proj-focus" onclick="jumpProject(\''+w.pid+'\')">'+
-    '<div class="pf-title">🎯 今日最需關注專案</div>'+
-    '<div class="pf-main"><div class="pf-name">'+escH(projectName(w.pid))+'</div>'+
-      '<span class="pf-health" style="background:'+hl.bg+';color:'+hl.color+'">健康度 '+w.health+'</span></div>'+
-    '<div class="pf-reasons">原因：'+(reasons.length?reasons.join('｜'):'整體進度落後')+'</div>'+
-    '<div class="pf-advice">🐠 建議：本週優先追蹤此專案</div>'+
-  '</div>';
-}
-
-// ── 專案管理 Dashboard 頁 ──
-function renderProjectDashboard(){
-  const pool=visibleTasks();
-  const ids=allProjectIds().filter(function(pid){return pool.some(function(t){return getProjectId(t)===pid;});});
-  const stats=ids.map(function(pid){return projectStats(pid);}).sort(function(a,b){return a.health-b.health;});
-  const totalP=stats.length;
-  const avgHealth=totalP?Math.round(stats.reduce(function(a,x){return a+x.health;},0)/totalP):0;
-  const atRisk=stats.filter(function(s){return s.health<45;}).length;
-  const ahColor=avgHealth>=70?'var(--green)':avgHealth>=45?'var(--amber)':'var(--red)';
-  const cards=stats.map(function(s){
-    const hl=healthLevel(s.health);
-    return '<div class="dept-card" style="cursor:pointer" onclick="openProjectFromDash(\''+s.pid+'\')">'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">'+
-        '<div><div class="dept-name">'+escH(projectName(s.pid))+'</div>'+
-          '<div style="font-size:10px;color:var(--hint);font-family:\'DM Mono\',monospace">'+escH(s.pid)+'</div></div>'+
-        '<div style="text-align:center;flex-shrink:0">'+
-          '<div style="font-size:22px;font-weight:700;font-family:\'DM Mono\',monospace;color:'+hl.color+';line-height:1">'+s.health+'</div>'+
-          '<div style="font-size:9px;color:'+hl.color+';font-weight:700">'+hl.label+'</div></div>'+
-      '</div>'+
-      '<div style="height:6px;background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:9px">'+
-        '<div style="height:100%;width:'+s.completion+'%;background:var(--green)"></div></div>'+
-      '<div class="proj-grid6">'+
-        '<div><div class="pg6-v">'+s.total+'</div><div class="pg6-l">任務數</div></div>'+
-        '<div><div class="pg6-v" style="color:var(--amber)">'+s.inProgress+'</div><div class="pg6-l">進行中</div></div>'+
-        '<div><div class="pg6-v" style="color:var(--green)">'+s.done+'</div><div class="pg6-l">已完成</div></div>'+
-        '<div><div class="pg6-v" style="color:var(--red)">'+s.overdue+'</div><div class="pg6-l">逾期</div></div>'+
-        '<div><div class="pg6-v">'+s.avgRisk+'</div><div class="pg6-l">平均風險</div></div>'+
-        '<div><div class="pg6-v">'+s.completion+'%</div><div class="pg6-l">完成率</div></div>'+
-      '</div>'+
-    '</div>';
-  }).join('');
-  document.getElementById('main').innerHTML=
-    '<div style="background:var(--navy-l);border:1px solid #C8D8F0;border-radius:var(--radius);padding:14px;margin-bottom:12px">'+
-      '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">📊 專案總覽</div>'+
-      '<div class="stats">'+
-        '<div class="sc" style="cursor:default"><div class="sv">'+totalP+'</div><div class="sl">專案數</div></div>'+
-        '<div class="sc" style="cursor:default"><div class="sv" style="color:'+ahColor+'">'+avgHealth+'</div><div class="sl">平均健康度</div></div>'+
-        '<div class="sc" style="cursor:default"><div class="sv" style="color:var(--red)">'+atRisk+'</div><div class="sl">高風險專案</div></div>'+
-        '<div class="sc" style="cursor:default"><div class="sv">'+pool.length+'</div><div class="sl">總任務</div></div>'+
-      '</div>'+
-    '</div>'+
-    '<div class="section-label" style="margin-bottom:6px">各專案健康度（風險高者在前）</div>'+
-    (cards||'<div class="empty">尚無專案資料</div>');
-}
-function openProjectFromDash(pid){
-  S.viewMode='project';S._openProjects={};S._openProjects[pid]=true;
-  swTab('board');
-  setTimeout(function(){var el=document.getElementById('pj-'+pid);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},120);
 }
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function setSyn(st){const d=document.getElementById('sdot');d.className='sync-dot'+(st==='sv'?' sv':st==='err'?' err':'');}
@@ -1111,25 +880,19 @@ async function _doLogin(name,isMgr,deptId){
   S.weekLabel=[getWeekLabel(0),getWeekLabel(1)];
   document.getElementById('hdr-sub').textContent=(isMgr?'管理者模式':'單位模式')+' · '+S.todayStr;
   if(isMgr){
-    ['import','report','depts','line','dupcheck','project'].forEach(t=>document.getElementById('nb-'+t).style.display='flex');
+    ['import','report','depts','line','dupcheck','inbox'].forEach(t=>document.getElementById('nb-'+t).style.display='flex');
   }
   const savedToken=localStorage.getItem('yilan_line_token')||'';
   const savedNotify=JSON.parse(localStorage.getItem('yilan_line_notify')||'null');
   if(savedToken)S.lineToken=savedToken;
   if(savedNotify)S.lineNotify=savedNotify;
-  const savedTeams=localStorage.getItem('yilan_teams_webhook')||'';
-  if(savedTeams)S.teamsWebhook=savedTeams;
-  S.teamsAuto=localStorage.getItem('yilan_teams_auto')==='1';
   await loadData();
+  if(isMgr) await _runMigration(); // WO-105：首次部署自動建立 inbox 節點
   renderTab();
   // V4.0：每日逾期 Line 自動提醒（啟用且有逾期任務時推播今日重點）
   if(S.lineNotify.overdue&&S.lineToken){
     const od=visibleTasks().filter(t=>isOverdue(t));
     if(od.length>0)lineNotify(buildDailyDigest());
-  }
-  // V12.2：Teams 每日登入自動推播今日摘要（當天尚未推播才送，避免重複）
-  if(S.teamsAuto&&S.teamsWebhook&&!pushedToday()){
-    sendTeamsDigest();
   }
 }
 
@@ -1159,17 +922,17 @@ function visibleTasks(){
 // ══ Tab ══
 function swTab(t){
   S.tab=t;
-  ['board','project','import','report','depts','line','dupcheck'].forEach(n=>document.getElementById('nb-'+n)?.classList.toggle('active',n===t));
+  ['board','import','report','depts','line','dupcheck','inbox'].forEach(n=>document.getElementById('nb-'+n)?.classList.toggle('active',n===t));
   renderTab();
 }
 function renderTab(){
   if(S.tab==='board')renderBoard();
-  else if(S.tab==='project')renderProjectDashboard();
   else if(S.tab==='import')renderImport();
   else if(S.tab==='report')renderReport();
   else if(S.tab==='depts')renderDepts();
   else if(S.tab==='line')renderLineSettings();
   else if(S.tab==='dupcheck')renderDupCheck();
+  else if(S.tab==='inbox')renderInbox();
 }
 
 // ══ 雙週看板 ══
@@ -1203,17 +966,16 @@ function renderBoard(){
         <div class="sv" style="color:var(--green)">${done.length}</div><div class="sl">已完成 ✓</div>
       </div>
     </div>
-    ${renderModeToggle()}
     <div style="display:flex;justify-content:space-between;align-items:center;margin:-4px 0 10px;gap:6px">
       <div style="display:flex;gap:5px;flex-wrap:wrap">
-        ${S.viewMode==='task'?`${wbtn('biweek','📅 本週+下週')}${wbtn('this','📅 本週')}${wbtn('next','🔭 下週')}${wbtn('all','📋 全部')}`:`<span style="font-size:11px;color:var(--muted);padding:5px 0">📊 依專案分組，健康度低者在前</span>`}
+        ${wbtn('biweek','📅 本週+下週')}
+        ${wbtn('this','📅 本週')}
+        ${wbtn('next','🔭 下週')}
+        ${wbtn('all','📋 全部')}
       </div>
       <button class="ra ra-xl" onclick="exportControlTable()" style="font-size:11px;padding:5px 10px;border-radius:8px;white-space:nowrap">📥 匯出</button>
     </div>
-    ${renderDailySummary()}
-    ${renderTeamsRiskAlert()}
-    ${renderProjectFocus()}
-    ${renderProjectRanking()}
+    ${renderTodayConsole()}
     <div class="ai-bar" id="ai-bar"><div class="ai-spin"></div><span id="ai-txt">🐠 小福處理中...</span></div>`;
 
   if(S.isMgr){html+=renderAddPanel()+renderMeetingPanel();}
@@ -1247,7 +1009,6 @@ function setBoardView(view){
 }
 
 function renderBoardContent(){
-  if(S.viewMode==='project'){renderProjectMode();return;}
   const tasks=visibleTasks();
   const filtered=applyFilters(tasks);
   const overdue=sortByRisk(filtered.filter(t=>isOverdue(t)));
@@ -1353,7 +1114,6 @@ function renderTaskCard(t,size='full'){
           <span class="st-chip" style="background:${STATUS_BG[st]};color:${STATUS_TC[st]}">${escH(st)}</span>
           ${(()=>{if(isDone)return'';const rs=computeRiskScore(t);const rl=riskLevel(rs);return '<span class="risk-chip" style="background:'+rl.bg+';color:'+rl.color+'" title="風險分數 '+rs+'（'+rl.label+'）">⚡'+rs+'</span>';})()}
           ${dept?`<span class="dept-chip" style="background:${dept.color}18;color:${dept.color};border-color:${dept.color}33">${escH(dept.name)}</span>`:''}
-          ${getProjectId(t)!=='GENERAL'?`<span class="proj-chip">📁 ${escH(projectName(getProjectId(t)))}</span>`:''}
           ${t.category?`<span class="date-chip">${escH(t.category)}</span>`:''}
           ${(()=>{if(!t.dueDate)return'';const cls='date-chip';const sty=overdue?' style="color:var(--red)"':'';return'<span class="'+cls+'"'+sty+'>'+(overdue?'⚠️ ':'\uD83D\uDCC5 ')+escH(t.dueDate)+'</span>';})()}
           ${t.fromMeeting?`<span class="meet-chip">📋 會議</span>`:''}
@@ -1381,9 +1141,6 @@ function openTaskEditModal(id){
   const body=document.getElementById('edit-modal-body');
   body.innerHTML=`
     <div class="af"><label>任務標題 *</label><input type="text" id="em-title" value="${escH(t.title)}" placeholder="任務標題"></div>
-    <div class="af"><label>所屬專案</label>
-      <select id="em-proj">${allProjectIds().map(p=>`<option value="${p}"${getProjectId(t)===p?' selected':''}>${escH(projectName(p))}</option>`).join('')}</select>
-    </div>
     <div class="af-grid">
       <div class="af"><label>分配單位</label>
         <select id="em-dept"><option value="">未分配</option>${S.depts.map(d=>`<option value="${d.id}"${t.deptId===d.id?' selected':''}>${escH(d.name)}</option>`).join('')}</select>
@@ -1441,7 +1198,6 @@ async function saveTaskEdit(id){
   const compRaw=document.getElementById('em-completed')?.value||'';
   t.title=title;
   t.deptId=document.getElementById('em-dept')?.value||'';
-  t.projectId=document.getElementById('em-proj')?.value||'GENERAL';
   t.category=document.getElementById('em-cat')?.value||'';
   t.status=document.getElementById('em-status')?.value||'進行中';
   t.dueDate=dueRaw?dueRaw.replace(/-/g,'/'):'';
@@ -1481,9 +1237,6 @@ function renderAddPanel(){
     </div>
     <div class="add-body" id="add-body">
       <div class="af"><label>任務標題 *</label><input type="text" id="af-title" placeholder="說明任務內容"></div>
-      <div class="af"><label>所屬專案</label>
-        <select id="af-proj">${allProjectIds().map(p=>`<option value="${p}">${escH(projectName(p))}</option>`).join('')}</select>
-      </div>
       <div class="af-grid">
         <div class="af"><label>分配單位</label>
           <select id="af-dept"><option value="">未分配</option>${S.depts.map(d=>`<option value="${d.id}">${escH(d.name)}</option>`).join('')}</select>
@@ -1588,7 +1341,7 @@ function togMeet(){
 }
 function resetAddForm(){
   ['af-title','af-desc','af-owner','af-coowner'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['af-dept','af-status','af-cat','af-proj'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
+  ['af-dept','af-status','af-cat'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
   const d=document.getElementById('af-due');if(d)d.value='';
 }
 
@@ -1613,9 +1366,8 @@ async function addTask(){
   const category=document.getElementById('af-cat')?.value||'';
   const owner=document.getElementById('af-owner')?.value.trim()||'';
   const coowner=document.getElementById('af-coowner')?.value.trim()||'';
-  const projectId=document.getElementById('af-proj')?.value||'GENERAL';
   const id='t'+Date.now();
-  const task={id,title,deptId,dueDate:due,status,desc,category,owner,coowner,projectId,progress:'',createdAt:S.todayStr,lastUpdated:'',fromMeeting:false};
+  const task={id,title,deptId,dueDate:due,status,desc,category,owner,coowner,progress:'',createdAt:S.todayStr,lastUpdated:'',fromMeeting:false};
   S.tasks[id]=task;
   setSyn('sv');
   await fbSet(P_TASKS+'/'+id,task);
@@ -2549,26 +2301,8 @@ async function lineNotify(message){
 function renderLineSettings(){
   const ln=S.lineNotify;
   document.getElementById('main').innerHTML=`
-    <div class="teams-setting-card">
-      <div class="teams-title">📨 Microsoft Teams 通知</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.65">
-        LINE Notify 已停止服務，改用 <strong style="color:var(--navy)">Microsoft Teams Incoming Webhook</strong> 推播。<br>
-        <strong style="color:var(--navy)">取得步驟：</strong>Teams 頻道 → ⋯ → 連接器／工作流程 → Incoming Webhook → 建立 → 複製 URL 貼到下方。
-      </div>
-      <label style="font-size:11px;color:var(--muted);font-weight:500;display:block;margin-bottom:4px">Teams Webhook URL</label>
-      <input class="teams-inp" type="text" id="teams-webhook-inp" placeholder="https://....webhook.office.com/..." value="${escH(S.teamsWebhook)}">
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="teams-btn" onclick="saveTeamsWebhook()">💾 儲存設定</button>
-        <button class="teams-btn-2" onclick="testTeamsNotification()">🔔 測試通知</button>
-      </div>
-      <div class="teams-status" id="teams-status"></div>
-      <div class="line-toggle-row" style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
-        <div><div class="line-toggle-label">🔄 每日登入自動推播今日摘要</div><div class="line-toggle-sub">登入系統時，若當天尚未推播則自動推播一次</div></div>
-        <label class="toggle"><input type="checkbox" id="ts-auto" ${S.teamsAuto?'checked':''} onchange="saveTeamsAuto()"><span class="toggle-slider"></span></label>
-      </div>
-    </div>
     <div class="line-setting-card">
-      <div class="line-setting-title">💬 Line Notify 推播設定 <span style="font-size:10px;font-weight:400;color:var(--red)">（已停止服務，僅保留設定）</span></div>
+      <div class="line-setting-title">💬 Line Notify 推播設定</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.65">
         設定後，新增任務、匯入會議任務、產出週報時，自動推播通知到你的 Line。<br>
         <strong style="color:#06C755">取得 Token 步驟：</strong>前往 <span style="font-family:monospace;background:var(--bg);padding:1px 5px;border-radius:3px">notify-bot.line.me/zh_TW</span> → 登入 → 產生權杖 → 選擇群組或個人。
@@ -2644,32 +2378,401 @@ async function manualLineNotify(){
   document.getElementById('manual-line-msg').value='';
 }
 
-// ══ V12.2 Teams 設定處理 ══
-function saveTeamsWebhook(){
-  const url=document.getElementById('teams-webhook-inp')?.value.trim();
-  if(!url){alert('請貼上 Teams Webhook URL');return;}
-  if(!/^https:\/\//i.test(url)){alert('Webhook URL 必須以 https:// 開頭');return;}
-  S.teamsWebhook=url;
-  localStorage.setItem('yilan_teams_webhook',url);
-  const st=document.getElementById('teams-status');
-  if(st){st.style.display='block';st.style.color='var(--green)';st.textContent='✓ Webhook 已儲存到本機';}
-  setTimeout(function(){if(st)st.style.display='none';},3000);
+// ══ v11.4 WO-105：Inbox Migration（Idempotent）════════════════
+// 目的：確保 /yilan/inbox 節點存在。
+// 策略：GET 確認不存在 → PUT _meta → 驗證。
+// 安全保證：只在節點不存在時才寫入；不覆蓋任何既有節點。
+// 幂等性：重複執行無副作用（已存在則靜默跳過）。
+async function _runMigration(){
+  try{
+    var existing=await fbGet(P_INBOX);
+    // 節點已存在（任何非 null 值）→ 靜默跳過
+    if(existing!==null){
+      console.log('[Migration] yilan/inbox 已存在，跳過。');
+      return {status:'already_exists'};
+    }
+    // 節點不存在 → 建立最小初始標記
+    console.log('[Migration] yilan/inbox 不存在，開始建立...');
+    var meta={
+      initialized:true,
+      version:'v11.4',
+      migratedAt:new Date().toISOString(),
+      migratedBy:S.me||'system'
+    };
+    var ok=await fbSet(P_INBOX+'/_meta',meta);
+    if(!ok)throw new Error('fbSet failed');
+    // 驗證
+    var verify=await fbGet(P_INBOX+'/_meta');
+    if(!verify||!verify.initialized)throw new Error('Verification failed');
+    console.log('[Migration] yilan/inbox 建立成功。');
+    toast('✓ 收件匣節點已建立（首次部署）','var(--green)');
+    return {status:'migrated'};
+  }catch(err){
+    console.error('[Migration] 失敗：',err);
+    toast('⚠️ 收件匣初始化失敗，請查看 Console','var(--amber)');
+    return {status:'error',error:err.message};
+  }
 }
-async function testTeamsNotification(){
-  const url=document.getElementById('teams-webhook-inp')?.value.trim();
-  if(!url){alert('請先貼上 Teams Webhook URL');return;}
-  S.teamsWebhook=url; // 暫存以利測試（按儲存才會寫入本機）
-  const st=document.getElementById('teams-status');
-  if(st){st.style.display='block';st.style.color='var(--navy)';st.textContent='📨 發送測試通知...';}
-  const text='Teams Webhook 測試成功\n時間：'+nowStamp();
-  const ok=await sendTeamsNotification({title:'【宜蘭廠區工作控管系統】',text:text,themeColor:'1F3864'});
-  if(st)st.textContent=ok?'✓ 測試通知已送出，請查看 Teams 頻道':'✗ 送出失敗，請確認 URL 是否正確';
+
+// ══ v11.2 INBOX ENGINE ══════════════════════════════════════════
+
+async function loadInbox(force){
+  if(!force&&Object.keys(S.inbox).length>0)return;
+  setSyn('sv');
+  var raw=await fbGet(P_INBOX);
+  S.inbox=(raw&&typeof raw==='object')?raw:{};
+  setSyn('ok');
+  var pending=Object.values(S.inbox).filter(function(e){return e.status==='pending';}).length;
+  var b=document.getElementById('badge-inbox');
+  if(b){if(pending>0){b.style.display='inline';b.textContent=pending;}else b.style.display='none';}
 }
-function saveTeamsAuto(){
-  S.teamsAuto=document.getElementById('ts-auto')?.checked||false;
-  localStorage.setItem('yilan_teams_auto',S.teamsAuto?'1':'0');
-  toast('✓ 自動推播設定已儲存','#1F3864');
+
+async function renderInbox(){
+  var main=document.getElementById('main');
+  main.innerHTML='<div class="loading"><div class="lspin"></div>載入收件匣...</div>';
+  await loadInbox();
+  var tab=S.inboxTab;
+  var src=S.inboxSrcFilter;
+  var all=Object.values(S.inbox);
+  var items=all
+    .filter(function(e){return e.status===tab;})
+    .filter(function(e){return src==='all'||e.source===src;})
+    .sort(function(a,b){return (b.receivedAt||'')>(a.receivedAt||'')?1:-1;});
+  var cnt={
+    pending:all.filter(function(e){return e.status==='pending';}).length,
+    approved:all.filter(function(e){return e.status==='approved';}).length,
+    skipped:all.filter(function(e){return e.status==='skipped';}).length,
+  };
+  var srcOpts=['all','outlook','teams','onedrive','meeting','manual'];
+  var srcLabel={all:'全部',outlook:'Outlook',teams:'Teams',onedrive:'OneDrive',meeting:'會議記錄',manual:'人工輸入'};
+  var srcIcon={outlook:'📧',teams:'💬',onedrive:'📁',meeting:'📋',manual:'✏️'};
+  var srcColor={outlook:'var(--blue)',teams:'var(--purple)',onedrive:'var(--teal)',meeting:'var(--navy)',manual:'var(--muted)'};
+  var tabLabel={pending:'待審核',approved:'已核准',skipped:'已跳過'};
+
+  function eCard(e){
+    var isPending=e.status==='pending';
+    var sc=srcColor[e.source]||'var(--muted)';
+    var si=srcIcon[e.source]||'📌';
+    var derived=e.derivedIds||{};
+    var dc=Object.values(derived).reduce(function(s,a){return s+(Array.isArray(a)?a.length:0);},0);
+    var rawPrev=escH((e.rawText||'').slice(0,120))+(e.rawText&&e.rawText.length>120?'…':'');
+    var ts=e.receivedAt?new Date(e.receivedAt).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    // v11.3 lifecycle badge
+    var lcMap={received:{label:'收到',bg:'var(--blue-l)',c:'var(--blue)'},
+               normalized:{label:'正規化',bg:'var(--purple-l)',c:'var(--purple)'},
+               reviewed:{label:'審核中',bg:'var(--amber-l)',c:'var(--amber)'},
+               approved:{label:'已核准',bg:'var(--green-l)',c:'var(--green)'},
+               archived:{label:'已封存',bg:'var(--border)',c:'var(--muted)'}};
+    var lc=lcMap[e.lifecycle]||lcMap['received'];
+    var lcBadge='<span style="font-size:10px;padding:1px 7px;border-radius:8px;background:'+lc.bg+';color:'+lc.c+';font-weight:600">'+lc.label+'</span>';
+    var revBadge=e.revision?'<span style="font-size:10px;color:var(--hint)">rev.'+e.revision+'</span>':'';
+    var foRow='';
+    if(isPending){
+      foRow='<div style="border-top:1px solid var(--border);padding:10px 14px;background:var(--bg)">'+
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600">核准後建立：</div>'+
+        '<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px">'+
+          ['task','risk','decision','schedule'].map(function(k){
+            var kl={task:'📋 Task',risk:'⚠️ Risk',decision:'🏛️ Decision',schedule:'📅 Schedule 備註'}[k];
+            var chk=k==='task'?'checked':'';
+            return '<label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:500;cursor:pointer">'+
+              '<input type="checkbox" id="fo-'+escH(e.eventId)+'-'+k+'" '+chk+' style="accent-color:var(--navy);width:15px;height:15px">'+
+              kl+'</label>';
+          }).join('')+
+        '</div>'+
+        '<div style="display:flex;gap:8px">'+
+          '<button onclick="approveEvent(\''+escH(e.eventId)+'\')" style="flex:1;padding:8px;border-radius:7px;border:none;background:var(--navy);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">✓ 核准</button>'+
+          '<button onclick="skipEvent(\''+escH(e.eventId)+'\')" style="padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer">✗ 跳過</button>'+
+        '</div></div>';
+    }
+    return '<div style="border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);margin-bottom:10px;overflow:hidden">'+
+      '<div style="padding:12px 14px 10px">'+
+        '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px">'+
+          '<span style="font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid '+sc+';color:'+sc+';white-space:nowrap;flex-shrink:0;font-weight:600">'+si+' '+(e.source||'').toUpperCase()+'</span>'+
+          lcBadge+' '+revBadge+
+          '<div style="font-size:14px;font-weight:600;line-height:1.4">'+escH(e.suggestedTitle||(e.rawText||'').slice(0,50)||'未命名事件')+'</div>'+
+        '</div>'+
+        (rawPrev?'<div style="font-size:12px;color:var(--muted);margin-bottom:6px;background:var(--bg);padding:7px 10px;border-radius:6px;line-height:1.5">'+rawPrev+'</div>':'')+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
+          (e.supplier?'<span style="font-size:11px;padding:2px 7px;border-radius:5px;background:var(--amber-l);color:var(--amber);font-weight:600">🏭 '+escH(e.supplier)+'</span>':'')+
+          (e.equipment?'<span style="font-size:11px;padding:2px 7px;border-radius:5px;background:var(--teal-l);color:var(--teal);font-weight:600">⚙️ '+escH(e.equipment)+'</span>':'')+
+          ((e.suggestedType||[]).length?'<span style="font-size:11px;color:var(--muted)">建議：'+escH((e.suggestedType||[]).join(', '))+'</span>':'')+
+          (e.matchStrength?'<span style="font-size:11px;color:var(--hint)">'+(e.matchStrength==='high'?'🟠 高':'🟡 低')+'</span>':'')+
+          '<span style="font-size:11px;color:var(--hint);margin-left:auto">'+ts+'</span>'+
+        '</div>'+
+        (dc>0?'<div style="font-size:11px;color:var(--green);margin-top:5px">↳ 已衍生 '+dc+' 筆紀錄</div>':'')+
+        (e.audit&&e.audit.approvedBy?'<div style="font-size:11px;color:var(--muted);margin-top:4px">核准：'+escH(e.audit.approvedBy)+' · '+(e.audit.approvedAt?new Date(e.audit.approvedAt).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'')+'</div>':'')+
+      '</div>'+foRow+'</div>';
+  }
+
+  var emptyMsg=items.length===0?
+    '<div style="text-align:center;padding:40px 20px;color:var(--hint);font-size:14px">沒有「'+tabLabel[tab]+'」事件</div>':
+    items.map(eCard).join('');
+
+  main.innerHTML=
+    '<div style="padding:16px">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'+
+        '<div>'+
+          '<div style="font-size:18px;font-weight:700;color:var(--navy)">📬 收件匣</div>'+
+          '<div style="font-size:12px;color:var(--muted);margin-top:2px">One Event → Many Outputs</div>'+
+        '</div>'+
+        '<button onclick="openManualEventModal()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--border-s);background:var(--surface);color:var(--blue);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">+ 手動新增</button>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px;margin-bottom:12px">'+
+        ['pending','approved','skipped'].map(function(t){
+          var active=S.inboxTab===t;
+          var c=cnt[t];
+          return '<button onclick="setInboxTab(\''+t+'\')" style="flex:1;padding:8px;border-radius:8px;border:1px solid '+(active?'var(--navy)':'var(--border)')+';background:'+(active?'var(--navy)':'var(--surface)')+';color:'+(active?'#fff':'var(--muted)')+';font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s">'+
+            tabLabel[t]+(c>0?' <span style="background:'+(active?'rgba(255,255,255,.25)':'var(--amber-l)')+';color:'+(active?'#fff':'var(--amber)')+';padding:1px 7px;border-radius:10px;font-size:11px">'+c+'</span>':'')+'</button>';
+        }).join('')+
+      '</div>'+
+      '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px">'+
+        srcOpts.map(function(s){
+          var active=S.inboxSrcFilter===s;
+          return '<button onclick="setInboxSrc(\''+s+'\')" style="padding:5px 10px;border-radius:6px;border:1px solid '+(active?'var(--blue)':'var(--border)')+';background:'+(active?'var(--blue-l)':'var(--surface)')+';color:'+(active?'var(--blue)':'var(--muted)')+';font-family:inherit;font-size:12px;cursor:pointer">'+srcLabel[s]+'</button>';
+        }).join('')+
+      '</div>'+
+      emptyMsg+
+    '</div>'+
+    '<div id="inbox-manual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center">'+
+      '<div style="background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:20px;width:100%;max-width:600px;max-height:85vh;overflow-y:auto">'+
+        '<div style="font-size:16px;font-weight:700;margin-bottom:14px;color:var(--navy)">手動新增事件到收件匣</div>'+
+        '<input id="ime-title" placeholder="事件標題 *" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;margin-bottom:8px;background:var(--surface);color:var(--text)">'+
+        '<textarea id="ime-raw" placeholder="原始內容（郵件/訊息/備忘）" rows="4" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;resize:vertical;margin-bottom:8px;background:var(--surface);color:var(--text)"></textarea>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'+
+          '<select id="ime-source" style="padding:9px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">'+
+            '<option value="manual">人工輸入</option>'+
+            '<option value="meeting">會議記錄</option>'+
+            '<option value="outlook">Outlook</option>'+
+            '<option value="teams">Teams</option>'+
+            '<option value="onedrive">OneDrive</option>'+
+          '</select>'+
+          '<input id="ime-supplier" placeholder="供應商（選填）" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">'+
+        '</div>'+
+        '<input id="ime-equipment" placeholder="設備（選填）" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:14px;background:var(--surface);color:var(--text)">'+
+        '<div style="display:flex;gap:8px">'+
+          '<button onclick="submitManualEvent()" style="flex:1;padding:10px;border-radius:8px;border:none;background:var(--navy);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">新增到收件匣</button>'+
+          '<button onclick="document.getElementById(\'inbox-manual-modal\').style.display=\'none\'" style="padding:10px 18px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer">取消</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
 }
+
+function setInboxTab(t){S.inboxTab=t;renderInbox();}
+function setInboxSrc(s){S.inboxSrcFilter=s;renderInbox();}
+
+function openManualEventModal(){
+  var m=document.getElementById('inbox-manual-modal');
+  if(m)m.style.display='flex';
+}
+
+// v11.3：eventHash — SHA-256(source|suggestedTitle|receivedAt)
+// 用途：跨來源 dedup 的補強層（現版只計算儲存，不觸發 gate）
+async function computeEventHash(source, title, receivedAt){
+  var msg=(source||'')+'|'+(title||'')+'|'+(receivedAt||'');
+  try{
+    if(window.crypto&&window.crypto.subtle){
+      var enc=new TextEncoder();
+      var buf=await window.crypto.subtle.digest('SHA-256',enc.encode(msg));
+      return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+    }
+  }catch(err){}
+  // TODO: crypto.subtle 不可用（非 HTTPS 環境）— 以 dedupeKey 替代，俟正式部署再啟用
+  return 'NOHASH:'+msg.slice(0,32);
+}
+
+async function submitManualEvent(){
+  var title=document.getElementById('ime-title')?.value.trim();
+  if(!title){alert('請填入事件標題');return;}
+  var raw=document.getElementById('ime-raw')?.value.trim()||'';
+  var source=document.getElementById('ime-source')?.value||'manual';
+  var supplier=document.getElementById('ime-supplier')?.value.trim()||'';
+  var equipment=document.getElementById('ime-equipment')?.value.trim()||'';
+  var ts=todayStr().replace(/\//g,'');
+  var eventId='EVT-'+ts+'-'+Date.now().toString(36).toUpperCase().slice(-4);
+  var nowIso=new Date().toISOString();
+  var hash=await computeEventHash(source,title,nowIso);
+  var event={
+    eventId:eventId,source:source,
+    dedupeKey:eventId,
+    rawText:raw||title,
+    receivedAt:nowIso,
+    status:'pending',
+    lifecycle:'received',    // v11.3 A: received|normalized|reviewed|approved|archived
+    retryCount:0,            // v11.3 B: 預留 Power Automate Retry
+    eventHash:hash,          // v11.3 C: SHA-256 跨來源 dedup 補強
+    revision:1,              // v11.3 D: 每次 PATCH 自動 +1
+    suggestedTitle:title,
+    suggestedType:[],matchStrength:'low',
+    supplier:supplier,equipment:equipment,
+    derivedIds:{tasks:[],risks:[],decisions:[],schedule:[]},
+    audit:{createdBy:S.me,approvedBy:'',approvedAt:''}
+  };
+  setSyn('sv');
+  await fbSet(P_INBOX+'/'+eventId,event);
+  S.inbox[eventId]=event;
+  setSyn('ok');
+  var m=document.getElementById('inbox-manual-modal');
+  if(m)m.style.display='none';
+  ['ime-title','ime-raw','ime-supplier','ime-equipment'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  toast('✓ 事件已加入收件匣','var(--green)');
+  _updateInboxBadge();
+  renderInbox();
+}
+
+async function approveEvent(eventId){
+  var e=S.inbox[eventId];
+  if(!e){alert('找不到事件');return;}
+  var fanOut={
+    task:    document.getElementById('fo-'+eventId+'-task')?.checked||false,
+    risk:    document.getElementById('fo-'+eventId+'-risk')?.checked||false,
+    decision:document.getElementById('fo-'+eventId+'-decision')?.checked||false,
+    schedule:document.getElementById('fo-'+eventId+'-schedule')?.checked||false,
+  };
+  var now=new Date().toISOString();
+  var derivedIds={tasks:[],risks:[],decisions:[],schedule:[]};
+  setSyn('sv');
+
+  // 1. Task
+  if(fanOut.task){
+    var tid='t'+Date.now()+Math.random().toString(36).slice(2,5);
+    var matchDept=S.depts.find(function(d){return e.supplier&&(d.name.includes(e.supplier)||e.supplier.includes(d.name));});
+    var task={
+      id:tid,title:e.suggestedTitle||(e.rawText||'').slice(0,50),
+      deptId:matchDept?matchDept.id:'',dueDate:'',completedDate:'',
+      status:'尚未開始',desc:e.rawText||'',category:'',
+      owner:'',coowner:'',progress:'',comments:'',
+      createdAt:S.todayStr,lastUpdated:'',fromMeeting:true,
+      sourceEventId:eventId   // ← Traceability
+    };
+    S.tasks[tid]=task;
+    await fbSet(P_TASKS+'/'+tid,task);
+    derivedIds.tasks.push(tid);
+  }
+
+  // 2. Risk
+  if(fanOut.risk){
+    var riskId='RSK-'+Date.now().toString(36).toUpperCase().slice(-6);
+    var risk={
+      id:riskId,
+      title:e.suggestedTitle||(e.rawText||'').slice(0,50),
+      supplier:e.supplier||'',equipment:e.equipment||'',
+      status:'Open',probability:'M',impact:'H',
+      mitigation:'',owner:S.me,
+      createdAt:S.todayStr,lastUpdated:S.todayStr,
+      sourceEventId:eventId   // ← Traceability
+    };
+    await fbSet(P_RISKS+'/'+riskId,risk);
+    derivedIds.risks.push(riskId);
+  }
+
+  // 3. Decision
+  if(fanOut.decision){
+    var decId='DEC-'+Date.now().toString(36).toUpperCase().slice(-6);
+    var dec={
+      id:decId,
+      title:e.suggestedTitle||(e.rawText||'').slice(0,50),
+      status:'待決策',approvedBy:'',impact:'',
+      createdAt:S.todayStr,owner:S.me,
+      sourceEventId:eventId   // ← Traceability
+    };
+    await fbSet(P_DECISIONS+'/'+decId,dec);
+    derivedIds.decisions.push(decId);
+  }
+
+  // 4. Schedule 備註
+  if(fanOut.schedule){
+    var sKey='SCH-'+Date.now().toString(36).toUpperCase().slice(-6);
+    await fbSet(P_META+'/scheduleNotes/'+sKey,{
+      note:e.suggestedTitle||(e.rawText||'').slice(0,80),
+      createdAt:S.todayStr,sourceEventId:eventId
+    });
+    derivedIds.schedule.push(sKey);
+  }
+
+  // 5. 回填 event（status + lifecycle + revision + derivedIds + audit）← Traceability 雙向
+  var patch={
+    status:'approved',
+    lifecycle:'approved',                    // v11.3 A
+    revision:(e.revision||1)+1,             // v11.3 D
+    derivedIds:derivedIds,
+    audit:{createdBy:e.audit&&e.audit.createdBy||'Copilot',approvedBy:S.me,approvedAt:now}
+  };
+  await fbPatch(P_INBOX+'/'+eventId,patch);
+  Object.assign(S.inbox[eventId],patch);
+  setSyn('ok');
+
+  var created=[
+    fanOut.task&&'Task',fanOut.risk&&'Risk',
+    fanOut.decision&&'Decision',fanOut.schedule&&'Schedule 備註'
+  ].filter(Boolean).join('、');
+  toast('✓ 已核准'+(created?'，建立：'+created:''),'var(--green)');
+  _updateInboxBadge();
+  renderInbox();
+}
+
+async function skipEvent(eventId){
+  var e=S.inbox[eventId];if(!e)return;
+  var patch={
+    status:'skipped',
+    lifecycle:'archived',                    // v11.3 A
+    revision:(e.revision||1)+1,             // v11.3 D
+    audit:{createdBy:e.audit&&e.audit.createdBy||'',approvedBy:S.me,approvedAt:new Date().toISOString()}
+  };
+  setSyn('sv');
+  await fbPatch(P_INBOX+'/'+eventId,patch);
+  Object.assign(S.inbox[eventId],patch);
+  setSyn('ok');
+  toast('已跳過事件');
+  _updateInboxBadge();
+  renderInbox();
+}
+
+function _updateInboxBadge(){
+  var pending=Object.values(S.inbox).filter(function(e){return e.status==='pending';}).length;
+  var b=document.getElementById('badge-inbox');
+  if(b){if(pending>0){b.style.display='inline';b.textContent=pending;}else b.style.display='none';}
+}
+
+/*
+<!-- COPILOT_CONTRACT ──────────────────────────────────────────────
+  Power Automate → Firebase /yilan/inbox 欄位契約 (v11.2)
+  
+  HTTP Action: PUT
+  URL: https://evaluation-survey-form-default-rtdb.firebaseio.com/yilan/inbox/{eventId}.json
+  
+  Body (JSON):
+  {
+    "eventId":    "EVT-YYYYMMDD-{messageId尾8碼}",   // 唯一 ID
+    "source":     "outlook",                           // outlook | teams | onedrive
+    "dedupeKey":  "{Outlook messageId}",               // 防重放，寫入前先 GET 確認不存在
+    "rawText":    "{郵件主旨} + \\n\\n + {郵件前300字}", // Normalize後純文字
+    "receivedAt": "{receivedDateTime ISO8601}",
+    "status":     "pending",
+    "suggestedTitle": "{郵件主旨}",
+    "suggestedType":  [],
+    "matchStrength":  "low",
+    "supplier":   "{從主旨/內文比對：TNA/Raypak/Robag/Amcor/Parkside}",
+    "equipment":  "{從主旨/內文比對：Robag/OMS/CLO/VM}",
+    "derivedIds": {"tasks":[],"risks":[],"decisions":[],"schedule":[]},
+    "audit":      {"createdBy":"Copilot","approvedBy":"","approvedAt":""},
+    "lifecycle":   "received",
+    "retryCount":  0,
+    "eventHash":   "",
+    "revision":    1
+  }
+  
+  Dedup 邏輯（Power Automate 端）：
+  1. GET /yilan/inbox.json?orderBy="dedupeKey"&equalTo="{messageId}" 
+  2. 如果回傳非 null → 跳過（同一封信已存在）
+  3. 如果回傳 null → 執行 PUT
+  
+  供應商比對關鍵字：
+  TNA | Raypak | Robag | Amcor | Parkside | 聯新 | 同和 | 瑞派克
+  
+  設備比對關鍵字：
+  Robag | OMS | CLO | VM | Install Kit | FAT | SAT
+────────────────────────────────────────────────────── -->
+*/
 
 // ══ 初始化 ══
 initLogin();
