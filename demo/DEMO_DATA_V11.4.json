@@ -1,0 +1,112 @@
+{
+  "_comment": "DEMO_DATA_V11.4.json — 宜蘭廠區工作控管系統 Firebase 測試資料",
+  "_import_instruction": "Firebase Console → Realtime Database → 右上角 ⋮ → Import JSON → 選擇此檔案（請先備份正式資料）",
+  "_import_path_note": "此 JSON 涵蓋 /yilan/inbox 完整結構，若只想匯入 inbox 請截取 data.yilan.inbox 部分",
+  "_version": "v1.0 | Sprint V11.4 | 2026-06-25",
+
+  "yilan": {
+    "inbox": {
+
+      "EVT-20260625-TNA001": {
+        "eventId":        "EVT-20260625-TNA001",
+        "source":         "outlook",
+        "dedupeKey":      "AAMkADEwODk5ZGNkLTY2NzEtNGUwMS1iMjY3LTMxNDY1YTQ3YWE5OABGAAAAAAD",
+        "rawText":        "TNA Install Kit Shipment Delay — Project Captain Danny\n\nDear Louis,\n\nWe regret to inform you that the Install Kit shipment for the Robag system has been delayed due to component shortage at our Brisbane facility.\n\nNew estimated delivery: 2026-07-15 (originally 2026-07-01)\nAffected items: Install Kit A, Install Kit B, Mounting brackets\nReason: PCB component shortage (global supply chain)\n\nWe will provide weekly updates and expedite where possible.\n\nBest regards,\nLuca Menassi | TNA Solutions",
+        "receivedAt":     "2026-06-25T08:30:00.000Z",
+        "status":         "pending",
+        "lifecycle":      "received",
+        "retryCount":     0,
+        "eventHash":      "",
+        "revision":       1,
+        "suggestedTitle": "TNA Install Kit Shipment Delay — Project Captain Danny",
+        "suggestedType":  [],
+        "matchStrength":  "low",
+        "supplier":       "TNA",
+        "equipment":      "Install Kit",
+        "derivedIds":     { "tasks": [], "risks": [], "decisions": [], "schedule": [] },
+        "audit":          { "createdBy": "Copilot-Outlook", "approvedBy": "", "approvedAt": "" }
+      },
+
+      "EVT-20260625-FAB002": {
+        "eventId":        "EVT-20260625-FAB002",
+        "source":         "teams",
+        "dedupeKey":      "1719302400000-teams-captain-danny-channel",
+        "rawText":        "【Teams 頻道訊息 - Captain Danny】\n\n陳敬穆：平台開孔圖 CAD 修正版今天會上傳到 OneDrive。圖面代號：CAP-DANNY-FAB-DWG-003 Rev.B\n\n開孔尺寸已依據 TNA FAT 報告調整：\n- Robag 主機開孔：1200 x 800mm（原 1150 x 750mm）\n- OMS 次機開孔：600 x 400mm（無變更）\n\n請 Louis 確認後通知 TNA 的 Kamchoke。",
+        "receivedAt":     "2026-06-25T09:15:00.000Z",
+        "status":         "pending",
+        "lifecycle":      "received",
+        "retryCount":     0,
+        "eventHash":      "",
+        "revision":       1,
+        "suggestedTitle": "平台開孔圖 CAD 修正 Rev.B 已上傳（Robag 尺寸變更）",
+        "suggestedType":  [],
+        "matchStrength":  "low",
+        "supplier":       "TNA",
+        "equipment":      "Robag",
+        "derivedIds":     { "tasks": [], "risks": [], "decisions": [], "schedule": [] },
+        "audit":          { "createdBy": "Copilot-Teams", "approvedBy": "", "approvedAt": "" }
+      },
+
+      "EVT-20260625-MTG003": {
+        "eventId":        "EVT-20260625-MTG003",
+        "source":         "meeting",
+        "dedupeKey":      "EVT-20260625-MTG003",
+        "rawText":        "【工程週會 2026-06-25 會議記錄】\n參與：Louis、陳敬穆、李秀龍、游荃傑\n\n行動項目：\n1. 確認 Robag FAT 報告簽核，期限：2026-06-30，負責：Louis\n2. 安排平台鋼構廠商現場放樣，期限：2026-07-05，負責：李秀龍\n3. 提供 OMS 電氣配置圖給業主確認，期限：2026-07-03，負責：游荃傑\n4. 建立設備到廠接收程序 SOP，期限：2026-07-10，負責：設備課\n\n風險：\n- Install Kit 延遲可能影響整體工期，建議提早確認備料清單。\n- 平台開孔尺寸變更需重新確認結構計算書。\n\n決策：\n- 決定採用分階段安裝方式：先安裝 Robag，再安裝 OMS/CLO。",
+        "receivedAt":     "2026-06-25T10:00:00.000Z",
+        "status":         "pending",
+        "lifecycle":      "received",
+        "retryCount":     0,
+        "eventHash":      "",
+        "revision":       1,
+        "suggestedTitle": "工程週會 2026-06-25 — 分階段安裝決策 + 4 項行動",
+        "suggestedType":  [],
+        "matchStrength":  "low",
+        "supplier":       "",
+        "equipment":      "Robag",
+        "derivedIds":     { "tasks": [], "risks": [], "decisions": [], "schedule": [] },
+        "audit":          { "createdBy": "Louis", "approvedBy": "", "approvedAt": "" }
+      },
+
+      "EVT-20260625-OD004": {
+        "eventId":        "EVT-20260625-OD004",
+        "source":         "onedrive",
+        "dedupeKey":      "01ABCDEF123456789-2026-06-25T11:00:00Z",
+        "rawText":        "檔案更新通知\n\n檔案名稱：CAP-DANNY-FAB-DWG-003_Rev.B_開孔圖.dwg\n路徑：/BFY-CapDanny/Engineering/CAD/Platform/\n修改時間：2026-06-25 11:00\n修改者：陳敬穆\n\n這是 Robag 開孔尺寸修正後的最新版 CAD 圖面，已對應 TNA FAT 報告要求。",
+        "receivedAt":     "2026-06-25T11:00:00.000Z",
+        "status":         "pending",
+        "lifecycle":      "received",
+        "retryCount":     0,
+        "eventHash":      "",
+        "revision":       1,
+        "suggestedTitle": "CAD 圖更新：CAP-DANNY-FAB-DWG-003 Rev.B 開孔圖",
+        "suggestedType":  [],
+        "matchStrength":  "low",
+        "supplier":       "",
+        "equipment":      "Robag",
+        "derivedIds":     { "tasks": [], "risks": [], "decisions": [], "schedule": [] },
+        "audit":          { "createdBy": "Copilot-OneDrive", "approvedBy": "", "approvedAt": "" }
+      },
+
+      "EVT-20260625-MAN005": {
+        "eventId":        "EVT-20260625-MAN005",
+        "source":         "manual",
+        "dedupeKey":      "EVT-20260625-MAN005",
+        "rawText":        "現場巡視記錄：宜蘭廠二樓平台施工區\n\n時間：2026-06-25 下午 2:30\n巡視人：Louis\n\n發現：\n1. 平台鋼構進度落後約三天（原定 6/28 完成，目前評估 7/1）\n2. 開孔位置尚未放樣，需等 CAD 圖 Rev.B 列印後才能進行\n3. 施工安全圍欄未完整設置，請工務課補強\n\n需要跟進事項：\n- 通知結構廠商確認延後時程\n- 確認開孔圖列印進度\n- 安全圍欄補強（今天內）",
+        "receivedAt":     "2026-06-25T14:30:00.000Z",
+        "status":         "pending",
+        "lifecycle":      "received",
+        "retryCount":     0,
+        "eventHash":      "",
+        "revision":       1,
+        "suggestedTitle": "現場巡視：平台施工落後 3 天 + 安全圍欄待補強",
+        "suggestedType":  [],
+        "matchStrength":  "low",
+        "supplier":       "",
+        "equipment":      "",
+        "derivedIds":     { "tasks": [], "risks": [], "decisions": [], "schedule": [] },
+        "audit":          { "createdBy": "Louis", "approvedBy": "", "approvedAt": "" }
+      }
+
+    }
+  }
+}
