@@ -1,0 +1,231 @@
+# DEPLOY_V11.4.md
+# 宜蘭廠區工作控管系統 v11.4 — 部署手冊
+# WO-105 Rev.A | 2026-06-25
+
+---
+
+## 部署原則
+
+1. **不得使用 Firebase Import JSON**（會覆蓋正式環境）
+2. **只能 Patch / Append / Migration**（新增節點，不覆蓋既有）
+3. **Idempotent**（任何步驟重複執行都安全）
+4. **先驗證後確認**（每一步都有驗收標準）
+
+---
+
+## 部署前 Checklist
+
+執行部署前，PMO 確認以下項目：
+
+| # | 確認項目 | 方法 | ✅ |
+|---|---|---|---|
+| 1 | Firebase 正式 URL 確認 | 查看 HTML 的 `FB` 常數 | ⬜ |
+| 2 | 既有節點確認（depts/managers/reports/tasks 正常） | Firebase Console | ⬜ |
+| 3 | `/yilan/inbox` 不存在（首次部署） | Firebase Console | ⬜ |
+| 4 | GitHub Pages 部署目標確認 | GitHub → Settings → Pages | ⬜ |
+| 5 | 測試用管理者帳號可正常登入 | 本機開啟 HTML 測試 | ⬜ |
+
+---
+
+## 第一次部署流程（完整步驟）
+
+### Phase 1：部署 HTML
+
+**1.1 取得最新版 HTML**
+
+```
+宜蘭廠區工作控管_全整合版_v11_4.html
+（來自 WO-105 Deployment Package）
+```
+
+**1.2 重新命名為 index.html**
+
+```bash
+cp 宜蘭廠區工作控管_全整合版_v11_4.html index.html
+```
+
+**1.3 上傳至 GitHub**
+
+```bash
+git add index.html
+git commit -m "Deploy YPOS v11.4 WO-105"
+git push origin main
+```
+
+**1.4 確認 GitHub Pages 更新**
+- 前往 `https://github.com/{帳號}/{repo}/actions`
+- 確認最新 deploy 工作流程顯示「✅ Complete」
+- 等待約 1～2 分鐘
+
+**Phase 1 驗收**：開啟 PWA URL → 確認 title 顯示「宜蘭廠區工作控管 v11.4」
+
+---
+
+### Phase 2：Firebase Migration（自動）
+
+**2.1 登入 YPOS**
+
+以管理者（Louis）身份登入：
+- 開啟 GitHub Pages URL
+- 選擇「Louis」→ 輸入密碼登入
+
+**2.2 觀察 Migration 結果**
+
+| 情況 | 顯示 | 意義 |
+|---|---|---|
+| 首次部署 | 綠色 toast：「✓ 收件匣節點已建立」 | Migration 成功 |
+| 已存在（重複部署） | 無 toast（靜默） | 已存在，無需 Migration |
+| 失敗 | 橘色 toast：「⚠️ 收件匣初始化失敗」 | 見 Troubleshooting |
+
+**Phase 2 驗收**：Firebase Console → 確認 `yilan/inbox/_meta` 存在
+
+---
+
+### Phase 3：功能驗證
+
+**3.1 新增測試事件**
+
+1. 點擊「📬 收件匣」
+2. 點擊「+ 手動新增」
+3. 填入：
+   - 事件標題：`[TEST] 部署驗證測試事件`
+   - 原始內容：`TNA Install Kit 部署驗證用`
+   - 來源：人工輸入
+   - 供應商：`TNA`
+   - 設備：`Install Kit`
+4. 點擊「新增到收件匣」
+5. **預期**：Toast「✓ 事件已加入收件匣」
+
+**3.2 執行 Approval**
+
+1. 在待審核 tab 看到新事件
+2. 勾選「☑ Task」
+3. 點擊「✓ 核准」
+4. **預期**：Toast「✓ 已核准，建立：Task」
+
+**3.3 確認 Firebase 資料**
+
+Firebase Console 確認：
+
+```
+/yilan/inbox/{eventId}
+  └── status: "approved"
+  └── lifecycle: "approved"
+  └── derivedIds.tasks: ["{taskId}"]
+  └── audit.approvedBy: "Louis"
+  └── audit.approvedAt: {timestamp}
+
+/yilan/tasks/{taskId}
+  └── sourceEventId: "{eventId}"  ← Traceability 確認
+  └── title: "[TEST] 部署驗證測試事件"
+```
+
+**Phase 3 驗收**：以上 Firebase 欄位全數確認 ✅
+
+---
+
+### Phase 4：清理測試資料（選用）
+
+部署驗收完成後，如需清除測試事件：
+
+在瀏覽器 Console 執行：
+```javascript
+// 列出所有測試事件 key（僅供確認，不執行刪除）
+const inbox = await fbGet(P_INBOX);
+const testKeys = Object.keys(inbox).filter(k => k.startsWith('EVT-'));
+console.log('測試事件：', testKeys);
+```
+
+如確認要刪除特定測試事件（手動執行，一次一個）：
+```javascript
+await fbDel(P_INBOX + '/EVT-20260625-XXXX');
+```
+
+---
+
+## Rollback 流程
+
+> 適用場景：部署後發現系統異常，需還原到部署前狀態
+
+### Rollback 條件
+
+| 條件 | 可否 Rollback | 說明 |
+|---|---|---|
+| inbox 只有 `_meta`（無真實事件） | ✅ 可以 | 安全，直接刪除 inbox |
+| inbox 有 EVT- 開頭事件 | ❌ 不可以 | 保護正式資料 |
+
+### Rollback 步驟
+
+**Step 1：確認 Rollback 條件**
+
+在瀏覽器 Console：
+```javascript
+rollback_inbox()
+// 若顯示「Rollback ABORTED: has_real_events」→ 不可 Rollback
+```
+
+**Step 2：執行 HTML Rollback**
+
+```bash
+# 還原 GitHub Pages 至上一版
+git revert HEAD
+git push origin main
+```
+
+**Step 3：確認上一版 HTML 已部署**
+
+等待 GitHub Pages 部署完成 → 確認 PWA 版本號還原
+
+**Step 4：確認 Firebase 狀態**
+
+Firebase Console 確認 `/yilan/inbox` 已刪除（若 Rollback 成功）
+
+---
+
+## 重複部署（已有正式資料的情況）
+
+當 inbox 已有正式事件時，重新部署 HTML 是安全的：
+
+1. 更新 HTML → push to GitHub
+2. 管理者重新登入
+3. `_runMigration()` 自動執行
+4. 因 `/yilan/inbox` 已存在 → 靜默跳過，不做任何寫入
+5. 既有事件完全不受影響
+
+---
+
+## 部署後驗收 Checklist（PMO 使用）
+
+| # | 驗收項目 | 預期結果 | 結果 |
+|---|---|---|---|
+| D-01 | PWA 標題版本 | `宜蘭廠區工作控管 v11.4` | ⬜ |
+| D-02 | 管理者登入成功 | 進入系統，nav 顯示 📬 收件匣 | ⬜ |
+| D-03 | Migration toast（首次） | 綠色「✓ 收件匣節點已建立」| ⬜ |
+| D-04 | Firebase inbox 節點存在 | Console → `yilan/inbox/_meta` | ⬜ |
+| D-05 | 既有節點未變動 | depts/managers/reports/tasks 正常 | ⬜ |
+| D-06 | 手動新增事件成功 | Toast「✓ 事件已加入收件匣」| ⬜ |
+| D-07 | Approval Gate 正常 | Toast「✓ 已核准，建立：Task」| ⬜ |
+| D-08 | Task.sourceEventId 存在 | Firebase Console 確認 | ⬜ |
+| D-09 | Event.derivedIds 回填 | Firebase Console 確認 | ⬜ |
+| D-10 | 重複登入無 Migration toast | 靜默，無副作用 | ⬜ |
+
+**驗收通過標準**：D-01 ~ D-10 全數 ✅ → V11.4 Release
+
+---
+
+## Open Items（WO-105 後）
+
+| # | 項目 | Sprint |
+|---|---|---|
+| OI-001 | Power Automate Outlook 整合（已暫停） | V11.5 |
+| OI-002 | Firebase Rules 加入 Auth（目前開放） | 上線前 |
+| OI-003 | Inbox 事件編輯功能 | V11.5 |
+| OI-004 | 本地 Hash Dedup | V11.5 |
+
+---
+
+## 版本紀錄
+
+| 版本 | 日期 | 說明 |
+|---|---|---|
+| v1.0 | 2026-06-25 | WO-105 初版 |
