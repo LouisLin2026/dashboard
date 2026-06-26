@@ -3,9 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>宜蘭廠區工作控管 v11.5</title>
+<title>宜蘭廠區工作控管 v11.7</title>
 <!-- ============================================================
   CHANGELOG
+  v11.7 (2026-06-26) — WO-003｜Input Engine MVP
+    新增「📎 貼上 / 上傳」入口按鈕（Inbox 頁面標題列右側）
+    inboxInputModal：Paste 文字 + 拖曳上傳區（TXT / DOCX / PDF / XLSX）
+    parseText(text, source)：關鍵字解析 → suggestedType + suggestedTitle
+    parseDocument(file)：DOCX/TXT/XLSX/PDF → 萃取文字 → parseText()
+    parseMeeting(text)：會議記錄專用解析 stub（source='meeting'）
+    _buildEventFromParsed()：統一 Event 建構，直接送入 Inbox（不建 Task）
+    PDF：使用 FileReader + pdfjs-dist CDN 萃取文字
+    零功能回歸：現有 Manual Modal / Approve / Skip 完全不動
+  v11.6 (2026-06-26) — WO-002｜Input Engine Source Rename
+    Inbox source 識別碼重構：outlook→email、teams→chat、onedrive→document
+    srcOpts / srcLabel / srcIcon / srcColor 全部更新
+    手動新增事件 Modal <select> 選項更新
+    Firebase 欄位契約 comment 同步更新
+    零功能回歸：所有邏輯、Firebase 路徑、Event schema 完全不動
   v11.5 (2026-06-25) — WO-107 Rev.A｜Register Center
     新增 Register Center（📋 Register nav tab，管理者限定）
     PMO Summary：Task/Risk/Decision/Schedule 四張統計卡（總計/待處理/本週/逾期）
@@ -27,6 +42,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 :root{
   --bg:#F7F6F3;--surface:#FFF;--border:#E4E2DC;--border-s:#CBC9C2;
@@ -515,7 +531,7 @@ let S={
   _registerLoaded:false,
   // v11.2 Inbox
   inboxTab:'pending',      // 'pending'|'approved'|'skipped'
-  inboxSrcFilter:'all',    // 'all'|'outlook'|'teams'|'onedrive'|'meeting'|'manual'
+  inboxSrcFilter:'all',    // 'all'|'email'|'chat'|'document'|'meeting'|'manual'
   inbox:{},                // 從 Firebase /inbox 載入的事件
 };
 
@@ -2461,10 +2477,10 @@ async function renderInbox(){
     approved:all.filter(function(e){return e.status==='approved';}).length,
     skipped:all.filter(function(e){return e.status==='skipped';}).length,
   };
-  var srcOpts=['all','outlook','teams','onedrive','meeting','manual'];
-  var srcLabel={all:'全部',outlook:'Outlook',teams:'Teams',onedrive:'OneDrive',meeting:'會議記錄',manual:'人工輸入'};
-  var srcIcon={outlook:'📧',teams:'💬',onedrive:'📁',meeting:'📋',manual:'✏️'};
-  var srcColor={outlook:'var(--blue)',teams:'var(--purple)',onedrive:'var(--teal)',meeting:'var(--navy)',manual:'var(--muted)'};
+  var srcOpts=['all','email','chat','document','meeting','manual'];
+  var srcLabel={all:'全部',email:'Email',chat:'Chat',document:'Document',meeting:'會議記錄',manual:'人工輸入'};
+  var srcIcon={email:'📧',chat:'💬',document:'📁',meeting:'📋',manual:'✏️'};
+  var srcColor={email:'var(--blue)',chat:'var(--purple)',document:'var(--teal)',meeting:'var(--navy)',manual:'var(--muted)'};
   var tabLabel={pending:'待審核',approved:'已核准',skipped:'已跳過'};
 
   function eCard(e){
@@ -2534,6 +2550,7 @@ async function renderInbox(){
           '<div style="font-size:12px;color:var(--muted);margin-top:2px">One Event → Many Outputs</div>'+
         '</div>'+
         '<button onclick="openManualEventModal()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--border-s);background:var(--surface);color:var(--blue);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">+ 手動新增</button>'+
+        '<button onclick="openInboxInputModal()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--border-s);background:var(--surface);color:var(--teal);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">📎 貼上 / 上傳</button>'+
       '</div>'+
       '<div style="display:flex;gap:6px;margin-bottom:12px">'+
         ['pending','approved','skipped'].map(function(t){
@@ -2560,9 +2577,9 @@ async function renderInbox(){
           '<select id="ime-source" style="padding:9px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">'+
             '<option value="manual">人工輸入</option>'+
             '<option value="meeting">會議記錄</option>'+
-            '<option value="outlook">Outlook</option>'+
-            '<option value="teams">Teams</option>'+
-            '<option value="onedrive">OneDrive</option>'+
+            '<option value="email">Email</option>'+
+            '<option value="chat">Chat</option>'+
+            '<option value="document">Document</option>'+
           '</select>'+
           '<input id="ime-supplier" placeholder="供應商（選填）" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">'+
         '</div>'+
@@ -2572,11 +2589,282 @@ async function renderInbox(){
           '<button onclick="document.getElementById(\'inbox-manual-modal\').style.display=\'none\'" style="padding:10px 18px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer">取消</button>'+
         '</div>'+
       '</div>'+
+    '</div>'+
+    // ── WO-003: Inbox Input Modal (Paste / Upload) ──
+    '<div id="inbox-input-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center">'+
+      '<div style="background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:20px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'+
+          '<div style="font-size:16px;font-weight:700;color:var(--navy)">📎 貼上文字 / 上傳檔案</div>'+
+          '<button onclick="closeInboxInputModal()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>'+
+        '</div>'+
+        // Paste area
+        '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">貼上文字</div>'+
+        '<textarea id="iim-paste" placeholder="貼上 Email、訊息、會議筆記…&#10;&#10;例：&#10;Danny：OMS Layout 7/20完成 預算50萬" rows="5" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;resize:vertical;margin-bottom:8px;background:var(--bg);color:var(--text)"></textarea>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">'+
+          '<select id="iim-source" style="padding:9px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">'+
+            '<option value="manual">人工輸入</option>'+
+            '<option value="email">Email</option>'+
+            '<option value="chat">Chat</option>'+
+            '<option value="meeting">會議記錄</option>'+
+            '<option value="document">Document</option>'+
+          '</select>'+
+          '<button onclick="submitPasteEvent()" style="padding:9px;border-radius:8px;border:none;background:var(--navy);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">解析並加入收件匣</button>'+
+        '</div>'+
+        // Divider
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'+
+          '<div style="flex:1;height:1px;background:var(--border)"></div>'+
+          '<span style="font-size:12px;color:var(--hint)">或上傳檔案</span>'+
+          '<div style="flex:1;height:1px;background:var(--border)"></div>'+
+        '</div>'+
+        // Drop zone
+        '<div id="iim-dropzone" '+
+          'style="border:2px dashed var(--border-s);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s" '+
+          'onclick="document.getElementById(\'iim-fi\').click()" '+
+          'ondragover="event.preventDefault();this.style.borderColor=\'var(--blue)\';this.style.background=\'var(--blue-l)\'" '+
+          'ondragleave="this.style.borderColor=\'\';this.style.background=\'\'" '+
+          'ondrop="event.preventDefault();this.style.borderColor=\'\';this.style.background=\'\';handleInboxFile(event.dataTransfer.files[0])">'+
+          '<div style="font-size:28px;margin-bottom:8px">📂</div>'+
+          '<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">拖曳檔案到這裡</div>'+
+          '<div style="font-size:12px;color:var(--muted)">.txt &nbsp;·&nbsp; .docx &nbsp;·&nbsp; .pdf &nbsp;·&nbsp; .xlsx</div>'+
+        '</div>'+
+        '<input type="file" id="iim-fi" accept=".txt,.docx,.doc,.pdf,.xlsx,.xls" style="display:none" onchange="handleInboxFile(this.files[0])">'+
+        '<div id="iim-status" style="margin-top:10px;font-size:13px;min-height:20px;color:var(--muted)"></div>'+
+      '</div>'+
     '</div>';
 }
 
 function setInboxTab(t){S.inboxTab=t;renderInbox();}
 function setInboxSrc(s){S.inboxSrcFilter=s;renderInbox();}
+
+// ══ WO-003: INPUT ENGINE MVP ══════════════════════════════════
+// parseText()     — 純文字解析 stub（可接 AI）
+// parseDocument() — 檔案 → 文字 → parseText()
+// parseMeeting()  — 會議記錄專用 stub
+// _buildEventFromParsed() — 統一 Event 建構 → Inbox
+
+// ── 關鍵字對照表 ──────────────────────────────────────────────
+var IE_TASK_KW     = ['完成','執行','負責','確認','安排','處理','跟進','follow','action','todo','任務','請','需要'];
+var IE_RISK_KW     = ['風險','異常','問題','故障','延遲','超預算','警告','warning','risk','issue','異常'];
+var IE_DECISION_KW = ['決定','決策','批准','核准','同意','採用','選擇','decided','approved','decision'];
+var IE_SCHEDULE_KW = ['排程','時程','預計','計畫','deadline','due','完工','交期','7/','8/','9/','日期'];
+
+/**
+ * parseText(text, source)
+ * 純文字解析 stub — 以關鍵字推斷 suggestedType 與 suggestedTitle。
+ * 未來替換為 AI 呼叫時，只需改此函式內部，其餘不動。
+ *
+ * @param {string} text
+ * @param {string} source
+ * @returns {{ suggestedTitle:string, suggestedType:string[], matchStrength:string, rawText:string }}
+ */
+function parseText(text, source) {
+  if (!text || !text.trim()) return null;
+  var lower = text.toLowerCase();
+  var types = [];
+  if (IE_TASK_KW.some(function(k){return lower.includes(k);}))     types.push('task');
+  if (IE_RISK_KW.some(function(k){return lower.includes(k);}))     types.push('risk');
+  if (IE_DECISION_KW.some(function(k){return lower.includes(k);})) types.push('decision');
+  if (IE_SCHEDULE_KW.some(function(k){return lower.includes(k);})) types.push('schedule');
+  if (types.length === 0) types.push('task'); // 預設
+
+  // 取第一行非空行作為 suggestedTitle
+  var firstLine = text.split('\n').map(function(l){return l.trim();}).filter(Boolean)[0] || text.slice(0,60);
+  var title = firstLine.slice(0, 120);
+
+  return {
+    suggestedTitle: title,
+    suggestedType:  types,
+    matchStrength:  types.length >= 2 ? 'high' : 'low',
+    rawText:        text.slice(0, 2000),
+  };
+}
+
+/**
+ * parseMeeting(text)
+ * 會議記錄專用解析 stub。
+ * 識別 "人名：動作" 句型，未來可接 AI 精確提取。
+ *
+ * @param {string} text
+ * @returns {{ suggestedTitle:string, suggestedType:string[], matchStrength:string, rawText:string }}
+ */
+function parseMeeting(text) {
+  if (!text || !text.trim()) return null;
+  // 識別「姓名：...」句型
+  var actionLines = text.split('\n').filter(function(l){
+    return /^[\u4e00-\u9fa5A-Za-z]+[：:].+/.test(l.trim());
+  });
+  var base = parseText(text, 'meeting');
+  if (actionLines.length > 0) {
+    base.suggestedTitle = actionLines[0].trim().slice(0, 120);
+    base.matchStrength = 'high';
+    if (base.suggestedType.indexOf('task') < 0) base.suggestedType.unshift('task');
+  }
+  return base;
+}
+
+/**
+ * parseDocument(file)
+ * 讀取檔案 → 萃取文字 → parseText()
+ * 支援：TXT / DOCX / XLSX / PDF
+ *
+ * @param {File} file
+ * @returns {Promise<{ parsed, source, rawText }>}
+ */
+async function parseDocument(file) {
+  var ext = file.name.split('.').pop().toLowerCase();
+  var text = '';
+
+  if (ext === 'docx' || ext === 'doc') {
+    var ab = await file.arrayBuffer();
+    var res = await mammoth.extractRawText({arrayBuffer: ab});
+    text = res.value;
+  } else if (ext === 'xlsx' || ext === 'xls') {
+    var ab2 = await file.arrayBuffer();
+    var wb = XLSX.read(ab2, {type: 'array'});
+    text = wb.SheetNames.map(function(sn){
+      return XLSX.utils.sheet_to_csv(wb.Sheets[sn]);
+    }).join('\n');
+  } else if (ext === 'pdf') {
+    text = await _extractPdfText(file);
+  } else {
+    // TXT, CSV, etc.
+    text = await file.text();
+  }
+
+  var src = (ext === 'xlsx' || ext === 'xls') ? 'document' : 'document';
+  var parsed = parseText(text, src);
+  if (!parsed) parsed = {suggestedTitle: file.name, suggestedType:['task'], matchStrength:'low', rawText:''};
+  // Use filename as fallback title prefix
+  if (!text.trim()) {
+    parsed.suggestedTitle = '[' + file.name + '] (空白或無法解析)';
+  }
+  return {parsed: parsed, source: src, rawText: text};
+}
+
+/**
+ * _extractPdfText(file)
+ * 使用 pdf.js 萃取 PDF 純文字。
+ *
+ * @param {File} file
+ * @returns {Promise<string>}
+ */
+async function _extractPdfText(file) {
+  try {
+    // Configure worker
+    if (window.pdfjsLib && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    var pdfjsLib = window.pdfjsLib;
+    if (!pdfjsLib) throw new Error('pdf.js 未載入');
+    var ab = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({data: ab}).promise;
+    var pages = [];
+    for (var p = 1; p <= Math.min(pdf.numPages, 20); p++) {
+      var page = await pdf.getPage(p);
+      var tc = await page.getTextContent();
+      pages.push(tc.items.map(function(i){return i.str;}).join(' '));
+    }
+    return pages.join('\n');
+  } catch(e) {
+    return '[PDF 解析失敗: ' + e.message + ']';
+  }
+}
+
+/**
+ * _buildEventFromParsed(parsed, source, rawText)
+ * 統一 Event 建構，直接寫入 Firebase Inbox。
+ * 不建立 Task — 交由 approveEvent() 決定。
+ */
+async function _buildEventFromParsed(parsed, source, rawText) {
+  var ts = todayStr().replace(/\//g,'');
+  var eventId = 'EVT-' + ts + '-' + Date.now().toString(36).toUpperCase().slice(-4);
+  var nowIso = new Date().toISOString();
+  var hash = await computeEventHash(source, parsed.suggestedTitle, nowIso);
+  var event = {
+    eventId:        eventId,
+    source:         source,
+    dedupeKey:      eventId,
+    rawText:        rawText || parsed.rawText || '',
+    receivedAt:     nowIso,
+    status:         'pending',
+    lifecycle:      'normalized',
+    retryCount:     0,
+    eventHash:      hash,
+    revision:       1,
+    suggestedTitle: parsed.suggestedTitle,
+    suggestedType:  parsed.suggestedType,
+    matchStrength:  parsed.matchStrength,
+    supplier:       '',
+    equipment:      '',
+    derivedIds:     {tasks:[], risks:[], decisions:[], schedule:[]},
+    audit:          {createdBy: S.me, approvedBy:'', approvedAt:''},
+  };
+  setSyn('sv');
+  await fbSet(P_INBOX + '/' + eventId, event);
+  S.inbox[eventId] = event;
+  setSyn('ok');
+  return eventId;
+}
+
+// ── Modal open / close ────────────────────────────────────────
+function openInboxInputModal() {
+  var m = document.getElementById('inbox-input-modal');
+  if (m) m.style.display = 'flex';
+}
+function closeInboxInputModal() {
+  var m = document.getElementById('inbox-input-modal');
+  if (m) m.style.display = 'none';
+  var pa = document.getElementById('iim-paste');
+  var fi = document.getElementById('iim-fi');
+  if (pa) pa.value = '';
+  if (fi) fi.value = '';
+  _iimSetStatus('');
+}
+
+function _iimSetStatus(msg, color) {
+  var el = document.getElementById('iim-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color || 'var(--muted)';
+}
+
+// ── Paste submit ──────────────────────────────────────────────
+async function submitPasteEvent() {
+  var text = (document.getElementById('iim-paste')?.value || '').trim();
+  if (!text) { _iimSetStatus('請貼上文字內容', 'var(--red)'); return; }
+  var source = document.getElementById('iim-source')?.value || 'manual';
+
+  _iimSetStatus('⏳ 解析中…', 'var(--purple)');
+  var parsed = (source === 'meeting') ? parseMeeting(text) : parseText(text, source);
+  if (!parsed) { _iimSetStatus('❌ 解析失敗，請確認內容', 'var(--red)'); return; }
+
+  var eid = await _buildEventFromParsed(parsed, source, text);
+  _iimSetStatus('✓ 已建立事件 ' + eid, 'var(--green)');
+  toast('✓ 事件已加入收件匣（' + parsed.suggestedType.join(', ') + '）', 'var(--green)');
+  _updateInboxBadge();
+  renderInbox();
+  setTimeout(closeInboxInputModal, 800);
+}
+
+// ── File upload handler ───────────────────────────────────────
+async function handleInboxFile(file) {
+  if (!file) return;
+  _iimSetStatus('📖 讀取 ' + file.name + '…', 'var(--purple)');
+  try {
+    var result = await parseDocument(file);
+    var source = document.getElementById('iim-source')?.value || result.source || 'document';
+    var eid = await _buildEventFromParsed(result.parsed, source, result.rawText);
+    _iimSetStatus('✓ 已解析並建立事件 ' + eid, 'var(--green)');
+    toast('✓ ' + file.name + ' → 收件匣', 'var(--green)');
+    _updateInboxBadge();
+    renderInbox();
+    setTimeout(closeInboxInputModal, 900);
+  } catch(e) {
+    _iimSetStatus('❌ 失敗：' + e.message, 'var(--red)');
+  }
+}
+// ══ END WO-003 ═══════════════════════════════════════════════
 
 function openManualEventModal(){
   var m=document.getElementById('inbox-manual-modal');
@@ -2761,8 +3049,8 @@ function _updateInboxBadge(){
   Body (JSON):
   {
     "eventId":    "EVT-YYYYMMDD-{messageId尾8碼}",   // 唯一 ID
-    "source":     "outlook",                           // outlook | teams | onedrive
-    "dedupeKey":  "{Outlook messageId}",               // 防重放，寫入前先 GET 確認不存在
+    "source":     "email",                             // email | chat | document | meeting | manual
+    "dedupeKey":  "{來源 messageId / docId}",            // 防重放，寫入前先 GET 確認不存在
     "rawText":    "{郵件主旨} + \\n\\n + {郵件前300字}", // Normalize後純文字
     "receivedAt": "{receivedDateTime ISO8601}",
     "status":     "pending",
