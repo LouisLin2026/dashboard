@@ -2004,6 +2004,216 @@
       cursor: pointer;
       margin-top: 7px
     }
+
+    /* ── Workspace Master ───────────────────────────── */
+    .ws-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px
+    }
+    .ws-header h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--navy);
+      margin: 0
+    }
+    .ws-add-btn {
+      padding: 7px 14px;
+      border: none;
+      border-radius: var(--radius-s);
+      background: var(--navy);
+      color: #fff;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer
+    }
+    .ws-filter-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      flex-wrap: wrap
+    }
+    .ws-filter-btn {
+      padding: 5px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      background: #fff;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s
+    }
+    .ws-filter-btn.active {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy)
+    }
+    .ws-list { display: flex; flex-direction: column; gap: 10px }
+    .ws-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-s)
+    }
+    .ws-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px
+    }
+    .ws-card-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+    .ws-card-id {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 400
+    }
+    .ws-status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 10px;
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+    .ws-status-active { background: var(--green-l); color: #166534 }
+    .ws-status-archived { background: #f3f4f6; color: var(--muted) }
+    .ws-card-desc {
+      font-size: 12.5px;
+      color: #555;
+      margin-bottom: 7px;
+      line-height: 1.5
+    }
+    .ws-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 7px
+    }
+    .ws-chip {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--blue-l);
+      color: #1e4088
+    }
+    .ws-chip.alias { background: #f3e8ff; color: #6b21a8 }
+    .ws-card-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 10px
+    }
+    .ws-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px
+    }
+    .ws-btn {
+      padding: 5px 14px;
+      border-radius: var(--radius-s);
+      border: 1.5px solid var(--border);
+      background: #fff;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--navy);
+      font-weight: 600;
+      transition: background .15s
+    }
+    .ws-btn:hover { background: var(--blue-l) }
+    .ws-btn.danger { color: #b91c1c; border-color: #fca5a5 }
+    .ws-btn.danger:hover { background: #fef2f2 }
+    .ws-btn.restore { color: #166534; border-color: #86efac }
+    .ws-btn.restore:hover { background: var(--green-l) }
+    .ws-empty {
+      text-align: center;
+      padding: 40px 0;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    /* ── Workspace Detail (DEV-CAP-002B) ────────────── */
+    .ws-card-link { cursor: pointer; color: var(--navy) }
+    .ws-card-link:hover { text-decoration: underline }
+    .ws-card-counts { font-size: 11px; color: var(--muted); margin-bottom: 5px }
+    .ws-detail-back { margin-bottom: 12px }
+    .ws-back-btn {
+      background: none;
+      border: none;
+      color: var(--navy);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 0
+    }
+    .ws-back-btn:hover { text-decoration: underline }
+    .ws-detail-box {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow-s)
+    }
+    .ws-detail-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border)
+    }
+    .ws-detail-name { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 4px }
+    .ws-detail-id { font-size: 12px; color: var(--muted) }
+    .ws-detail-section {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border)
+    }
+    .ws-detail-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: .5px;
+      margin-bottom: 10px
+    }
+    .ws-field-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      font-size: 13px
+    }
+    .ws-field-key { width: 60px; flex-shrink: 0; color: var(--muted); font-size: 12px; padding-top: 2px }
+    .ws-field-val { color: #333; display: flex; flex-wrap: wrap; gap: 4px; line-height: 1.6 }
+    .ws-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px
+    }
+    .ws-stat-cell {
+      background: var(--navy-l);
+      border-radius: var(--radius-s);
+      padding: 10px 8px;
+      text-align: center
+    }
+    .ws-stat-num { font-size: 20px; font-weight: 700; color: var(--navy); line-height: 1; margin-bottom: 4px }
+    .ws-stat-lbl { font-size: 11px; color: var(--muted) }
+    .ws-detail-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px }
   </style>
 </head>
 
@@ -2119,6 +2329,9 @@
       <button class="nav-btn" id="nb-register" onclick="swTab('register')" style="display:none">
         <span class="ico">📋</span>Register
       </button>
+      <button class="nav-btn" id="nb-workspaces" onclick="swTab('workspaces')" style="display:none">
+        <span class="ico">📁</span>工作區管理
+      </button>
     </div>
 
     <div class="content" id="main"></div>
@@ -2138,6 +2351,7 @@
     const P_RISKS = 'yilan/risks';
     const P_DECISIONS = 'yilan/decisions';
     const P_SCHEDULE = 'yilan/schedule'; // v11.5
+    const P_WORKSPACES = 'yilan/workspaces'; // DEV-CAP-002A
 
     async function fbGet(p) { try { const r = await fetch(`${FB}/${p}.json`); if (!r.ok) return null; return r.json(); } catch (e) { return null; } }
     async function fbSet(p, v) { try { await fetch(`${FB}/${p}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(v) }); return true; } catch (e) { return false; } }
@@ -2195,6 +2409,11 @@
       inboxTab: 'pending',      // 'pending'|'approved'|'skipped'
       inboxSrcFilter: 'all',    // 'all'|'email'|'chat'|'document'|'meeting'|'manual'
       inbox: {},                // 從 Firebase /inbox 載入的事件
+      // DEV-CAP-002A/B Workspace
+      workspaces: {},
+      wsFilter: 'active',
+      wsView: 'list',
+      activeWsId: null,
     };
 
     function todayStr() { const n = new Date(); return `${n.getFullYear()}/${(n.getMonth() + 1).toString().padStart(2, '0')}/${n.getDate().toString().padStart(2, '0')}`; }
@@ -2570,7 +2789,7 @@
       S.weekLabel = [getWeekLabel(0), getWeekLabel(1)];
       document.getElementById('hdr-sub').textContent = (isMgr ? '管理者模式' : '單位模式') + ' · ' + S.todayStr;
       if (isMgr) {
-        ['import', 'report', 'depts', 'line', 'dupcheck', 'inbox', 'register'].forEach(t => document.getElementById('nb-' + t).style.display = 'flex');
+        ['import', 'report', 'depts', 'line', 'dupcheck', 'inbox', 'register', 'workspaces'].forEach(t => document.getElementById('nb-' + t).style.display = 'flex');
       }
       const savedToken = localStorage.getItem('yilan_line_token') || '';
       const savedNotify = JSON.parse(localStorage.getItem('yilan_line_notify') || 'null');
@@ -2598,9 +2817,10 @@
     async function loadData() {
       document.getElementById('main').innerHTML = '<div class="loading"><div class="lspin"></div>載入中...</div>';
       setSyn('sv');
-      const [rawT, rawM] = await Promise.all([fbGet(P_TASKS), fbGet(P_META)]);
+      const [rawT, rawM, rawWS] = await Promise.all([fbGet(P_TASKS), fbGet(P_META), fbGet(P_WORKSPACES)]);
       S.tasks = (rawT && typeof rawT === 'object') ? rawT : {};
       S.meta = (rawM && typeof rawM === 'object') ? rawM : {};
+      S.workspaces = (rawWS && typeof rawWS === 'object') ? rawWS : {};
       setSyn('ok');
     }
 
@@ -2613,7 +2833,7 @@
     // ══ Tab ══
     function swTab(t) {
       S.tab = t;
-      ['board', 'import', 'report', 'depts', 'line', 'dupcheck', 'inbox', 'register'].forEach(n => document.getElementById('nb-' + n)?.classList.toggle('active', n === t));
+      ['board', 'import', 'report', 'depts', 'line', 'dupcheck', 'inbox', 'register', 'workspaces'].forEach(n => document.getElementById('nb-' + n)?.classList.toggle('active', n === t));
       renderTab();
     }
     function renderTab() {
@@ -2625,6 +2845,7 @@
       else if (S.tab === 'dupcheck') renderDupCheck();
       else if (S.tab === 'inbox') renderInbox();
       else if (S.tab === 'register') renderRegister();
+      else if (S.tab === 'workspaces') renderWorkspaces();
     }
 
     // ══ 雙週看板 ══
@@ -4974,6 +5195,253 @@ ${nextW.map(t => `- ${t.title}（${t.dueDate}）`).join('\n') || '無'}`;
       toast('已切換至收件匣：' + eid, 'var(--blue)');
     }
 
+
+    // ══ Workspace Catalog (DEV-CAP-002A/B) ══
+
+    function _nextWsId() {
+      const nums = Object.keys(S.workspaces).map(k => {
+        const m = k.match(/^WS-(\d+)$/);
+        return m ? parseInt(m[1], 10) : 0;
+      });
+      const next = nums.length ? Math.max(...nums) + 1 : 1;
+      return 'WS-' + String(next).padStart(3, '0');
+    }
+
+    function renderWorkspaces() {
+      if (S.wsView === 'detail') renderWsDetail();
+      else renderWsList();
+    }
+
+    function renderWsList() {
+      const all = Object.values(S.workspaces);
+      const filtered = all.filter(ws => {
+        if (S.wsFilter === 'active') return ws.status === 'active';
+        if (S.wsFilter === 'archived') return ws.status === 'archived';
+        return true;
+      }).sort((a, b) => (a.id || '').localeCompare(b.id || ''));
+
+      const filterBtns = [
+        { key: 'active', label: '使用中' },
+        { key: 'archived', label: '已封存' },
+        { key: 'all', label: '全部' },
+      ].map(f =>
+        `<button class="ws-filter-btn ${S.wsFilter === f.key ? 'active' : ''}" onclick="setWsFilter('${f.key}')">${f.label}</button>`
+      ).join('');
+
+      const cards = filtered.length
+        ? filtered.map(ws => renderWsCard(ws)).join('')
+        : '<div class="ws-empty">目前沒有符合條件的工作區</div>';
+
+      document.getElementById('main').innerHTML = `
+        <div class="ws-header">
+          <h2>📁 工作區目錄</h2>
+          <button class="ws-add-btn" onclick="openWsModal('create',null)">+ 新增工作區</button>
+        </div>
+        <div class="ws-filter-row">${filterBtns}</div>
+        <div class="ws-list">${cards}</div>`;
+    }
+
+    function renderWsCard(ws) {
+      const isArchived = ws.status === 'archived';
+      const statusBadge = isArchived
+        ? '<span class="ws-status-badge ws-status-archived">已封存</span>'
+        : '<span class="ws-status-badge ws-status-active">● 使用中</span>';
+
+      const aliasChips = (ws.alias || '').split(',').map(a => a.trim()).filter(Boolean)
+        .map(a => `<span class="ws-chip alias">${escH(a)}</span>`).join('');
+      const kwChips = (ws.keywords || '').split(',').map(k => k.trim()).filter(Boolean)
+        .map(k => `<span class="ws-chip">#${escH(k)}</span>`).join('');
+      const chipsHtml = (aliasChips || kwChips)
+        ? `<div class="ws-chips">${aliasChips}${kwChips}</div>` : '';
+
+      const taskCount = Object.values(S.tasks).filter(t => t.workspaceId === ws.id).length;
+      const meetCount = Object.values(S.inbox).filter(e => e.workspaceId === ws.id).length;
+
+      const actionBtn = isArchived
+        ? `<button class="ws-btn restore" onclick="restoreWorkspace('${ws.id}')">還原</button>`
+        : `<button class="ws-btn danger" onclick="confirmArchiveWs('${ws.id}')">封存</button>`;
+
+      return `<div class="ws-card">
+        <div class="ws-card-top">
+          <div class="ws-card-name">
+            <span class="ws-card-link" onclick="openWsDetail('${ws.id}')">📁 ${escH(ws.name)}</span>
+            <span class="ws-card-id">${escH(ws.id)}</span>
+          </div>
+          ${statusBadge}
+        </div>
+        ${ws.description ? `<div class="ws-card-desc">${escH(ws.description)}</div>` : ''}
+        ${chipsHtml}
+        <div class="ws-card-counts">任務 ${taskCount}　會議 ${meetCount}</div>
+        <div class="ws-card-meta">建立：${ws.createdAt || '—'}　最後更新：${ws.updatedAt || '—'}</div>
+        <div class="ws-card-actions">
+          <button class="ws-btn" onclick="openWsModal('edit','${ws.id}')">編輯</button>
+          ${actionBtn}
+        </div>
+      </div>`;
+    }
+
+    function openWsDetail(id) {
+      S.wsView = 'detail';
+      S.activeWsId = id;
+      renderWorkspaces();
+    }
+
+    function closeWsDetail() {
+      S.wsView = 'list';
+      S.activeWsId = null;
+      renderWorkspaces();
+    }
+
+    function renderWsDetail() {
+      const ws = S.workspaces[S.activeWsId];
+      if (!ws) { S.wsView = 'list'; S.activeWsId = null; renderWsList(); return; }
+
+      const isArchived = ws.status === 'archived';
+      const statusBadge = isArchived
+        ? '<span class="ws-status-badge ws-status-archived">已封存</span>'
+        : '<span class="ws-status-badge ws-status-active">● 使用中</span>';
+
+      const aliasChips = (ws.alias || '').split(',').map(a => a.trim()).filter(Boolean)
+        .map(a => `<span class="ws-chip alias">${escH(a)}</span>`).join('')
+        || '<span style="color:var(--muted)">—</span>';
+      const kwChips = (ws.keywords || '').split(',').map(k => k.trim()).filter(Boolean)
+        .map(k => `<span class="ws-chip">#${escH(k)}</span>`).join('')
+        || '<span style="color:var(--muted)">—</span>';
+
+      const taskCount = Object.values(S.tasks).filter(t => t.workspaceId === ws.id).length;
+      const meetCount = Object.values(S.inbox).filter(e => e.workspaceId === ws.id).length;
+      const regCount = [
+        ...Object.values(S.risks || {}),
+        ...Object.values(S.decisions || {}),
+        ...Object.values(S.schedule || {}),
+      ].filter(r => r.workspaceId === ws.id).length;
+
+      const actionBtn = isArchived
+        ? `<button class="ws-btn restore" onclick="restoreWorkspace('${ws.id}')">還原</button>`
+        : `<button class="ws-btn danger" onclick="confirmArchiveWs('${ws.id}')">封存</button>`;
+
+      document.getElementById('main').innerHTML = `
+        <div class="ws-detail-back">
+          <button class="ws-back-btn" onclick="closeWsDetail()">← 工作區目錄</button>
+        </div>
+        <div class="ws-detail-box">
+          <div class="ws-detail-header">
+            <div>
+              <div class="ws-detail-name">📁 ${escH(ws.name)}</div>
+              <div class="ws-detail-id">${escH(ws.id)}</div>
+            </div>
+            ${statusBadge}
+          </div>
+
+          <div class="ws-detail-section">
+            <div class="ws-detail-label">基本資訊</div>
+            <div class="ws-field-row"><span class="ws-field-key">別名</span><span class="ws-field-val">${aliasChips}</span></div>
+            <div class="ws-field-row"><span class="ws-field-key">描述</span><span class="ws-field-val">${ws.description ? escH(ws.description) : '<span style="color:var(--muted)">—</span>'}</span></div>
+            <div class="ws-field-row"><span class="ws-field-key">關鍵字</span><span class="ws-field-val">${kwChips}</span></div>
+          </div>
+
+          <div class="ws-detail-section">
+            <div class="ws-detail-label">統計</div>
+            <div class="ws-stats-grid">
+              <div class="ws-stat-cell"><div class="ws-stat-num">${taskCount}</div><div class="ws-stat-lbl">任務</div></div>
+              <div class="ws-stat-cell"><div class="ws-stat-num">${meetCount}</div><div class="ws-stat-lbl">會議</div></div>
+              <div class="ws-stat-cell"><div class="ws-stat-num">${regCount}</div><div class="ws-stat-lbl">Register</div></div>
+              <div class="ws-stat-cell"><div class="ws-stat-num">0</div><div class="ws-stat-lbl">文件</div></div>
+            </div>
+          </div>
+
+          <div class="ws-detail-section">
+            <div class="ws-detail-label">時間</div>
+            <div class="ws-field-row"><span class="ws-field-key">建立日期</span><span class="ws-field-val">${ws.createdAt || '—'}</span></div>
+            <div class="ws-field-row"><span class="ws-field-key">最後更新</span><span class="ws-field-val">${ws.updatedAt || '—'}</span></div>
+          </div>
+
+          <div class="ws-detail-actions">
+            <button class="ws-btn" onclick="openWsModal('edit','${ws.id}')">編輯</button>
+            ${actionBtn}
+          </div>
+        </div>`;
+    }
+
+    function setWsFilter(f) { S.wsFilter = f; renderWorkspaces(); }
+
+    function openWsModal(mode, id) {
+      const ws = id ? S.workspaces[id] : null;
+      const title = mode === 'create' ? '新增工作區' : '編輯工作區';
+      const body = document.getElementById('edit-modal-body');
+      body.innerHTML = `
+        <div class="af"><label>名稱 *</label><input type="text" id="wsm-name" value="${ws ? escH(ws.name) : ''}" placeholder="例：瑞派克設備導入"></div>
+        <div class="af"><label>別名 Alias（逗號分隔）</label><input type="text" id="wsm-alias" value="${ws ? escH(ws.alias || '') : ''}" placeholder="例：Raypak, OMS"></div>
+        <div class="af"><label>描述</label><textarea id="wsm-desc" rows="3" style="width:100%;padding:8px;border:1px solid var(--border-s);border-radius:var(--radius-s);font-family:inherit;font-size:13px;resize:vertical;box-sizing:border-box">${ws ? escH(ws.description || '') : ''}</textarea></div>
+        <div class="af"><label>關鍵字（逗號分隔）</label><input type="text" id="wsm-keywords" value="${ws ? escH(ws.keywords || '') : ''}" placeholder="例：設備, 導入, 瑞派克"></div>
+        <div class="modal-footer">
+          <button class="modal-btn-save" onclick="saveWorkspace('${mode}','${id || ''}')">💾 儲存</button>
+          <button class="modal-btn-cancel" onclick="closeEditModal()">取消</button>
+        </div>`;
+      document.getElementById('edit-modal').querySelector('.modal-title span').textContent = '📁 ' + title;
+      document.getElementById('edit-modal').classList.add('op');
+    }
+
+    async function saveWorkspace(mode, id) {
+      const name = document.getElementById('wsm-name')?.value.trim();
+      if (!name) { alert('請填入工作區名稱'); return; }
+      const alias = document.getElementById('wsm-alias')?.value.trim() || '';
+      const description = document.getElementById('wsm-desc')?.value.trim() || '';
+      const keywords = document.getElementById('wsm-keywords')?.value.trim() || '';
+      const today = todayStr();
+
+      if (mode === 'create') {
+        const newId = _nextWsId();
+        const ws = { id: newId, name, alias, description, status: 'active', keywords, createdAt: today, updatedAt: today };
+        S.workspaces[newId] = ws;
+        await fbSet(P_WORKSPACES + '/' + newId, ws);
+        toast('✓ 已建立工作區：' + name);
+        closeEditModal();
+        renderWorkspaces();
+      } else {
+        const ws = S.workspaces[id]; if (!ws) return;
+        Object.assign(ws, { name, alias, description, keywords, updatedAt: today });
+        await fbPatch(P_WORKSPACES + '/' + id, { name, alias, description, keywords, updatedAt: today });
+        toast('✓ 已更新工作區：' + name);
+        closeEditModal();
+        if (S.wsView === 'detail') openWsDetail(id); else renderWorkspaces();
+      }
+    }
+
+    function confirmArchiveWs(id) {
+      const ws = S.workspaces[id]; if (!ws) return;
+      const body = document.getElementById('edit-modal-body');
+      body.innerHTML = `
+        <div style="padding:8px 0 16px;font-size:14px;color:#374151;line-height:1.7">
+          封存「<strong>${escH(ws.name)}</strong>」？<br>
+          <span style="font-size:12px;color:var(--muted)">封存後從使用中清單移除，可在「已封存」篩選中選擇還原。</span>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn-del" onclick="archiveWorkspace('${id}')">確認封存</button>
+          <button class="modal-btn-cancel" onclick="closeEditModal()">取消</button>
+        </div>`;
+      document.getElementById('edit-modal').querySelector('.modal-title span').textContent = '📁 封存工作區';
+      document.getElementById('edit-modal').classList.add('op');
+    }
+
+    async function archiveWorkspace(id) {
+      const ws = S.workspaces[id]; if (!ws) return;
+      const today = todayStr();
+      Object.assign(ws, { status: 'archived', updatedAt: today });
+      await fbPatch(P_WORKSPACES + '/' + id, { status: 'archived', updatedAt: today });
+      closeEditModal();
+      toast('已封存工作區：' + ws.name, 'var(--muted)');
+      if (S.wsView === 'detail') openWsDetail(id); else renderWorkspaces();
+    }
+
+    async function restoreWorkspace(id) {
+      const ws = S.workspaces[id]; if (!ws) return;
+      const today = todayStr();
+      Object.assign(ws, { status: 'active', updatedAt: today });
+      await fbPatch(P_WORKSPACES + '/' + id, { status: 'active', updatedAt: today });
+      toast('✓ 已還原工作區：' + ws.name);
+      if (S.wsView === 'detail') openWsDetail(id); else renderWorkspaces();
+    }
 
     // ══ 初始化 ══
     initLogin();
